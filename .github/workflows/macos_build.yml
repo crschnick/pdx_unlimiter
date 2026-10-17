@@ -1,6 +1,26 @@
 name: MacOS Build
 
-on: workflow_call
+on:
+  workflow_call:
+    secrets:
+      MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE:
+        required: false
+      MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_PASSWORD:
+        required: false
+      MACOS_DEVELOPER_ID_INSTALLER_CERTIFICATE:
+        required: false
+      MACOS_DEVELOPER_ID_INSTALLER_CERTIFICATE_PASSWORD:
+        required: false
+      MACOS_DEVELOPER_ID_INSTALLER_CERTIFICATE_NAME:
+        required: false
+      MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME:
+        required: false
+      MACOS_NOTARIZATION_APPLE_ID:
+        required: false
+      MACOS_NOTARIZATION_APP_SPECIFIC_PASSWORD:
+        required: false
+      MACOS_NOTARIZATION_TEAM_ID:
+        required: false
 
 jobs:
   build:
@@ -26,10 +46,15 @@ jobs:
     timeout-minutes: 60
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
 
       - name: Set up JDK
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: '25.0.2'
           distribution: 'zulu'
@@ -80,7 +105,7 @@ jobs:
         run: ./gradlew clean dist --info --stacktrace
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: ${{ matrix.os }}-artifacts
           retention-days: 1
@@ -98,7 +123,7 @@ jobs:
           chmod +x "dist/build/dist/portable/launch.sh"
 
       - name: Upload Steam build
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ contains(matrix.os, 'macos-15-intel') == false }}
         with:
           name: macos-arm-steam

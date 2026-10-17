@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.update;
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.base.MarkdownComp;
 import com.crschnick.pdxu.app.comp.base.ModalOverlay;
+import com.crschnick.pdxu.app.core.AppProperties;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 
 import javafx.beans.property.Property;
@@ -13,6 +14,14 @@ public class UpdateAvailableDialog {
     private static final Property<ModalOverlay> last = new SimpleObjectProperty<>();
 
     public static void showIfNeeded(boolean wait) {
+        showIfNeeded(wait, true);
+    }
+
+    public static void showIfNeeded(boolean wait, boolean refresh) {
+        if (AppProperties.get().isAotTrainMode()) {
+            return;
+        }
+
         var l = last.getValue();
         if (l != null && l.isShowing()) {
             return;
@@ -24,9 +33,11 @@ public class UpdateAvailableDialog {
         }
 
         // Check whether we still have the latest version prepared
-        uh.refreshUpdateCheckSilent();
-        if (uh.getLastUpdateCheckResult().getValue() == null) {
-            return;
+        if (refresh) {
+            uh.refreshUpdateCheckSilent();
+            if (uh.getLastUpdateCheckResult().getValue() == null) {
+                return;
+            }
         }
 
         TrackEvent.withInfo("Showing update alert ...")

@@ -33,7 +33,7 @@ public abstract class UpdateHandler {
     protected final BooleanProperty busy = new SimpleBooleanProperty();
 
     protected UpdateHandler(boolean startBackgroundThread) {
-        if (startBackgroundThread) {
+        if (startBackgroundThread && !AppProperties.get().isAotTrainMode()) {
             startBackgroundUpdater();
         }
 
@@ -75,12 +75,27 @@ public abstract class UpdateHandler {
             return false;
         }
 
-        if (!AppProperties.get().getVersion().equals(releaseVersion)) {
-            event("Release has a different version");
+        var current = AppVersion.parse(stripPrefix(AppProperties.get().getVersion()));
+        var release = AppVersion.parse(stripPrefix(releaseVersion));
+        if (current.isEmpty() || release.isEmpty()) {
+            if (!stripPrefix(AppProperties.get().getVersion()).equals(stripPrefix(releaseVersion))) {
+                event("Release has a different unparsable version");
+                return true;
+            }
+
+            return false;
+        }
+
+        if (release.get().greaterThan(current.get())) {
+            event("Release has a newer version");
             return true;
         }
 
         return false;
+    }
+
+    private static String stripPrefix(String version) {
+        return version.startsWith("v") ? version.substring(1) : version;
     }
 
     public final AvailableRelease refreshUpdateCheckSilent() {

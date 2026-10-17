@@ -13,13 +13,15 @@ import java.io.IOException;
 import java.net.StandardProtocolFamily;
 import java.net.UnixDomainSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 public class AppUnixSocketBeacon extends AppBeacon {
 
-    private static final int MAX_BUFFER_SIZE = 1024;
+    private static final int MAX_BUFFER_SIZE = 65536;
 
     private ServerSocketChannel serverSocket;
 
@@ -31,20 +33,22 @@ public class AppUnixSocketBeacon extends AppBeacon {
         try (SocketChannel channel = SocketChannel.open(StandardProtocolFamily.UNIX)) {
             channel.connect(getSocketAddress());
 
-            ByteBuffer buffer = ByteBuffer.allocate(1024);
-            buffer.clear();
-            buffer.put(JacksonMapper.getDefault().writeValueAsString(message).getBytes());
-            buffer.flip();
-
-            channel.write(buffer);
+            ByteBuffer buffer = ByteBuffer.wrap(
+                    JacksonMapper.getDefault().writeValueAsString(message).getBytes(StandardCharsets.UTF_8));
+            while (buffer.hasRemaining()) {
+                channel.write(buffer);
+            }
         } catch (Exception e) {
             ErrorEventFactory.fromThrowable(e).handle();
         }
     }
 
     private static UnixDomainSocketAddress getSocketAddress() {
-        var file =
-                AppSystemInfo.ofCurrent().getTemp().resolve(AppNames.ofCurrent().getKebapName() + ".sock");
+        // Include the user name as the temp directory might be shared between users
+        var file = AppSystemInfo.ofCurrent()
+                .getTemp()
+                .resolve(AppNames.ofCurrent().getKebapName() + "-"
+                        + AppSystemInfo.ofCurrent().getUser() + ".sock");
         return UnixDomainSocketAddress.of(file);
     }
 
@@ -57,18 +61,15 @@ public class AppUnixSocketBeacon extends AppBeacon {
     private void runThread() {
         ThreadHelper.createPlatformThread("beacon", false, () -> {
                     while (true) {
-                        try {
-                            SocketChannel channel = serverSocket.accept();
+                        try (SocketChannel channel = serverSocket.accept()) {
                             ByteBuffer buffer = ByteBuffer.allocate(MAX_BUFFER_SIZE);
-                            int bytesRead = channel.read(buffer);
-                            if (bytesRead < 0) {
-                                break;
+                            while (buffer.hasRemaining() && channel.read(buffer) >= 0) {}
+                            if (buffer.position() == 0) {
+                                continue;
                             }
 
-                            byte[] bytes = new byte[bytesRead];
                             buffer.flip();
-                            buffer.get(bytes);
-                            var message = new String(bytes);
+                            var message = StandardCharsets.UTF_8.decode(buffer).toString();
 
                             var parsed = JacksonMapper.getDefault().readValue(message, AppBeaconMessage.class);
                             if (parsed instanceof AppBeaconMessage.ExitRequest) {
@@ -87,6 +88,8 @@ public class AppUnixSocketBeacon extends AppBeacon {
                             if (parsed != null) {
                                 parsed.handle();
                             }
+                        } catch (ClosedChannelException e) {
+                            break;
                         } catch (Exception e) {
                             ErrorEventFactory.fromThrowable(e).omit().handle();
                         }

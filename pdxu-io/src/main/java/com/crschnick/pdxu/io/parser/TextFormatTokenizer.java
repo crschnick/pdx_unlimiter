@@ -331,7 +331,8 @@ public class TextFormatTokenizer {
         }
 
         // Account for case where control tokens are used as scalars
-        var isControlTokenScalar = (controlToken == CLOSE_GROUP || controlToken== EQUALS) && i > 0 && bytes[i - 1] == EQUALS_CHAR;
+        var isControlTokenScalar =
+                (controlToken == CLOSE_GROUP || controlToken == EQUALS) && i > 0 && bytes[i - 1] == EQUALS_CHAR;
         if (isControlTokenScalar) {
             finishCurrentToken(i + 1);
             moveScalarStartToNext();

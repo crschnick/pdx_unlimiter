@@ -3,11 +3,26 @@ package com.crschnick.pdxu.app.util;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.Optional;
 
 public class LocalExec {
 
-    public static void executeAsync(String... command) {
+    public static void prepareLocalProcessEnvironment(Map<String, String> env) {
+        // https://bugs.openjdk.org/browse/JDK-8360500
+        env.remove("_JPACKAGE_LAUNCHER");
+
+        // Remove debug mode vars
+        env.remove("JAVA_EXEC");
+        env.remove("CDS_JVM_OPTS");
+
+        // Remove any custom java vars
+        env.remove("_JAVA_OPTIONS");
+        env.remove("JAVA_TOOL_OPTIONS");
+        env.remove("JDK_JAVA_OPTIONS");
+    }
+
+    public static Process executeAsync(String... command) {
         try {
             TrackEvent.withTrace("Running local command")
                     .tag("command", String.join(" ", command))
@@ -17,15 +32,15 @@ public class LocalExec {
                     .redirectOutput(ProcessBuilder.Redirect.DISCARD)
                     .redirectError(ProcessBuilder.Redirect.DISCARD);
             var env = pb.environment();
-            // https://bugs.openjdk.org/browse/JDK-8360500
-            env.remove("_JPACKAGE_LAUNCHER");
+            prepareLocalProcessEnvironment(env);
 
-            pb.start();
+            return pb.start();
         } catch (Exception ex) {
             TrackEvent.withTrace("Local command finished")
                     .tag("command", String.join(" ", command))
                     .tag("error", ex.toString())
                     .handle();
+            return null;
         }
     }
 
@@ -37,8 +52,7 @@ public class LocalExec {
 
             var pb = new ProcessBuilder(command).redirectError(ProcessBuilder.Redirect.DISCARD);
             var env = pb.environment();
-            // https://bugs.openjdk.org/browse/JDK-8360500
-            env.remove("_JPACKAGE_LAUNCHER");
+            prepareLocalProcessEnvironment(env);
 
             var process = pb.start();
             var out = process.getInputStream().readAllBytes();

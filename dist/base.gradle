@@ -2,6 +2,28 @@ import java.util.stream.Collectors
 
 def distDir = "${project.layout.buildDirectory.get()}/dist"
 
+// Signing can fail intermittently, e.g. due to the timestamp server, so retry
+def signWindowsFile = { path ->
+    for (int i = 0; i < 15; i++) {
+        def r = execOps.exec {
+            commandLine "$projectDir\\tools\\sign.bat", path
+            ignoreExitValue = true
+        }.getExitValue()
+        if (r == 0) {
+            break
+        }
+
+        if (i == 14) {
+            if (ci) {
+                throw new IllegalStateException("Failed to codesign " + path)
+            }
+            break
+        }
+
+        sleep(5000)
+    }
+}
+
 tasks.register('licenses', DefaultTask) {
     doLast {
         copy {
@@ -42,10 +64,7 @@ if (os.isWindows()) {
 
             var signEnv = System.getenv("AZURE_KEY_VAULT_URI")
             if (signEnv != null && !signEnv.isEmpty()) {
-                execOps.exec {
-                    commandLine "$projectDir\\tools\\sign.bat", "$distDir/base/rakaly/rakaly.exe"
-                    ignoreExitValue = !ci
-                }
+                signWindowsFile("$distDir/base/rakaly/rakaly.exe")
             }
 
             file("$distDir/base/app/.jpackage.xml").delete()
@@ -115,10 +134,7 @@ if (os.isWindows()) {
 
             if (signEnv != null && !signEnv.isEmpty()) {
                 file("$distDir/base/${jpackageExecutableName}.exe").writable = true
-                execOps.exec {
-                    commandLine "$projectDir\\tools\\sign.bat", "$distDir/base/${jpackageExecutableName}.exe"
-                    ignoreExitValue = !ci
-                }
+                signWindowsFile("$distDir/base/${jpackageExecutableName}.exe")
                 file("$distDir/base/${jpackageExecutableName}.exe").writable = false
             }
         }
@@ -245,7 +261,7 @@ if (os.isWindows()) {
 }
 
 baseDist.dependsOn(licenses)
-baseDist.dependsOn(jpackage)
+baseDist.dependsOn(tasks.named('jpackage'))
 dist.dependsOn(baseDist)
 
 if (enableAot) {

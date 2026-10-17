@@ -4,18 +4,19 @@ import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.util.JacksonMapper;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.fasterxml.jackson.databind.util.TokenBuffer;
 import lombok.SneakyThrows;
 import org.apache.commons.io.FileUtils;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 
 import java.io.IOException;
+import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,14 +53,31 @@ public class AppPrefsStorageHandler {
                             content = (ObjectNode) read;
                         }
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     ErrorEventFactory.fromThrowable(e).handle();
+                }
+
+                // Keep a copy of an unreadable file so that the next save does not silently lose it
+                if (content == null) {
+                    backupCorruptedFile();
                 }
             }
 
             if (content == null) {
                 content = JsonNodeFactory.instance.objectNode();
             }
+        }
+    }
+
+    private void backupCorruptedFile() {
+        try {
+            var backup = file.resolveSibling(file.getFileName() + ".bak");
+            Files.copy(file, backup, StandardCopyOption.REPLACE_EXISTING);
+            TrackEvent.withWarn("Preferences file could not be read, created backup")
+                    .tag("backup", backup)
+                    .handle();
+        } catch (IOException e) {
+            ErrorEventFactory.fromThrowable(e).omit().expected().handle();
         }
     }
 
@@ -70,13 +88,20 @@ public class AppPrefsStorageHandler {
     @SneakyThrows
     void save() {
         FileUtils.forceMkdir(file.getParent().toFile());
-        JacksonMapper.getDefault().writeValue(file.toFile(), content);
+        // Write to a temporary file first so that a crash during the write can't corrupt the existing file
+        var temp = file.resolveSibling(file.getFileName() + ".tmp");
+        JacksonMapper.getDefault().writeValue(temp.toFile(), content);
+        try {
+            Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
+        } catch (AtomicMoveNotSupportedException e) {
+            Files.move(temp, file, StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 
     @SneakyThrows
     public void updateObject(String key, Object object, JavaType type) {
         if (object instanceof PrefsChoiceValue prefsChoiceValue) {
-            setContent(key, new TextNode(prefsChoiceValue.getId()));
+            setContent(key, new StringNode(prefsChoiceValue.getId()));
             return;
         }
 
@@ -86,10 +111,7 @@ public class AppPrefsStorageHandler {
         }
 
         var mapper = JacksonMapper.getDefault();
-        TokenBuffer buf = new TokenBuffer(mapper, false);
-        mapper.writerFor(type).writeValue(buf, object);
-        var tree = mapper.readTree(buf.asParser());
-        setContent(key, (JsonNode) tree);
+        setContent(key, mapper.writerFor(type).valueToTree(object));
     }
 
     @SuppressWarnings("unchecked")
@@ -108,7 +130,7 @@ public class AppPrefsStorageHandler {
             List<T> all = (List<T>) getAll(type.getRawClass());
             if (all != null) {
                 Class<PrefsChoiceValue> cast = (Class<PrefsChoiceValue>) type.getRawClass();
-                var in = tree.asText();
+                var in = tree.asString();
                 var found = all.stream()
                         .filter(t -> ((PrefsChoiceValue) t).getId().equalsIgnoreCase(in))
                         .findAny();

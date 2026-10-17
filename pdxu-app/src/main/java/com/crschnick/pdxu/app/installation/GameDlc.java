@@ -73,8 +73,8 @@ public class GameDlc {
         var json = JacksonMapper.getDefault().readTree(filePath.toFile());
         GameDlc dlc = new GameDlc();
         dlc.filePath = filePath;
-        dlc.name = json.required("name").asText();
-        dlc.affectsCompatibility = json.required("affects_save_compatibility").asBoolean();
+        dlc.name = json.required("name").asString("");
+        dlc.affectsCompatibility = json.required("affects_save_compatibility").asBoolean(false);
         return Optional.of(dlc);
     }
 

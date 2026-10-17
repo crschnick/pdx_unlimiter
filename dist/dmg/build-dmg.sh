@@ -9,6 +9,7 @@ mkdir -p "$1/build/dist/dmg/"
 rm -f "$DMG_FILE"
 
 # This is unreliable, so retry
+SUCCESS=false
 for i in {1..5} ; do
   # The --skip-jenkins option should be required for CI systems, but on some runners it works without it
   # Without the option, the dmg looks better
@@ -26,10 +27,12 @@ for i in {1..5} ; do
     "$DMG_FILE" \
     "$APP_DIR"
     if [ $? == 0 ]; then
+        SUCCESS=true
         break;
     fi
 done
 
-if [ $? != 0 ]; then
+if [ "$SUCCESS" != true ]; then
+    echo "Failed to create dmg"
     exit 1
 fi

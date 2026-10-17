@@ -7,7 +7,6 @@ import com.crschnick.pdxu.app.core.window.AppDialog;
 import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.platform.ColorHelper;
-import com.crschnick.pdxu.app.platform.PlatformThread;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
 
 import javafx.animation.*;
@@ -115,21 +114,19 @@ public class AppMainWindowContentComp extends SimpleComp {
             loaded.subscribe(struc -> {
                 if (struc != null) {
                     TrackEvent.info("Window content node set");
-                    PlatformThread.runNestedLoopIteration();
                     struc.prepareAddition();
                     pane.getStyleClass().remove("background");
                     loadingAnimation.stop();
                     pane.getChildren().remove(loadingVbox);
                     pane.getChildren().add(struc.get());
                     sidebarPresent.set(true);
-                    PlatformThread.runNestedLoopIteration();
                     struc.show();
                     TrackEvent.info("Window content node shown");
                 }
             });
 
             overlay.addListener((ListChangeListener<? super ModalOverlay>) c -> {
-                if (c.next() && c.wasAdded()) {
+                if (c.next() && c.wasAdded() && c.getAddedSubList().stream().anyMatch(o -> o != null)) {
                     AppMainWindow.get().focus(false);
 
                     // Close blocking modal windows
@@ -145,7 +142,7 @@ public class AppMainWindowContentComp extends SimpleComp {
             return pane;
         });
 
-        var modal = new ModalOverlayStackComp(bg, overlay);
+        var modal = new ModalOverlayStackComp(bg);
         var r = modal.createRegion();
         var p = r.lookupAll(".modal-overlay-stack-element");
         sidebarPresent.subscribe(v -> {

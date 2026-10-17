@@ -36,6 +36,7 @@ public class AppProperties {
     boolean newBuildSession;
     boolean aotTrainMode;
     boolean debugPlatformThreadAccess;
+    boolean buildAllPages;
     AppArguments arguments;
     AppOperationModeSelection explicitMode;
     boolean logToSysOut;
@@ -47,9 +48,9 @@ public class AppProperties {
         var appDir = Path.of(System.getProperty("user.dir")).resolve("pdxu-app");
         Path propsFile = appDir.resolve("dev.properties");
         if (Files.exists(propsFile)) {
-            try {
+            try (var in = Files.newInputStream(propsFile)) {
                 Properties props = new Properties();
-                props.load(Files.newInputStream(propsFile));
+                props.load(in);
                 props.forEach((key, value) -> {
                     // Don't overwrite existing properties
                     if (System.getProperty(key.toString()) == null) {
@@ -78,12 +79,19 @@ public class AppProperties {
                 .orElse(UUID.randomUUID());
         sentryUrl = System.getProperty(AppNames.propertyName("sentryUrl"));
         var osArch = System.getProperty("os.arch");
-        arch = osArch.equals("amd64") || osArch.equals("x86_64") ? "x86_64" : "arm64";
+        arch = switch (osArch) {
+            case "amd64", "x86_64" -> "x86_64";
+            case "aarch64", "arm64" -> "arm64";
+            default -> osArch;
+        };
         useVirtualThreads = Optional.ofNullable(System.getProperty(AppNames.propertyName("useVirtualThreads")))
                 .map(Boolean::parseBoolean)
                 .orElse(true);
         debugPlatformThreadAccess = Optional.ofNullable(
                         System.getProperty(AppNames.propertyName("debugPlatformThreadAccess")))
+                .map(Boolean::parseBoolean)
+                .orElse(false);
+        buildAllPages = Optional.ofNullable(System.getProperty(AppNames.propertyName("buildAllPages")))
                 .map(Boolean::parseBoolean)
                 .orElse(false);
         showcase = Optional.ofNullable(System.getProperty(AppNames.propertyName("showcase")))

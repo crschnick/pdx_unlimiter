@@ -69,6 +69,8 @@ public abstract class AppSystemInfo {
 
     public abstract Path getTemp();
 
+    public abstract String getUser();
+
     public static final class Windows extends AppSystemInfo {
 
         private Path userHome;
@@ -120,7 +122,7 @@ public abstract class AppSystemInfo {
                 return env;
             }
 
-            var def = Path.of("C:\\ProgramFiles");
+            var def = Path.of("C:\\Program Files");
             return def;
         }
 
@@ -162,27 +164,38 @@ public abstract class AppSystemInfo {
             return def;
         }
 
+        @Override
+        public String getUser() {
+            var username = System.getenv("USERNAME");
+            if (username == null) {
+                username = System.getProperty("user.name");
+            }
+            if (username == null) {
+                username = "User";
+            }
+            return username;
+        }
+
         public Path getUserHome() {
-            var env = System.getenv("HOME");
-            if (env != null) {
-                try {
-                    return Path.of(env);
-                } catch (InvalidPathException ignored) {}
+            if (userHome != null) {
+                return userHome;
             }
 
-            // This can actually fail and return ?
-            // See https://stackoverflow.com/questions/70010648/system-getpropertyuser-name-returns
-            // The env variable is actually better
-            var dir = System.getProperty("user.home");
+            var dir = AppSystemInfo.parsePath(System.getenv("USERPROFILE"));
+            if (dir == null) {
+                dir = AppSystemInfo.parsePath(System.getProperty("user.home"));
+            }
+            if (dir == null) {
+                dir = Path.of("C:\\Users\\" + getUser());
+            }
+
             try {
-                Path.of(dir);
-            } catch (InvalidPathException ignored) {
-                dir = null;
+                // Replace 8.3 filename
+                userHome = dir.toRealPath();
+            } catch (Exception ignored) {
+                userHome = dir;
             }
-            if (dir == null || dir.equals("?")) {
-                dir = "/";
-            }
-            return Path.of(dir);
+            return userHome;
         }
 
         @Override
@@ -246,12 +259,30 @@ public abstract class AppSystemInfo {
         }
 
         @Override
+        public String getUser() {
+            var env = System.getenv("USER");
+            if (env != null) {
+                return env;
+            }
+
+            // This can actually fail and return ?
+            // See https://stackoverflow.com/questions/70010648/system-getpropertyuser-name-returns
+            // The env variable is actually better
+            var username = System.getProperty("user.name");
+            if (username == null || username.equals("?")) {
+                username = "user";
+            }
+            return username;
+        }
+
+        @Override
         public Path getUserHome() {
             var env = System.getenv("HOME");
             if (env != null) {
                 try {
                     return Path.of(env);
-                } catch (InvalidPathException ignored) {}
+                } catch (InvalidPathException ignored) {
+                }
             }
 
             // This can actually fail and return ?
@@ -275,12 +306,12 @@ public abstract class AppSystemInfo {
                 return downloads;
             }
 
-            var out = LocalExec.readStdoutIfPossible("xdg-user-dir DOWNLOAD");
+            var out = LocalExec.readStdoutIfPossible("xdg-user-dir", "DOWNLOAD");
             if (out.isPresent() && !out.get().isBlank()) {
                 return (downloads = Path.of(out.get()));
             }
 
-            var fallback = getUserHome().resolve("Desktop");
+            var fallback = getUserHome().resolve("Downloads");
             return (downloads = fallback);
         }
 
@@ -290,7 +321,7 @@ public abstract class AppSystemInfo {
                 return desktop;
             }
 
-            var out = LocalExec.readStdoutIfPossible("xdg-user-dir DESKTOP");
+            var out = LocalExec.readStdoutIfPossible("xdg-user-dir", "DESKTOP");
             if (out.isPresent() && !out.get().isBlank()) {
                 return (desktop = Path.of(out.get()));
             }
@@ -306,6 +337,15 @@ public abstract class AppSystemInfo {
     }
 
     public static class MacOs extends AppSystemInfo {
+
+        @Override
+        public String getUser() {
+            var username = System.getProperty("user.name");
+            if (username == null) {
+                username = "user";
+            }
+            return username;
+        }
 
         @Override
         public Path getUserHome() {

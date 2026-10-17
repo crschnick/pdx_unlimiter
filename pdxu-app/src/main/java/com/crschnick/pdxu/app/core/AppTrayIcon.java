@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.core;
 
 import com.crschnick.pdxu.app.core.mode.AppOperationMode;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.util.LocalExec;
 import com.crschnick.pdxu.app.util.OsType;
 
 import java.awt.*;
@@ -19,12 +20,11 @@ public class AppTrayIcon {
 
         tray = SystemTray.getSystemTray();
 
-        var image =
-                switch (OsType.ofLocal()) {
-                    case OsType.Windows ignored -> "img/tray/tray_windows.png";
-                    case OsType.Linux ignored -> "img/tray/tray_linux.png";
-                    case OsType.MacOs ignored -> "img/tray/tray_macos.png";
-                };
+        var image = switch (OsType.ofLocal()) {
+            case OsType.Windows ignored -> "img/tray/tray_windows.png";
+            case OsType.Linux ignored -> "img/tray/tray_linux.png";
+            case OsType.MacOs ignored -> "img/tray/tray_macos.png";
+        };
         var url = AppResources.getResourceURL(AppResources.MAIN_MODULE, image).orElseThrow();
 
         PopupMenu popupMenu = new PopupMenu();
@@ -52,6 +52,10 @@ public class AppTrayIcon {
         }
 
         trayIcon.addActionListener(e -> {
+            if (AppOperationMode.isInShutdown()) {
+                return;
+            }
+
             if (OsType.ofLocal() != OsType.MACOS) {
                 tray.remove(trayIcon);
                 AppOperationMode.switchToAsync(AppOperationMode.GUI);
@@ -102,13 +106,19 @@ public class AppTrayIcon {
         }
     }
 
+    private static String escapeAppleScriptString(String s) {
+        if (s == null) {
+            return "";
+        }
+
+        return s.replace("\\", "\\\\").replace("\"", "\\\"");
+    }
+
     private void showMacAlert(String subTitle, String message, String title) {
         String execute = String.format(
                 "display notification \"%s\"" + " with title \"%s\"" + " subtitle \"%s\"",
-                message != null ? message : "", title != null ? title : "", subTitle != null ? subTitle : "");
-        try {
-            Runtime.getRuntime().exec(new String[] {"osascript", "-e", execute});
-        } catch (IOException e) {
+                escapeAppleScriptString(message), escapeAppleScriptString(title), escapeAppleScriptString(subTitle));
+        if (LocalExec.executeAsync("osascript", "-e", execute) == null) {
             throw new UnsupportedOperationException("Cannot run osascript with given parameters.");
         }
     }

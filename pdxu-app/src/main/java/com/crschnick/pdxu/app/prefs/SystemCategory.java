@@ -35,7 +35,10 @@ public class SystemCategory extends AppPrefsCategory {
                                         PrefsChoiceValue.getSupported(CloseBehaviour.class),
                                         false)
                                 .maxWidth(300.0))
-                        .name(OsType.ofLocal() == OsType.MACOS ? "enableKeyboardShortcutsUnsupported" : "enableKeyboardShortcuts")
+                        .name(
+                                OsType.ofLocal() == OsType.MACOS
+                                        ? "enableKeyboardShortcutsUnsupported"
+                                        : "enableKeyboardShortcuts")
                         .description("enableKeyboardShortcutsDescription")
                         .addToggle(prefs.enableKeyboardShortcuts));
         return builder.buildComp();

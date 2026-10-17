@@ -61,12 +61,11 @@ public class AppWindowStyle {
 
         // This allows for assigning logos even if AppImages has not been initialized yet
         AppResources.with(AppResources.MAIN_MODULE, "img/icon", path -> {
-            var size =
-                    switch (OsType.ofLocal()) {
-                        case OsType.Linux ignored -> 128;
-                        case OsType.MacOs ignored -> 128;
-                        case OsType.Windows ignored -> 32;
-                    };
+            var size = switch (OsType.ofLocal()) {
+                case OsType.Linux ignored -> 128;
+                case OsType.MacOs ignored -> 128;
+                case OsType.Windows ignored -> 32;
+            };
             stage.getIcons().add(AppImages.loadImage(path.resolve("logo_" + size + "x" + size + ".png")));
         });
     }

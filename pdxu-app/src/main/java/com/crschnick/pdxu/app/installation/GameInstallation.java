@@ -115,17 +115,15 @@ public final class GameInstallation {
         Game g = dist.getGame();
         TrackEvent.debug("Initializing " + g.getTranslatedAbbreviation() + " installation ...");
 
-        var dirs =
-                switch (OsType.ofLocal()) {
-                    case OsType.Linux linux -> List.of("~/.steam/steam/steamapps/common/" + g.getInstallationName());
-                    case OsType.MacOs macOs ->
-                        List.of("~/Library/Application Support/Steam/steamapps/common/" + g.getInstallationName()
-                                + ".app");
-                    case OsType.Windows windows ->
-                        List.of(
-                                "C:\\Program Files (x86)\\Steam\\steamapps\\common\\" + g.getInstallationName(),
-                                "C:\\Program Files (x86)\\Paradox Interactive\\" + g.getInstallationName());
-                };
+        var dirs = switch (OsType.ofLocal()) {
+            case OsType.Linux linux -> List.of("~/.steam/steam/steamapps/common/" + g.getInstallationName());
+            case OsType.MacOs macOs ->
+                List.of("~/Library/Application Support/Steam/steamapps/common/" + g.getInstallationName() + ".app");
+            case OsType.Windows windows ->
+                List.of(
+                        "C:\\Program Files (x86)\\Steam\\steamapps\\common\\" + g.getInstallationName(),
+                        "C:\\Program Files (x86)\\Paradox Interactive\\" + g.getInstallationName());
+        };
         var dirsString = dirs.stream().map(s -> "- " + s).collect(Collectors.joining("\n"));
 
         if (getInstallDir()

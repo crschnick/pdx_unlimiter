@@ -37,8 +37,8 @@ public class GuiListViewComp<T> extends SimpleComp {
         // Nodes are created lazily once an item is first displayed.
         // Only accessed from the platform thread
         Map<T, Region> nodes = new HashMap<>();
-        Function<T, Region> getNode = item -> nodes.computeIfAbsent(
-                item, li -> nodeFactory.apply(li).createRegion());
+        Function<T, Region> getNode =
+                item -> nodes.computeIfAbsent(item, li -> nodeFactory.apply(li).createRegion());
 
         listView.setCellFactory(lv -> new ListCell<>() {
             @Override
@@ -53,7 +53,9 @@ public class GuiListViewComp<T> extends SimpleComp {
         });
 
         Runnable updateFixedSize = () -> {
-            if (!fixSize || listView.getItems().isEmpty() || listView.fixedCellSizeProperty().isBound()) {
+            if (!fixSize
+                    || listView.getItems().isEmpty()
+                    || listView.fixedCellSizeProperty().isBound()) {
                 return;
             }
 

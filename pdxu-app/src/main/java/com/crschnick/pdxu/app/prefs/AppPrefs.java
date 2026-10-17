@@ -23,14 +23,13 @@ import javafx.beans.value.ObservableBooleanValue;
 import javafx.beans.value.ObservableDoubleValue;
 import javafx.beans.value.ObservableValue;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Value;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.type.TypeFactory;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
@@ -473,7 +472,7 @@ public final class AppPrefs {
                     .filter(gameDist -> {
                         try {
                             return Files.exists(gameDist.determineUserDir());
-                        } catch (IOException e) {
+                        } catch (Exception e) {
                             ErrorEventFactory.fromThrowable(e).omit().handle();
                             return false;
                         }
@@ -575,7 +574,7 @@ public final class AppPrefs {
         public static class MappingBuilder {
 
             MappingBuilder valueClass(Class<?> clazz) {
-                this.valueType(TypeFactory.defaultInstance().constructType(clazz));
+                this.valueType(TypeFactory.createDefaultInstance().constructType(clazz));
                 return this;
             }
         }

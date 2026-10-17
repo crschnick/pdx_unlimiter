@@ -17,6 +17,7 @@ import java.util.List;
 
 public class AppWindowsShutdown {
 
+    private static final int WH_CALLWNDPROC = 0x4;
     public static final int WM_ENDSESSION = 0x16;
     public static final int WM_QUERYENDSESSION = 0x11;
     public static final long ENDSESSION_CRITICAL = 0x40000000L;
@@ -31,7 +32,21 @@ public class AppWindowsShutdown {
             }
 
             PROC.hwnd = hwnd;
-            PROC.hhook = User32.INSTANCE.SetWindowsHookEx(4, PROC, null, windowThreadID);
+            PROC.hhook = User32.INSTANCE.SetWindowsHookEx(WH_CALLWNDPROC, PROC, null, windowThreadID);
+        } catch (Throwable t) {
+            ErrorEventFactory.fromThrowable(t).omit().handle();
+        }
+    }
+
+    public static void unregisterHook() {
+        try {
+            if (PROC.hhook == null) {
+                return;
+            }
+
+            User32.INSTANCE.UnhookWindowsHookEx(PROC.hhook);
+            PROC.hhook = null;
+            PROC.hwnd = null;
         } catch (Throwable t) {
             ErrorEventFactory.fromThrowable(t).omit().handle();
         }
@@ -87,7 +102,7 @@ public class AppWindowsShutdown {
                             .handle();
 
                     // Instant exit for critical shutdowns
-                    if (type == ENDSESSION_CRITICAL) {
+                    if ((type & ENDSESSION_CRITICAL) != 0) {
                         AppOperationMode.halt(0);
                     }
 

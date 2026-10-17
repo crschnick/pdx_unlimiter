@@ -26,13 +26,16 @@ public class SyncErrorHandler implements ErrorHandler {
             busy.set(true);
         }
 
-        errorHandler.handle(event);
-        synchronized (eventQueue) {
-            eventQueue.forEach(errorEvent -> {
-                System.out.println("Event happened during error handling: " + errorEvent.toString());
-            });
-            eventQueue.clear();
+        try {
+            errorHandler.handle(event);
+        } finally {
+            synchronized (eventQueue) {
+                eventQueue.forEach(errorEvent -> {
+                    System.out.println("Event happened during error handling: " + errorEvent.toString());
+                });
+                eventQueue.clear();
+            }
+            busy.set(false);
         }
-        busy.set(false);
     }
 }

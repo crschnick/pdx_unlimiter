@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.editor;
 
 import com.crschnick.pdxu.app.core.AppSystemInfo;
+
 import org.apache.commons.lang3.SystemUtils;
 
 import java.nio.file.Files;
@@ -10,7 +11,8 @@ public class EditorProgram {
 
     public static String getDefaultEditor() {
         if (SystemUtils.IS_OS_WINDOWS) {
-            var vsCodeUser = AppSystemInfo.ofWindows().getLocalAppData().resolve("Programs", "Microsoft VS Code", "Code.exe");
+            var vsCodeUser =
+                    AppSystemInfo.ofWindows().getLocalAppData().resolve("Programs", "Microsoft VS Code", "Code.exe");
             if (Files.exists(vsCodeUser)) {
                 return vsCodeUser.toString();
             }

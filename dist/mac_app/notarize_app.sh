@@ -5,10 +5,10 @@ set -e
 APP_DIR="$1/build/dist/$3.app"
 ARCHIVE="$TMPDIR/notarization.zip"
 
-find "$APP_DIR/Contents/runtime/Contents/Home/bin/" -exec codesign -vvv --entitlements "$1/mac_app/Entitlements.plist" --options=runtime --force --strict --sign "$MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME" {} \;
-find "$APP_DIR/Contents/runtime/Contents/Home/lib/" -exec codesign -vvv --entitlements "$1/mac_app/Entitlements.plist" --options=runtime --force --strict --sign "$MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME" {} \;
-find "$APP_DIR/Contents/runtime/Contents/MacOS" -exec codesign -vvv --entitlements "$1/mac_app/Entitlements.plist" --options=runtime --force --strict --sign "$MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME" {} \;
-find "$APP_DIR/Contents/MacOS/" -exec codesign -vvv --entitlements "$1/mac_app/Entitlements.plist" --options=runtime --deep --force --strict --sign "$MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME" {} \;
+find "$APP_DIR/Contents/runtime/Contents/Home/bin/" -type f -exec codesign -vvv --entitlements "$1/mac_app/Entitlements.plist" --options=runtime --force --strict --sign "$MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME" {} +
+find "$APP_DIR/Contents/runtime/Contents/Home/lib/" -type f -exec codesign -vvv --entitlements "$1/mac_app/Entitlements.plist" --options=runtime --force --strict --sign "$MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME" {} +
+find "$APP_DIR/Contents/runtime/Contents/MacOS" -type f -exec codesign -vvv --entitlements "$1/mac_app/Entitlements.plist" --options=runtime --force --strict --sign "$MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME" {} +
+find "$APP_DIR/Contents/MacOS/" -type f -exec codesign -vvv --entitlements "$1/mac_app/Entitlements.plist" --options=runtime --deep --force --strict --sign "$MACOS_DEVELOPER_ID_APPLICATION_CERTIFICATE_NAME" {} +
 
 echo "Create keychain profile"
 xcrun notarytool store-credentials "notarytool-profile" --apple-id "$MACOS_NOTARIZATION_APPLE_ID" --team-id "$MACOS_NOTARIZATION_TEAM_ID" --password "$MACOS_NOTARIZATION_APP_SPECIFIC_PASSWORD"
@@ -28,16 +28,31 @@ ditto -c -k --sequesterRsrc --keepParent "$APP_DIR" "$ARCHIVE"
 set +e
 
 # This is unreliable, so retry
+SUCCESS=false
 for i in {1..5} ; do
     echo "Notarize app (try $i)"
-    ID=$(xcrun notarytool submit "$ARCHIVE" --keychain-profile "notarytool-profile" --wait | grep -o -i -E '[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}' | head -1)
+    OUTPUT=$(xcrun notarytool submit "$ARCHIVE" --keychain-profile "notarytool-profile" --wait)
+    echo "$OUTPUT"
+    ID=$(echo "$OUTPUT" | grep -o -i -E '[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}' | head -1)
     echo "Submission ID is $ID"
-    sleep 15
-    xcrun notarytool log "$ID" --keychain-profile "notarytool-profile"
-    if [ $? == 0 ]; then
+    if [ -n "$ID" ]; then
+        sleep 15
+        xcrun notarytool log "$ID" --keychain-profile "notarytool-profile"
+    fi
+    if echo "$OUTPUT" | grep -q -E "status: Accepted"; then
+        SUCCESS=true
+        break;
+    fi
+    # A rejected submission will not be accepted on a retry
+    if echo "$OUTPUT" | grep -q -E "status: (Invalid|Rejected)"; then
         break;
     fi
 done
+
+if [ "$SUCCESS" != true ]; then
+    echo "Notarization failed"
+    exit 1
+fi
 
 # Finally, we need to "attach the staple" to our executable, which will allow our app to be
 # validated by macOS even when an internet connection is not available.

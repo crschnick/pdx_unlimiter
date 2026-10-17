@@ -13,7 +13,6 @@ import com.crschnick.pdxu.app.util.RakalyHelper;
 import com.crschnick.pdxu.io.savegame.SavegameParseResult;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 
-
 import org.apache.commons.io.FileUtils;
 
 import java.nio.file.Files;
@@ -86,9 +85,7 @@ public class SavegameActions {
         SavegameParseResult r = null;
         try {
             var file = savegames.getFirst().path;
-            var bytes = type.isBinary(file)
-                    ? RakalyHelper.toEquivalentPlaintext(file)
-                    : Files.readAllBytes(file);
+            var bytes = type.isBinary(file) ? RakalyHelper.toEquivalentPlaintext(file) : Files.readAllBytes(file);
             var struc = type.determineStructure(bytes);
             r = struc.parse(bytes);
         } catch (Exception e) {

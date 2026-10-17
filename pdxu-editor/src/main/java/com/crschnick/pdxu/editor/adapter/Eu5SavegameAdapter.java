@@ -10,14 +10,11 @@ import com.crschnick.pdxu.editor.gui.GuiCoaViewerState;
 import com.crschnick.pdxu.editor.gui.GuiEditorNodeTagFactory;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
-import com.crschnick.pdxu.io.node.NodeEnvironment;
-import com.crschnick.pdxu.io.node.NodeEvaluator;
 import com.crschnick.pdxu.io.node.NodePointer;
-
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
+
 import javafx.scene.control.Button;
-import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.Region;
 
 import org.kordamp.ikonli.javafx.FontIcon;
@@ -63,9 +60,12 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
                 return false;
             }
 
-            return node.getKeyName().map(s -> s.equals("flag")).orElse(false) &&
-                    node.getParent() != null &&
-                    node.getParent().getKeyName().map(s -> s.equals("metadata")).orElse(false);
+            return node.getKeyName().map(s -> s.equals("flag")).orElse(false)
+                    && node.getParent() != null
+                    && node.getParent()
+                            .getKeyName()
+                            .map(s -> s.equals("metadata"))
+                            .orElse(false);
         }
 
         @Override
@@ -80,7 +80,8 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
                     protected CoatOfArms createCoatOfArms() {
                         try {
                             var s = node.getBackingNode().getString();
-                            var parsed = TextFormatParser.eu5().parse(node.getKeyName().orElse("?"), s.getBytes(StandardCharsets.UTF_8), 0);
+                            var parsed = TextFormatParser.eu5()
+                                    .parse(node.getKeyName().orElse("?"), s.getBytes(StandardCharsets.UTF_8), 0);
                             var coaNode = parsed.getNodeArray().getFirst().getArrayNode();
                             return Eu5TagRenderer.getCoatOfArms(coaNode, ArrayNode.array(List.of()));
                         } catch (Exception ex) {
@@ -99,12 +100,14 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
         private final String nodeName;
 
         public ImagePreview(Path base, String nodeName, String icon) {
-            super(icon, node -> GameInstallation.ALL
-                    .get(Game.EU5)
-                    .getInstallDir()
-                    .resolve("game")
-                    .resolve(base)
-                    .resolve(node.getBackingNode().getString()));
+            super(
+                    icon,
+                    node -> GameInstallation.ALL
+                            .get(Game.EU5)
+                            .getInstallDir()
+                            .resolve("game")
+                            .resolve(base)
+                            .resolve(node.getBackingNode().getString()));
             this.nodeName = nodeName;
         }
 

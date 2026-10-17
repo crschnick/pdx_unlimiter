@@ -551,8 +551,7 @@ public class AppTheme {
         }
 
         protected String getPlatformPreferencesStylesheet() {
-            var s =
-                    """
+            var s = """
                     * {
                         -color-context-menu: %s;
                         -color-accent-fg: %s;
@@ -560,19 +559,13 @@ public class AppTheme {
                         -color-accent-muted: %s;
                         -color-accent-subtle: %s;
                     }
-                    """
-                            .formatted(
-                                    ColorHelper.toWeb(contextMenuColor.get()),
-                                    ColorHelper.toWeb(emphasisColor.get()),
-                                    ColorHelper.toWeb(emphasisColor.get().darker()),
-                                    ColorHelper.toWeb(emphasisColor.get().desaturate()),
-                                    ColorHelper.toWeb(ColorHelper.withOpacity(
-                                            emphasisColor
-                                                    .get()
-                                                    .darker()
-                                                    .desaturate()
-                                                    .desaturate(),
-                                            0.2)));
+                    """.formatted(
+                            ColorHelper.toWeb(contextMenuColor.get()),
+                            ColorHelper.toWeb(emphasisColor.get()),
+                            ColorHelper.toWeb(emphasisColor.get().darker()),
+                            ColorHelper.toWeb(emphasisColor.get().desaturate()),
+                            ColorHelper.toWeb(ColorHelper.withOpacity(
+                                    emphasisColor.get().darker().desaturate().desaturate(), 0.2)));
             return s;
         }
 

@@ -2,7 +2,6 @@ package com.crschnick.pdxu.app.core;
 
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
-import com.crschnick.pdxu.app.platform.BindingsHelper;
 import com.crschnick.pdxu.app.platform.GlobalObjectProperty;
 import com.crschnick.pdxu.app.platform.PlatformState;
 import com.crschnick.pdxu.app.platform.PlatformThread;
@@ -24,9 +23,7 @@ public class AppI18n {
     private AppI18nData english;
 
     public AppI18n() {
-        currentLocale.bind(BindingsHelper.map(
-                currentLanguage,
-                appI18nData -> appI18nData != null ? appI18nData.getLocale() : SupportedLocale.getEnglish()));
+        currentLocale.bind(currentLanguage.map(AppI18nData::getLocale).orElse(SupportedLocale.getEnglish()));
     }
 
     public static ObservableValue<SupportedLocale> activeLanguage() {

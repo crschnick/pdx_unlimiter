@@ -5,8 +5,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.JsonNodeFactory;
 
 import java.util.Optional;
 
@@ -41,9 +41,10 @@ public final class SavegameNotes {
             return empty();
         }
 
-        var text = Optional.ofNullable(node.get("text")).map(JsonNode::asText).orElse("");
+        var text =
+                Optional.ofNullable(node.get("text")).map(n -> n.asString("")).orElse("");
         var b = Optional.ofNullable(node.get("remindMe"))
-                .map(JsonNode::asBoolean)
+                .map(n -> n.asBoolean(false))
                 .orElse(false);
         return new SavegameNotes(text, b);
     }

@@ -1,6 +1,5 @@
 package com.crschnick.pdxu.app.issue;
 
-import com.crschnick.pdxu.app.core.App;
 import com.crschnick.pdxu.app.core.AppProperties;
 import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.platform.PlatformInit;

@@ -7,8 +7,8 @@ import com.crschnick.pdxu.app.util.JacksonMapper;
 import com.crschnick.pdxu.app.util.OsType;
 import com.crschnick.pdxu.app.util.WindowsRegistry;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.SystemUtils;
+import tools.jackson.databind.JsonNode;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -144,7 +144,7 @@ public class PdxLauncherDist extends GameDist {
     public Optional<String> determineVersion() throws IOException {
         JsonNode node =
                 JacksonMapper.getDefault().readTree(getLauncherSettings().toFile());
-        return Optional.ofNullable(node.get("version")).map(JsonNode::textValue);
+        return Optional.ofNullable(node.get("version")).map(n -> n.stringValue());
     }
 
     @Override
@@ -157,7 +157,7 @@ public class PdxLauncherDist extends GameDist {
         JsonNode node =
                 JacksonMapper.getDefault().readTree(getLauncherSettings().toFile());
         return Optional.ofNullable(node.get("gameDataPath"))
-                .map(JsonNode::textValue)
+                .map(n -> n.stringValue())
                 .map(this::replaceVariablesInPath)
                 .orElse(super.determineUserDir());
     }

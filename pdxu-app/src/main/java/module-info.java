@@ -1,10 +1,11 @@
 import com.crschnick.pdxu.app.core.AppLogs;
 import com.crschnick.pdxu.app.util.AppJacksonModule;
 import com.crschnick.pdxu.app.util.EditorProvider;
+import com.crschnick.pdxu.app.util.JacksonMapper;
 import com.crschnick.pdxu.app.util.ModuleLayerLoader;
 
-import com.fasterxml.jackson.databind.Module;
 import org.slf4j.spi.SLF4JServiceProvider;
+import tools.jackson.databind.JacksonModule;
 
 open module com.crschnick.pdxu.app {
     exports com.crschnick.pdxu.app.core;
@@ -34,8 +35,8 @@ open module com.crschnick.pdxu.app {
     requires org.slf4j;
     requires atlantafx.base;
     requires com.vladsch.flexmark;
-    requires com.fasterxml.jackson.core;
-    requires com.fasterxml.jackson.databind;
+    requires tools.jackson.core;
+    requires tools.jackson.databind;
     requires com.fasterxml.jackson.annotation;
     requires io.xpipe.modulefs;
     requires org.apache.commons.io;
@@ -78,11 +79,13 @@ open module com.crschnick.pdxu.app {
     requires io.github.ititus.ddsiio;
 
     uses ModuleLayerLoader;
-    uses Module;
+    uses JacksonModule;
     uses EditorProvider;
 
-    provides Module with
+    provides JacksonModule with
             AppJacksonModule;
+    provides ModuleLayerLoader with
+            JacksonMapper.Loader;
     provides SLF4JServiceProvider with
             AppLogs.Slf4jProvider;
 }

@@ -1,13 +1,11 @@
 package com.crschnick.pdxu.model;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.annotation.JsonDeserialize;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
-import java.io.IOException;
 import java.time.Month;
 import java.time.format.TextStyle;
 import java.util.Locale;
@@ -23,18 +21,18 @@ public abstract class GameDateType {
         }
 
         @Override
-        public GameDateType deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-            JsonNode node = jp.getCodec().readTree(jp);
-            if (node.textValue().equals("eu4")) {
+        public GameDateType deserialize(JsonParser jp, DeserializationContext ctxt) {
+            var value = ctxt.readTree(jp).asString();
+            if (value.equals("eu4")) {
                 return EU4;
             }
-            if (node.textValue().equals("hoi4")) {
+            if (value.equals("hoi4")) {
                 return HOI4;
             }
-            if (node.textValue().equals("vic3")) {
+            if (value.equals("vic3")) {
                 return VIC3;
             }
-            if (node.textValue().equals("stellaris")) {
+            if (value.equals("stellaris")) {
                 return STELLARIS;
             }
             throw new IllegalArgumentException();

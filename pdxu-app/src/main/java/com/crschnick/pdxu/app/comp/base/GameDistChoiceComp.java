@@ -14,8 +14,8 @@ import com.crschnick.pdxu.app.installation.dist.SteamDist;
 import com.crschnick.pdxu.app.installation.dist.WindowsStoreDist;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
-
 import com.crschnick.pdxu.app.util.OsType;
+
 import javafx.beans.property.*;
 import javafx.scene.layout.Region;
 import javafx.stage.DirectoryChooser;

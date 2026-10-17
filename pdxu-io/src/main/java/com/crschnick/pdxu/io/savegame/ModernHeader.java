@@ -81,7 +81,10 @@ public record ModernHeader(int version, int compressionType, boolean binary, lon
     }
 
     public static ModernHeader fromString(String header) {
-        if (!header.startsWith("SAV000") && !header.startsWith("SAV010") && !header.startsWith("SAV020") && !header.startsWith("SAV030")) {
+        if (!header.startsWith("SAV000")
+                && !header.startsWith("SAV010")
+                && !header.startsWith("SAV020")
+                && !header.startsWith("SAV030")) {
             throw new SavegameFormatException(
                     "Invalid header start: " + header.substring(0, Math.min(6, header.length())));
         }

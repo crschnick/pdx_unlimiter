@@ -4,6 +4,8 @@ def UPGRADE_CODE = '{35478070-7e9b-469b-b433-73ed3fa24812}'
 
 tasks.register('installerDist', DefaultTask) {
     dependsOn baseDist
+    // The base dist must be fully finalized before copying it
+    mustRunAfter tasks.matching { it.name == 'trainAot' || it.name == 'notarize' }
     doLast {
         copy {
             from "$distDir/base"

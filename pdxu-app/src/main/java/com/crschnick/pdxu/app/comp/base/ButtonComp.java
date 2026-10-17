@@ -56,6 +56,7 @@ public class ButtonComp extends Comp<CompStructure<Button>> {
             graphic.subscribe(t -> {
                 PlatformThread.runLaterIfNeeded(() -> {
                     if (t == null) {
+                        button.setGraphic(null);
                         return;
                     }
 

@@ -1,24 +1,25 @@
 package com.crschnick.pdxu.app.core.beacon;
 
 import com.crschnick.pdxu.app.core.AppNames;
+import com.crschnick.pdxu.app.core.AppSystemInfo;
 import com.crschnick.pdxu.app.core.mode.AppOperationMode;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.util.JacksonMapper;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.sun.jna.platform.win32.*;
 import com.sun.jna.ptr.IntByReference;
 import lombok.SneakyThrows;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
 public class AppNamedPipeBeacon extends AppBeacon {
 
-    private static final int MAX_BUFFER_SIZE = 1024;
+    private static final int MAX_BUFFER_SIZE = 65536;
 
     private WinNT.HANDLE serverPipeHandle;
 
@@ -45,7 +46,7 @@ public class AppNamedPipeBeacon extends AppBeacon {
         Kernel32.INSTANCE.SetNamedPipeHandleState(hPipe, lpMode, null, null);
 
         String expMessage = JacksonMapper.getDefault().writeValueAsString(message);
-        byte[] expData = expMessage.getBytes();
+        byte[] expData = expMessage.getBytes(StandardCharsets.UTF_8);
         IntByReference lpNumberOfBytesWritten = new IntByReference(0);
         Kernel32.INSTANCE.WriteFile(hPipe, expData, expData.length, lpNumberOfBytesWritten, null);
 
@@ -54,7 +55,9 @@ public class AppNamedPipeBeacon extends AppBeacon {
     }
 
     private static Path getNamedPipeLocation() {
-        var pipeName = "\\\\.\\pipe\\" + AppNames.ofCurrent().getKebapName();
+        // Named pipes are machine-wide, so include the user name to allow multiple user sessions
+        var pipeName = "\\\\.\\pipe\\" + AppNames.ofCurrent().getKebapName() + "-"
+                + AppSystemInfo.ofCurrent().getUser();
         return Path.of(pipeName);
     }
 
@@ -65,8 +68,8 @@ public class AppNamedPipeBeacon extends AppBeacon {
                 WinBase.PIPE_ACCESS_DUPLEX,
                 WinBase.PIPE_TYPE_MESSAGE | WinBase.PIPE_READMODE_MESSAGE | WinBase.PIPE_WAIT,
                 1,
-                Byte.MAX_VALUE,
-                Byte.MAX_VALUE,
+                MAX_BUFFER_SIZE,
+                MAX_BUFFER_SIZE,
                 30000,
                 null);
         if (WinBase.INVALID_HANDLE_VALUE.equals(hNamedPipe)) {
@@ -93,8 +96,9 @@ public class AppNamedPipeBeacon extends AppBeacon {
                         Kernel32.INSTANCE.DisconnectNamedPipe(serverPipeHandle);
 
                         try {
-                            var message =
-                                    new String(readBuffer, 0, lpNumberOfBytesRead.getValue()).replaceAll("\r\n", "\n");
+                            var message = new String(
+                                            readBuffer, 0, lpNumberOfBytesRead.getValue(), StandardCharsets.UTF_8)
+                                    .replaceAll("\r\n", "\n");
                             var parsed = JacksonMapper.getDefault().readValue(message, AppBeaconMessage.class);
 
                             if (parsed instanceof AppBeaconMessage.ExitRequest) {
@@ -113,7 +117,7 @@ public class AppNamedPipeBeacon extends AppBeacon {
                             if (parsed != null) {
                                 parsed.handle();
                             }
-                        } catch (JsonProcessingException e) {
+                        } catch (Exception e) {
                             ErrorEventFactory.fromThrowable(e).omit().handle();
                         }
                     }

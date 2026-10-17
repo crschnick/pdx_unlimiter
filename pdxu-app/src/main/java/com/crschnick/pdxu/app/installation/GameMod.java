@@ -36,7 +36,7 @@ public class GameMod {
                 return Optional.of(mod);
             }
 
-            mod.name = content.get("name").asText();
+            mod.name = content.get("name").asString();
             mod.path = p;
             return Optional.of(mod);
         } catch (Exception ex) {

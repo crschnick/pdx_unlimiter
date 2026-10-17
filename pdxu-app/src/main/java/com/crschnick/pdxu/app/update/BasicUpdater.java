@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.update;
 
 import com.crschnick.pdxu.app.comp.base.ModalButton;
 import com.crschnick.pdxu.app.core.AppInstallation;
+import com.crschnick.pdxu.app.core.AppLogs;
 import com.crschnick.pdxu.app.core.AppNames;
 import com.crschnick.pdxu.app.core.AppProperties;
 import com.crschnick.pdxu.app.core.mode.AppOperationMode;
@@ -9,6 +10,7 @@ import com.crschnick.pdxu.app.util.Hyperlinks;
 import com.crschnick.pdxu.app.util.LocalExec;
 import com.crschnick.pdxu.app.util.OsType;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,11 +55,22 @@ public class BasicUpdater extends UpdateHandler {
                         var url = rel.getRepository() + "/releases/download/" + rel.getVersion() + "/"
                                 + AppNames.ofCurrent().getDistName() + "-installer-windows-"
                                 + AppProperties.get().getArch() + ".msi";
+                        // Note that the downloaded installer is not verified against a checksum
+                        // Consider adding verification for production use
+                        var systemWide = AppInstallation.ofWindows().isSystemWide();
+                        var properties = "MSIFASTINSTALL=7 DISABLEROLLBACK=1" + (systemWide ? " ALLUSERS=1" : "");
+                        var logFile = AppLogs.get()
+                                .getSessionLogsDirectory()
+                                .getParent()
+                                .resolve("installer.log");
+                        var command = "start \"\" /wait msiexec /i \"" + url + "\" /lv \"" + logFile + "\" /qb "
+                                + properties + "&start \"\" \""
+                                + AppInstallation.ofCurrent().getExecutablePath()
+                                + "\"";
                         AppOperationMode.executeAfterShutdown(() -> {
-                            var command = "set MSIFASTINSTALL=7&set DISABLEROLLBACK=1&start \"\" /wait msiexec /i \""
-                                    + url + "\" /qb&start \"\" \""
-                                    + AppInstallation.ofCurrent().getExecutablePath() + "\"";
-                            LocalExec.executeAsync("cmd", "/c", command);
+                            if (LocalExec.executeAsync("cmd", "/c", command) == null) {
+                                throw new IOException("Failed to launch update installer");
+                            }
                         });
                     },
                     false,
@@ -70,6 +83,7 @@ public class BasicUpdater extends UpdateHandler {
     public synchronized AvailableRelease refreshUpdateCheckImpl() throws Exception {
         var found = AppReleases.getLatestSuitableRelease();
         if (found.isEmpty()) {
+            lastUpdateCheckResult.setValue(null);
             return null;
         }
 
@@ -87,6 +101,6 @@ public class BasicUpdater extends UpdateHandler {
                         Instant.now())
                 : null;
         lastUpdateCheckResult.setValue(val);
-        return lastUpdateCheckResult.getValue();
+        return val;
     }
 }

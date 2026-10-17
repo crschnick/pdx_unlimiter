@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.comp.base;
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.CompStructure;
 import com.crschnick.pdxu.app.core.AppLayoutModel;
+import com.crschnick.pdxu.app.core.AppProperties;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.app.prefs.AppPrefsComp;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class AppLayoutComp extends Comp<AppLayoutComp.Structure> {
@@ -31,12 +33,13 @@ public class AppLayoutComp extends Comp<AppLayoutComp.Structure> {
                         entry -> entry.comp(),
                         entry -> Bindings.createBooleanBinding(
                                 () -> {
-                                    return model.getSelected().getValue().equals(entry);
+                                    return Objects.equals(model.getSelected().getValue(), entry);
                                 },
                                 model.getSelected()),
                         (v1, v2) -> v2,
                         LinkedHashMap::new));
-        var multi = new MultiContentComp(map);
+        // Pages are only built once they are shown, unless configured otherwise
+        var multi = new MultiContentComp(!AppProperties.get().isBuildAllPages(), map);
         multi.styleClass("background");
 
         var pane = new BorderPane();
@@ -67,6 +70,7 @@ public class AppLayoutComp extends Comp<AppLayoutComp.Structure> {
             stack.getChildren().addAll(children);
             PlatformThread.runNestedLoopIteration();
             sidebar.setDisable(false);
+            stack.requestFocus();
         }
 
         @Override

@@ -39,6 +39,10 @@ public class AppDataLock {
             }
             channel = new RandomAccessFile(file, "rw").getChannel();
             lock = channel.tryLock();
+            if (lock == null) {
+                channel.close();
+                channel = null;
+            }
         } catch (Exception ex) {
             ErrorEventFactory.fromThrowable(ex).build().handle();
         }

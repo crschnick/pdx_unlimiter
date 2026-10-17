@@ -7,7 +7,6 @@ import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.UserReportComp;
-import com.crschnick.pdxu.app.platform.BindingsHelper;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 import com.crschnick.pdxu.app.prefs.AppPrefsComp;
@@ -232,9 +231,12 @@ public class AppLayoutModel {
                         pane.setMinHeight(24);
                         return pane;
                     }),
-                    new GuiLayoutComp(new SavegameManagerState<>(game, BindingsHelper.map(selected, s -> {
-                        return s instanceof GameEntry ge && ge.game.equals(game);
-                    }))),
+                    new GuiLayoutComp(new SavegameManagerState<>(
+                            game,
+                            selected.map(s -> {
+                                        return s instanceof GameEntry ge && ge.game.equals(game);
+                                    })
+                                    .orElse(false))),
                     null);
             this.game = game;
         }

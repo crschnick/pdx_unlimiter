@@ -32,16 +32,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.scene.image.Image;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.function.FailableBiFunction;
 import org.apache.commons.lang3.function.FailableConsumer;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.node.ArrayNode;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.node.StringNode;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -211,14 +211,14 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
                 c = JsonNodeFactory.instance.objectNode();
             }
             for (int i = 0; i < c.size(); i++) {
-                String name = c.get(i).required("name").textValue();
-                GameDate date = dateType.fromString(c.get(i).required("date").textValue());
-                UUID id = UUID.fromString(c.get(i).required("uuid").textValue());
+                String name = c.get(i).required("name").stringValue();
+                GameDate date = dateType.fromString(c.get(i).required("date").stringValue());
+                UUID id = UUID.fromString(c.get(i).required("uuid").stringValue());
                 if (!Files.isDirectory(getSavegameDataDirectory().resolve(id.toString()))) {
                     continue;
                 }
 
-                Instant lastDate = Instant.parse(c.get(i).required("lastPlayed").textValue());
+                Instant lastDate = Instant.parse(c.get(i).required("lastPlayed").stringValue());
                 Image image = ImageHelper.loadImage(
                         getSavegameDataDirectory().resolve(id.toString()).resolve("campaign.png"));
                 collections.add(new SavegameCampaign<>(lastDate, name, id, date, image));
@@ -229,13 +229,13 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
             // Legacy support, can be missing
             JsonNode f = Optional.ofNullable(node.get("folders")).orElse(JsonNodeFactory.instance.arrayNode());
             for (int i = 0; i < f.size(); i++) {
-                String name = f.get(i).required("name").textValue();
-                UUID id = UUID.fromString(f.get(i).required("uuid").textValue());
+                String name = f.get(i).required("name").stringValue();
+                UUID id = UUID.fromString(f.get(i).required("uuid").stringValue());
                 if (!Files.isDirectory(getSavegameDataDirectory().resolve(id.toString()))) {
                     continue;
                 }
 
-                Instant lastDate = Instant.parse(f.get(i).required("lastPlayed").textValue());
+                Instant lastDate = Instant.parse(f.get(i).required("lastPlayed").stringValue());
                 collections.add(
                         new SavegameCampaign<>(lastDate, name, id, GameDate.zero(dateType), ImageHelper.DEFAULT_IMAGE));
             }
@@ -261,16 +261,16 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
                 e = JsonNodeFactory.instance.objectNode();
             }
             StreamSupport.stream(e.spliterator(), false).forEach(entryNode -> {
-                UUID eId = UUID.fromString(entryNode.required("uuid").textValue());
+                UUID eId = UUID.fromString(entryNode.required("uuid").stringValue());
                 String name = Optional.ofNullable(entryNode.get("name"))
-                        .map(JsonNode::textValue)
+                        .map(n -> n.stringValue())
                         .orElse(null);
-                GameDate date = dateType.fromString(entryNode.required("date").textValue());
-                String checksum = entryNode.required("checksum").textValue();
+                GameDate date = dateType.fromString(entryNode.required("date").stringValue());
+                String checksum = entryNode.required("checksum").stringValue();
                 SavegameNotes notes = SavegameNotes.fromNode(entryNode.get("notes"));
                 List<String> sourceFileChecksums = Optional.ofNullable(entryNode.get("sourceFileChecksums"))
                         .map(n -> StreamSupport.stream(n.spliterator(), false)
-                                .map(JsonNode::textValue)
+                                .map(v -> v.stringValue())
                                 .collect(Collectors.toList()))
                         .orElse(List.of());
                 addEntry(collection, new SavegameEntry<>(name, eId, checksum, date, notes, sourceFileChecksums));
@@ -301,14 +301,16 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
                                     JsonNodeFactory.instance
                                             .arrayNode()
                                             .addAll(entry.getSourceFileChecksums().stream()
-                                                    .map(TextNode::new)
+                                                    .map(StringNode::new)
                                                     .collect(Collectors.toList())))
                             .<ObjectNode>set("notes", SavegameNotes.toNode(entry.getNotes())))
                     .forEach(entries::add);
 
             if (!campaignFileNode.equals(writtenCampaignNodes.get(col.getUuid()))) {
                 var written = ConfigHelper.writeConfig(
-                        getSavegameDataDirectory().resolve(col.getUuid().toString()).resolve("campaign.json"),
+                        getSavegameDataDirectory()
+                                .resolve(col.getUuid().toString())
+                                .resolve("campaign.json"),
                         campaignFileNode);
                 if (written) {
                     writtenCampaignNodes.put(col.getUuid(), campaignFileNode);
@@ -355,7 +357,8 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
             this.collections.add(newCampaign);
 
             // Campaign images don't change afterwards, so they only have to be written once
-            var imgFile = getSavegameDataDirectory().resolve(campainUuid.toString()).resolve("campaign.png");
+            var imgFile =
+                    getSavegameDataDirectory().resolve(campainUuid.toString()).resolve("campaign.png");
             try {
                 ImageHelper.writePng(img, imgFile);
             } catch (IOException ex) {
@@ -577,7 +580,9 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
     }
 
     public Path getSavegameFile(SavegameCampaign<?, ?> c, SavegameEntry<?, ?> e) {
-        return path.resolve(c.getUuid().toString()).resolve(e.getUuid().toString()).resolve(getSaveFileName());
+        return path.resolve(c.getUuid().toString())
+                .resolve(e.getUuid().toString())
+                .resolve(getSaveFileName());
     }
 
     public Path getSavegameInfoFile(SavegameEntry<T, I> e) {

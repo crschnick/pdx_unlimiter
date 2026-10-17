@@ -14,7 +14,6 @@ import javafx.scene.text.Font;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
-import org.apache.commons.lang3.SystemUtils;
 
 import java.awt.*;
 import java.util.List;
@@ -70,10 +69,11 @@ public enum PlatformState {
                 "java.lang.InternalError: Error loading stock shader",
                 "java.lang.RuntimeException: Error creating vertex shader",
                 "java.lang.RuntimeException: Error creating fragment shader",
-                "java.lang.RuntimeException: Error creating shader program"
-        );
-        if (AppPrefs.get() != null && AppPrefs.get().canSaveLocal() &&
-                !AppPrefs.get().disableHardwareAcceleration().get() && l.stream().anyMatch(msg::contains)) {
+                "java.lang.RuntimeException: Error creating shader program");
+        if (AppPrefs.get() != null
+                && AppPrefs.get().canSaveLocal()
+                && !AppPrefs.get().disableHardwareAcceleration().get()
+                && l.stream().anyMatch(msg::contains)) {
             reset();
             AppPrefs.get().setFromExternal(AppPrefs.get().disableHardwareAcceleration(), true);
             AppPrefs.get().save();

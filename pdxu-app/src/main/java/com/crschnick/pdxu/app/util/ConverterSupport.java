@@ -4,7 +4,6 @@ import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.gui.dialog.GuiConverterConfig;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameInstallation;
-import com.crschnick.pdxu.app.installation.dist.SteamDist;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
@@ -101,7 +100,9 @@ public class ConverterSupport {
                     writeLine(
                             writer,
                             getFromConfigurationName() + "SteamModDirectory",
-                            GameInstallation.ALL.get(getFromGame()).getDist()
+                            GameInstallation.ALL
+                                    .get(getFromGame())
+                                    .getDist()
                                     .getWorkshopDir()
                                     .orElseThrow()
                                     .toString());
@@ -112,9 +113,7 @@ public class ConverterSupport {
                                     .get(getFromGame())
                                     .getInstallDir()
                                     .toString());
-                    writeLine(
-                            writer,
-                            "sourceGameModPath", getFromModDir());
+                    writeLine(writer, "sourceGameModPath", getFromModDir());
                     writeLine(writer, "targetGameModPath", getToModDir());
                     writeLine(
                             writer,

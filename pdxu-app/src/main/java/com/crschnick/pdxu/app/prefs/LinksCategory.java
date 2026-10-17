@@ -28,15 +28,15 @@ public class LinksCategory extends AppPrefsCategory {
                                         })
                                 .maxWidth(2000),
                         null)
-                .addComp(
-                        new TileButtonComp("thirdParty", "thirdPartyDescription", "mdi2o-open-source-initiative", e -> {
+                .addComp(new TileButtonComp(
+                                "thirdParty", "thirdPartyDescription", "mdi2o-open-source-initiative", e -> {
                                     var comp = new ThirdPartyDependencyListComp()
                                             .prefWidth(650)
                                             .styleClass("open-source-notices");
                                     var modal = ModalOverlay.of("openSourceNotices", comp);
                                     modal.show();
                                 })
-                                .maxWidth(2000))
+                        .maxWidth(2000))
                 .addComp(
                         new TileButtonComp(
                                         "otherProjects",
@@ -64,7 +64,9 @@ public class LinksCategory extends AppPrefsCategory {
 
     @Override
     public Comp<?> create() {
-        return createLinks().styleClass("information").styleClass("about-tab").apply(struc -> struc.get()
-                .setPrefWidth(600));
+        return createLinks()
+                .styleClass("information")
+                .styleClass("about-tab")
+                .apply(struc -> struc.get().setPrefWidth(600));
     }
 }

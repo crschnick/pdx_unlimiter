@@ -29,6 +29,8 @@ import lombok.AllArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Consumer;
 
 @AllArgsConstructor
 public class SideMenuBarComp extends Comp<CompStructure<VBox>> {
@@ -64,7 +66,8 @@ public class SideMenuBarComp extends Comp<CompStructure<VBox>> {
         }
 
         {
-            var b = new IconButtonComp("mdi2u-update", () -> UpdateAvailableDialog.showIfNeeded(false));
+            // The button is only shown if an update was already found, so no need to check again
+            var b = new IconButtonComp("mdi2u-update", () -> UpdateAvailableDialog.showIfNeeded(false, false));
             b.tooltipKey("updateAvailableTooltip").accessibleTextKey("updateAvailableTooltip");
             var stack = createStyle(null, b);
             stack.hide(Bindings.createBooleanBinding(
@@ -87,36 +90,41 @@ public class SideMenuBarComp extends Comp<CompStructure<VBox>> {
         vbox.getStyleClass().add("sidebar-comp");
 
         var queueButtons = new VBox();
+        Consumer<List<? extends AppLayoutModel.QueueEntry>> update = l -> {
+            queueButtons.getChildren().clear();
+            for (int i = l.size() - 1; i >= 0; i--) {
+                var item = l.get(i);
+                var b = new IconButtonComp(item.getIcon(), null);
+                b.apply(struc -> {
+                    var tt = TooltipHelper.create(item.getName(), null);
+                    tt.setShowDelay(Duration.millis(50));
+                    Tooltip.install(struc.get(), tt);
+
+                    struc.get().setOnAction(e -> {
+                        struc.get().setDisable(true);
+                        ThreadHelper.runAsync(() -> {
+                            try {
+                                item.getAction().run();
+                            } finally {
+                                Platform.runLater(() -> {
+                                    queueEntries.remove(item);
+                                });
+                            }
+                        });
+                        e.consume();
+                    });
+                });
+                b.accessibleText(item.getName());
+                var stack = createStyle(null, b);
+                queueButtons.getChildren().add(stack.createRegion());
+            }
+        };
+
+        update.accept(new ArrayList<>(queueEntries));
         queueEntries.addListener((ListChangeListener<? super AppLayoutModel.QueueEntry>) c -> {
             var l = new ArrayList<>(c.getList());
             PlatformThread.runLaterIfNeeded(() -> {
-                queueButtons.getChildren().clear();
-                for (int i = l.size() - 1; i >= 0; i--) {
-                    var item = l.get(i);
-                    var b = new IconButtonComp(item.getIcon(), null);
-                    b.apply(struc -> {
-                        var tt = TooltipHelper.create(item.getName(), null);
-                        tt.setShowDelay(Duration.millis(50));
-                        Tooltip.install(struc.get(), tt);
-
-                        struc.get().setOnAction(e -> {
-                            struc.get().setDisable(true);
-                            ThreadHelper.runAsync(() -> {
-                                try {
-                                    item.getAction().run();
-                                } finally {
-                                    Platform.runLater(() -> {
-                                        queueEntries.remove(item);
-                                    });
-                                }
-                            });
-                            e.consume();
-                        });
-                    });
-                    b.accessibleText(item.getName());
-                    var stack = createStyle(null, b);
-                    queueButtons.getChildren().add(stack.createRegion());
-                }
+                update.accept(l);
             });
         });
         vbox.getChildren().add(queueButtons);
@@ -133,10 +141,14 @@ public class SideMenuBarComp extends Comp<CompStructure<VBox>> {
             AppFontSizes.lg(struc.get());
             struc.get().setAlignment(Pos.CENTER);
 
-            struc.get().pseudoClassStateChanged(selected, value.getValue().equals(e));
+            struc.get().pseudoClassStateChanged(selected, Objects.equals(value.getValue(), e));
+            if (e == null) {
+                return;
+            }
+
             value.addListener((c, o, n) -> {
                 PlatformThread.runLaterIfNeeded(() -> {
-                    struc.get().pseudoClassStateChanged(selected, n.equals(e));
+                    struc.get().pseudoClassStateChanged(selected, Objects.equals(n, e));
                 });
             });
         });
@@ -180,7 +192,7 @@ public class SideMenuBarComp extends Comp<CompStructure<VBox>> {
                     .backgroundProperty()
                     .bind(Bindings.createObjectBinding(
                             () -> {
-                                if (value.getValue().equals(e)) {
+                                if (Objects.equals(value.getValue(), e)) {
                                     return selectedBorder.get();
                                 }
 

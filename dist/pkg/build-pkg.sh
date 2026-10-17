@@ -87,6 +87,10 @@ copyBuildDirectory() {
 
   mkdir -p "${TARGET_DIRECTORY}/darwinpkg/${PRODUCT}.app"
   cp -a "$BUILDPATH/dist/${PRODUCT}.app/" "${TARGET_DIRECTORY}/darwinpkg/${PRODUCT}.app"
+  if [[ $? != 0 ]]; then
+    log_error "Failed to copy application bundle"
+    exit 1
+  fi
   chmod -R 755 "${TARGET_DIRECTORY}/darwinpkg/${PRODUCT}.app"
 
   rm -rf "${TARGET_DIRECTORY}/package"
@@ -103,6 +107,10 @@ function buildPackage() {
 
   # Make bundle not relocatable. Important!
   pkgbuild --analyze --root "${TARGET_DIRECTORY}/darwinpkg" "$TMPDIR/${PRODUCT}.plist"
+  if [[ $? != 0 ]]; then
+    log_error "Failed to analyze package root"
+    exit 1
+  fi
   # The schema changed at some point, so better do both. One will fail
   plutil -replace BundleIsRelocatable -bool NO "$TMPDIR/${PRODUCT}.plist"
   plutil -replace 0.BundleIsRelocatable -bool NO "$TMPDIR/${PRODUCT}.plist"
@@ -120,6 +128,10 @@ function buildPackage() {
   fi
   params+=("${TARGET_DIRECTORY}/package/${PRODUCT}.pkg")
   pkgbuild "${params[@]}"
+  if [[ $? != 0 ]]; then
+    log_error "Failed to build package"
+    exit 1
+  fi
 }
 
 function buildProduct() {
@@ -135,6 +147,10 @@ function buildProduct() {
   fi
   params+=("${TARGET_DIRECTORY}/pkg/${OUT_FILE_NAME}")
   productbuild "${params[@]}"
+  if [[ $? != 0 ]]; then
+    log_error "Failed to build product"
+    exit 1
+  fi
 }
 
 function createInstaller() {

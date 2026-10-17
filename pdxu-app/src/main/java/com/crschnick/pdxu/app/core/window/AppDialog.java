@@ -20,6 +20,8 @@ import javafx.util.Duration;
 
 import lombok.Getter;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AppDialog {
@@ -28,11 +30,13 @@ public class AppDialog {
     private static final ObservableList<ModalOverlay> modalOverlays = FXCollections.observableArrayList();
 
     public static void closeDialog(ModalOverlay overlay) {
-        PlatformThread.runLaterIfNeeded(() -> {
-            synchronized (modalOverlays) {
-                modalOverlays.remove(overlay);
-            }
-        });
+        hide(overlay);
+    }
+
+    public static List<ModalOverlay> getCurrentModalOverlays() {
+        synchronized (modalOverlays) {
+            return modalOverlays.stream().filter(Objects::nonNull).toList();
+        }
     }
 
     public static void waitForAllDialogsClose() {
@@ -53,7 +57,19 @@ public class AppDialog {
 
     public static void hide(ModalOverlay o) {
         PlatformThread.runLaterIfNeeded(() -> {
-            modalOverlays.remove(o);
+            synchronized (modalOverlays) {
+                var index = modalOverlays.indexOf(o);
+                if (index == -1) {
+                    return;
+                }
+
+                // Never shift indices of other overlays as each index is bound to an overlay layer
+                // Only trim trailing empty slots
+                modalOverlays.set(index, null);
+                while (!modalOverlays.isEmpty() && modalOverlays.getLast() == null) {
+                    modalOverlays.removeLast();
+                }
+            }
         });
     }
 

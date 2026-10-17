@@ -54,12 +54,14 @@ public class Vic3SavegameAdapter implements EditorSavegameAdapter {
         private final String nodeName;
 
         public ImagePreview(Path base, String nodeName, String icon) {
-            super(icon, node -> GameInstallation.ALL
-                    .get(Game.VIC3)
-                    .getInstallDir()
-                    .resolve("game")
-                    .resolve(base)
-                    .resolve(node.getBackingNode().getString()));
+            super(
+                    icon,
+                    node -> GameInstallation.ALL
+                            .get(Game.VIC3)
+                            .getInstallDir()
+                            .resolve("game")
+                            .resolve(base)
+                            .resolve(node.getBackingNode().getString()));
             this.nodeName = nodeName;
         }
 

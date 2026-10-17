@@ -31,6 +31,14 @@ public abstract class AppInstallation {
         };
     }
 
+    public static AppInstallation.Windows ofWindows() {
+        if (OsType.ofLocal() != OsType.WINDOWS) {
+            throw new IllegalStateException();
+        }
+
+        return WINDOWS;
+    }
+
     public static AppInstallation ofDefault() {
         var def = determineDefaultInstallationBasePath();
         return switch (OsType.ofLocal()) {
@@ -150,6 +158,11 @@ public abstract class AppInstallation {
 
         private Windows(Path base) {
             super(base);
+        }
+
+        public boolean isSystemWide() {
+            return !getBaseInstallationPath()
+                    .startsWith(AppSystemInfo.ofWindows().getUserHome());
         }
 
         @Override

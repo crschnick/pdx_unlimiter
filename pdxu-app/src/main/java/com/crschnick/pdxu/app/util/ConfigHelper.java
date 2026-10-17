@@ -4,22 +4,21 @@ import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.window.AppDialog;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 
-import com.fasterxml.jackson.core.JsonFactory;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.JsonNodeFactory;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class ConfigHelper {
+
+    private static final JsonMapper MAPPER =
+            JsonMapper.builder().enable(SerializationFeature.INDENT_OUTPUT).build();
 
     private static boolean isAllZero(byte[] bytes) {
         for (byte b : bytes) {
@@ -48,10 +47,9 @@ public class ConfigHelper {
                     throw new IOException("Corrupted file contents");
                 }
 
-                ObjectMapper o = new ObjectMapper();
-                node = o.readTree(bytes);
+                node = MAPPER.readTree(bytes);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             ErrorEventFactory.fromThrowable("The config file " + in.toString() + " could not be read", e)
                     .expected()
                     .handle();
@@ -63,15 +61,14 @@ public class ConfigHelper {
         var backupFile = in.resolveSibling(
                 FilenameUtils.getBaseName(in.toString()) + "_old." + FilenameUtils.getExtension(in.toString()));
         if (Files.exists(backupFile)) {
-            ObjectMapper o = new ObjectMapper();
             try {
                 byte[] bytes = Files.readAllBytes(backupFile);
                 if (bytes.length > 0 && isAllZero(bytes)) {
                     throw new IOException("Corrupted file contents");
                 }
 
-                node = o.readTree(bytes);
-            } catch (IOException e) {
+                node = MAPPER.readTree(bytes);
+            } catch (Exception e) {
                 ErrorEventFactory.fromThrowable(
                                 "The backup config file " + in.toString() + " could not be read as well", e)
                         .handle();
@@ -115,16 +112,14 @@ public class ConfigHelper {
 
         var currentValid = !isAllZero(currentContent.toCharArray());
 
-        JsonFactory f = new JsonFactory();
-        var writer = new StringWriter();
-        try (JsonGenerator g = f.createGenerator(writer).setPrettyPrinter(new DefaultPrettyPrinter())) {
-            new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT).writeTree(g, node);
-        } catch (IOException e) {
+        String newContent;
+        try {
+            newContent = MAPPER.writeValueAsString(node);
+        } catch (Exception e) {
             ErrorEventFactory.fromThrowable(e).handle();
             return false;
         }
 
-        var newContent = writer.toString();
         try {
             if (!newContent.equals(currentContent)) {
                 var backupFile = out.resolveSibling(FilenameUtils.getBaseName(out.toString()) + "_old."

@@ -26,7 +26,7 @@ public abstract class LabelGraphic {
     public abstract Node createGraphicNode();
 
     @Value
-    @EqualsAndHashCode(callSuper = true)
+    @EqualsAndHashCode(callSuper = false)
     public static class IconGraphic extends LabelGraphic {
 
         String icon;
@@ -40,7 +40,7 @@ public abstract class LabelGraphic {
     }
 
     @Value
-    @EqualsAndHashCode(callSuper = true)
+    @EqualsAndHashCode(callSuper = false)
     public static class ImageGraphic extends LabelGraphic {
 
         String file;

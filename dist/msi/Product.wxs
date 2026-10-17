@@ -8,6 +8,8 @@
 			 Manufacturer="!(loc.Company)" UpgradeCode="$(var.UpgradeCode)" InstallerVersion="500"
 			 Scope="perUser">
 
+		<Property Id="MSICHECKCRCS" Value="1" />
+
 		<SummaryInformation Manufacturer="!(loc.Company)" Description="!(loc.Description)" Keywords="!(loc.Keywords)" />
 
 		<MajorUpgrade Schedule="afterInstallExecute" DowngradeErrorMessage="!(loc.NewerVersionInstalled)" AllowSameVersionUpgrades="yes" />
@@ -36,7 +38,9 @@
 		<Feature Id="FileAssociations" Title="!(loc.FileAssociationsName)" Description="!(loc.FileAssociationsDesc)" Level="1">
 			<ComponentRef Id="FileAssociations" />
 		</Feature>
-		
+
+		<util:CloseApplication Id="CloseApp" Target="$(var.ExecutableName).exe" EndSessionMessage="yes" RebootPrompt="no" TerminateProcess="1" Timeout="10"></util:CloseApplication>
+
 		<ui:WixUI Id="WixUI_Custom" />
 	</Package>
 </Wix>

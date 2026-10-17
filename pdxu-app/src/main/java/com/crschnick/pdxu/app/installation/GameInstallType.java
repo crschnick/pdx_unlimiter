@@ -11,9 +11,9 @@ import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameNamedVersion;
 import com.crschnick.pdxu.model.GameVersion;
 
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.io.FilenameUtils;
+import tools.jackson.databind.node.JsonNodeFactory;
+import tools.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -425,7 +425,10 @@ public interface GameInstallType {
         @Override
         public Path determineUserDir(Path p, String name) throws IOException {
             if (OsType.ofLocal() == OsType.LINUX) {
-                return AppSystemInfo.ofCurrent().getUserHome().resolve(".paradoxinteractive").resolve("Crusader Kings II");
+                return AppSystemInfo.ofCurrent()
+                        .getUserHome()
+                        .resolve(".paradoxinteractive")
+                        .resolve("Crusader Kings II");
             }
 
             return super.determineUserDir(p, name);
@@ -675,7 +678,7 @@ public interface GameInstallType {
 
             var node = JacksonMapper.getDefault().readTree(sf.toFile());
             var id = Optional.ofNullable(node.get("System")).flatMap(n -> Optional.ofNullable(n.get("language")));
-            return id.flatMap(l -> Optional.ofNullable(GameLanguage.byId(l.asText())));
+            return id.flatMap(l -> Optional.ofNullable(GameLanguage.byId(l.asString())));
         }
 
         public Path getSteamSpecificFile(Path p) {
@@ -725,7 +728,7 @@ public interface GameInstallType {
             }
 
             return StreamSupport.stream(node.required("enabledMods").spliterator(), false)
-                    .map(n -> n.required("path").textValue())
+                    .map(n -> n.required("path").stringValue())
                     .collect(Collectors.toList());
         }
 
@@ -741,7 +744,7 @@ public interface GameInstallType {
             }
 
             return StreamSupport.stream(node.required("disabledDLC").spliterator(), false)
-                    .map(n -> n.required("paradoxAppId").textValue())
+                    .map(n -> n.required("paradoxAppId").stringValue())
                     .collect(Collectors.toList());
         }
 
@@ -955,7 +958,7 @@ public interface GameInstallType {
 
             var node = JacksonMapper.getDefault().readTree(sf.toFile());
             var id = Optional.ofNullable(node.get("System")).flatMap(n -> Optional.ofNullable(n.get("language")));
-            return id.flatMap(l -> Optional.ofNullable(GameLanguage.byId(l.asText())));
+            return id.flatMap(l -> Optional.ofNullable(GameLanguage.byId(l.asString())));
         }
 
         public Path getSteamSpecificFile(Path p) {
@@ -1233,7 +1236,7 @@ public interface GameInstallType {
             }
 
             return StreamSupport.stream(node.required("enabled_mods").spliterator(), false)
-                    .map(n -> n.textValue())
+                    .map(n -> n.stringValue())
                     .collect(Collectors.toList());
         }
 
@@ -1249,7 +1252,7 @@ public interface GameInstallType {
             }
 
             return StreamSupport.stream(node.required("disabled_dlcs").spliterator(), false)
-                    .map(n -> n.textValue())
+                    .map(n -> n.stringValue())
                     .collect(Collectors.toList());
         }
 
@@ -1267,28 +1270,26 @@ public interface GameInstallType {
                                     .getUserDir()
                                     .relativize(d.getModFile())
                                     .toString()))
-                            .map(JsonNodeFactory.instance::textNode)
+                            .map(JsonNodeFactory.instance::stringNode)
                             .toList());
 
             var availableDlcs = installation.getDlcs();
             var currentlyDisabledDlcs = installation.queryDisabledDlcs();
-            var dlcsToDisable =
-                    switch (getDlcInfoStorageType()) {
-                        case SAVEGAME_STORES_INFO ->
-                            availableDlcs.stream()
-                                    .filter(gameDlc -> (gameDlc.isAffectsCompatibility() && !dlcs.contains(gameDlc))
-                                            || (!gameDlc.isAffectsCompatibility()
-                                                    && currentlyDisabledDlcs.contains(gameDlc)))
-                                    .toList();
-                        case SAVEGAME_DOESNT_STORE_INFO -> currentlyDisabledDlcs;
-                    };
+            var dlcsToDisable = switch (getDlcInfoStorageType()) {
+                case SAVEGAME_STORES_INFO ->
+                    availableDlcs.stream()
+                            .filter(gameDlc -> (gameDlc.isAffectsCompatibility() && !dlcs.contains(gameDlc))
+                                    || (!gameDlc.isAffectsCompatibility() && currentlyDisabledDlcs.contains(gameDlc)))
+                            .toList();
+                case SAVEGAME_DOESNT_STORE_INFO -> currentlyDisabledDlcs;
+            };
             n.putArray("disabled_dlcs")
                     .addAll(dlcsToDisable.stream()
                             .map(d -> FilenameUtils.separatorsToUnix(installation
                                     .getInstallDir()
                                     .relativize(d.getInfoFilePath())
                                     .toString()))
-                            .map(JsonNodeFactory.instance::textNode)
+                            .map(JsonNodeFactory.instance::stringNode)
                             .toList());
             JacksonMapper.getDefault().writeValue(file.toFile(), n);
         }

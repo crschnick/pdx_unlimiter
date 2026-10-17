@@ -14,19 +14,9 @@ import java.util.List;
 public class AppInstance {
 
     public static void init() {
-        var reachable = AppBeacon.get().isExistingBeaconRunning();
+        var reachable = AppBeacon.get() != null && AppBeacon.get().isExistingBeaconRunning();
         if (!reachable) {
-            // Even in case we are unable to reach another beacon server
-            // there might be another instance running, for example
-            // starting up
-            if (!AppDataLock.hasLock()) {
-                TrackEvent.info(
-                        "Data directory " + AppProperties.get().getDataDir().toString()
-                                + " is already locked. Is another instance running?");
-                AppOperationMode.halt(1);
-            }
-
-            // We are good to start up!
+            checkDataLock();
             return;
         }
 
@@ -42,6 +32,8 @@ public class AppInstance {
             }
         } catch (Exception ex) {
             ErrorEventFactory.fromThrowable(ex).handle();
+            // Only continue if there isn't actually another instance running
+            checkDataLock();
             return;
         }
 
@@ -60,5 +52,16 @@ public class AppInstance {
         }
         TrackEvent.info("Another instance is already running. Quitting ...");
         AppOperationMode.halt(1);
+    }
+
+    private static void checkDataLock() {
+        // Even in case we are unable to reach another beacon server
+        // there might be another instance running, for example
+        // starting up
+        if (!AppDataLock.hasLock()) {
+            TrackEvent.info("Data directory " + AppProperties.get().getDataDir().toString()
+                    + " is already locked. Is another instance running?");
+            AppOperationMode.halt(1);
+        }
     }
 }

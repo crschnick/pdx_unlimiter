@@ -2,6 +2,8 @@ def distDir = "${project.layout.buildDirectory.get()}/dist"
 
 tasks.register('portableDist', DefaultTask) {
     dependsOn baseDist
+    // The base dist must be fully finalized before copying it
+    mustRunAfter tasks.matching { it.name == 'trainAot' || it.name == 'notarize' }
     doLast {
         copy {
             from "$distDir/base/"

@@ -59,9 +59,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
     private final SavegameManagerState<T, I> savegameManagerState;
 
     private Region setupTopBar(
-            SavegameEntry<T, I> e,
-            SavegameContext<T, I> context,
-            List<Consumer<SavegameContext<T, I>>> infoActions) {
+            SavegameEntry<T, I> e, SavegameContext<T, I> context, List<Consumer<SavegameContext<T, I>>> infoActions) {
         BorderPane topBar = new BorderPane();
         topBar.getStyleClass().add(CLASS_ENTRY_BAR);
         infoActions.add(ctx -> {
@@ -139,9 +137,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
     }
 
     private HBox createButtonBar(
-            SavegameEntry<T, I> e,
-            SavegameContext<T, I> context,
-            List<Consumer<SavegameContext<T, I>>> infoActions) {
+            SavegameEntry<T, I> e, SavegameContext<T, I> context, List<Consumer<SavegameContext<T, I>>> infoActions) {
         HBox staticButtons = new HBox();
         staticButtons.setAlignment(Pos.CENTER);
         staticButtons.getStyleClass().add(CLASS_BUTTON_BAR);
@@ -152,18 +148,18 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
                 SavegameActions.exportSavegame(e);
                 savegameManagerState.selectEntry(null);
                 export.setDisable(true);
-                GlobalTimer.delay(() -> {
-                    Platform.runLater(() -> {
-                        export.setDisable(false);
-                    });
-                }, Duration.ofSeconds(3));
+                GlobalTimer.delay(
+                        () -> {
+                            Platform.runLater(() -> {
+                                export.setDisable(false);
+                            });
+                        },
+                        Duration.ofSeconds(3));
             });
             export.getStyleClass().add(CLASS_EXPORT);
             export.setAccessibleText("Export");
             GuiTooltips.install(
-                    export,
-                    AppI18n.get(
-                            "exportSavegame", context.getGame().getTranslatedFullName()));
+                    export, AppI18n.get("exportSavegame", context.getGame().getTranslatedFullName()));
             staticButtons.getChildren().add(export);
         }
         {

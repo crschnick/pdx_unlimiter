@@ -3,7 +3,6 @@ package com.crschnick.pdxu.app.comp.base;
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.core.AppImages;
 import com.crschnick.pdxu.app.core.window.AppMainWindow;
-import com.crschnick.pdxu.app.platform.BindingsHelper;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -78,7 +77,7 @@ public class PrettyImageHelper {
             return new PrettyImageComp(new SimpleStringProperty(null), w, h);
         }
 
-        var binding = BindingsHelper.flatMap(img, s -> {
+        var binding = img.flatMap(s -> {
             return rasterizedImageIfExistsScaled(s, h, 16, 24, 40, 80);
         });
         return new PrettyImageComp(binding, w, h);

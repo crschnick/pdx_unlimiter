@@ -55,7 +55,7 @@ public class ToggleSwitchComp extends Comp<CompStructure<ToggleSwitch>> {
         if (graphic != null) {
             graphic.subscribe(value -> {
                 PlatformThread.runLaterIfNeeded(() -> {
-                    s.setGraphic(value.createGraphicNode());
+                    s.setGraphic(value != null ? value.createGraphicNode() : null);
                 });
             });
             s.pseudoClassStateChanged(PseudoClass.getPseudoClass("has-graphic"), true);

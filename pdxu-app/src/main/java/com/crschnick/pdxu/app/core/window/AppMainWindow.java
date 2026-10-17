@@ -51,7 +51,7 @@ public class AppMainWindow {
 
     private final BooleanProperty windowActive = new SimpleBooleanProperty(false);
     private volatile Instant lastUpdate;
-    private boolean shown = false;
+    private NativeWinWindowControl windowHandle;
 
     private AppMainWindow(Stage stage) {
         this.stage = stage;
@@ -159,11 +159,22 @@ public class AppMainWindow {
 
     public void show() {
         stage.show();
-        if (OsType.ofLocal() == OsType.WINDOWS && !shown) {
-            var ctrl = new NativeWinWindowControl(stage);
-            AppWindowsShutdown.registerHook(ctrl.getWindowHandle());
+
+        if (OsType.ofLocal() == OsType.WINDOWS) {
+            var currentControl = new NativeWinWindowControl(stage);
+
+            // Clean up old window as the HWND might not be reused
+            var oldControl = windowHandle;
+            if (oldControl != null && !oldControl.getWindowHandle().equals(currentControl.getWindowHandle())) {
+                AppWindowsShutdown.unregisterHook();
+                windowHandle = null;
+            }
+
+            if (windowHandle == null) {
+                windowHandle = currentControl;
+                AppWindowsShutdown.registerHook(currentControl.getWindowHandle());
+            }
         }
-        shown = true;
     }
 
     public void focus(boolean force) {
@@ -302,8 +313,8 @@ public class AppMainWindow {
                 var image = stage.getScene().snapshot(null);
                 var awt = AppImages.toAwtImage(image);
                 var file = AppSystemInfo.ofCurrent()
-                        .getUserHome()
-                        .resolve("Desktop", AppNames.ofCurrent().getKebapName() + "-screenshot.png");
+                        .getDesktop()
+                        .resolve(AppNames.ofCurrent().getKebapName() + "-screenshot.png");
                 try {
                     ImageIO.write(awt, "png", file.toFile());
                 } catch (IOException e) {

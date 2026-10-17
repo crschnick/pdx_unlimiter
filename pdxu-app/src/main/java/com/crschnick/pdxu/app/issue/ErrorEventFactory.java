@@ -28,9 +28,10 @@ public class ErrorEventFactory {
         return expectedIf(
                 t,
                 t.getMessage() != null
-                        && Arrays.stream(s).map(String::toLowerCase).anyMatch(string -> t.getMessage()
-                                .toLowerCase(Locale.ROOT)
-                                .contains(string)));
+                        && Arrays.stream(s)
+                                .map(String::toLowerCase)
+                                .anyMatch(string ->
+                                        t.getMessage().toLowerCase(Locale.ROOT).contains(string)));
     }
 
     public static <T extends Throwable> T expectedIf(T t, boolean b) {

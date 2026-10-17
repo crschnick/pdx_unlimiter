@@ -4,7 +4,22 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    # Don't immediately pick up new releases, in case they turn out to be compromised
+    cooldown:
+      default-days: 7
+    ignore:
+      # The JNA version has to match the prebuilt jmods in dist/jna
+      - dependency-name: "net.java.dev.jna:*"
+      # The jnativehook version has to match the prebuilt jmods in dist/jnativehook
+      - dependency-name: "com.github.kwhat:jnativehook"
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: "daily"
+    # Don't immediately pick up new releases, in case they turn out to be compromised
+    cooldown:
+      default-days: 7
+    groups:
+      github-actions:
+        patterns:
+          - "*"

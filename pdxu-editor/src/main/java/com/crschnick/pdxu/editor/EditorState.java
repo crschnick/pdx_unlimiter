@@ -7,7 +7,6 @@ import com.crschnick.pdxu.app.util.ThreadHelper;
 import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.editor.node.EditorRootNode;
 import com.crschnick.pdxu.editor.target.EditTarget;
-import com.crschnick.pdxu.editor.target.SavegameEditTarget;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.LinkedArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;

@@ -4,9 +4,9 @@ import java.lang.module.ModuleFinder
 import java.util.stream.Stream
 
 plugins {
-    id 'org.gradlex.extra-java-module-info' version '1.13.1' apply false
-    id("com.diffplug.spotless") version "8.0.0" apply false
-    id 'de.undercouch.download' version '5.6.0'
+    id 'org.gradlex.extra-java-module-info' version '1.14.2' apply false
+    id("com.diffplug.spotless") version "8.10.4" apply false
+    id 'de.undercouch.download' version '5.7.0'
 }
 
 allprojects { subproject ->
@@ -15,6 +15,14 @@ allprojects { subproject ->
         failOnMissingModuleInfo.set(true)
     }
     apply from: "$rootDir/gradle/gradle_scripts/modules.gradle"
+
+    // Always download dependency sources when the project is imported into an IDE
+    apply plugin: 'idea'
+    idea {
+        module {
+            downloadSources = true
+        }
+    }
 
     // https://docs.gradle.org/9.0.0/userguide/upgrading_major_version_9.html#reproducible_archives_by_default
     tasks.withType(AbstractArchiveTask).configureEach {
@@ -115,7 +123,7 @@ def getJvmArgs() {
 
     // GC config
     jvmRunArgs += ['-XX:+UseG1GC',
-                   '-Xms300m',
+                   '-Xms150m',
                    '-Xmx16G',
                    '-XX:MinHeapFreeRatio=20',
                    '-XX:MaxHeapFreeRatio=30',
@@ -152,6 +160,12 @@ def getJvmArgs() {
             '-Djdk.http.auth.proxying.disabledSchemes=""',
             '-Djdk.http.auth.tunneling.disabledSchemes=""',
             '-Djdk.httpclient.auth.retrylimit=1'
+    ]
+
+    // Include host info in HTTP exceptions
+    // https://docs.oracle.com/en/java/javase/22/core/java-networking.htm
+    jvmRunArgs += [
+            '-Djdk.includeInExceptions=hostInfo'
     ]
 
     return jvmRunArgs

@@ -9,6 +9,11 @@ import java.nio.file.Path;
 
 public class DesktopHelper {
 
+    private static boolean isSupported(Desktop.Action action) {
+        // Desktop.getDesktop() throws if the desktop is not supported at all, e.g. on minimal linux systems
+        return Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(action);
+    }
+
     public static void openUrlInBrowser(String uri) {
         if (uri == null) {
             return;
@@ -23,7 +28,7 @@ public class DesktopHelper {
             return;
         }
 
-        if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+        if (!isSupported(Desktop.Action.BROWSE)) {
             if (OsType.ofLocal() == OsType.LINUX) {
                 LocalExec.executeAsync("xdg-open", parsed.toString());
                 return;
@@ -78,7 +83,7 @@ public class DesktopHelper {
             return;
         }
 
-        if (!Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+        if (!isSupported(Desktop.Action.OPEN)) {
             if (OsType.ofLocal() == OsType.LINUX) {
                 LocalExec.executeAsync("xdg-open", file.toString());
                 return;
@@ -87,7 +92,7 @@ public class DesktopHelper {
 
         // This can be a blocking operation
         ThreadHelper.runAsync(() -> {
-            if (Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+            if (isSupported(Desktop.Action.OPEN)) {
                 try {
                     Desktop.getDesktop().open(file.toFile());
                     return;
@@ -115,14 +120,14 @@ public class DesktopHelper {
         if (OsType.ofLocal() == OsType.WINDOWS) {
             // Explorer does not support single quotes, so use normal quotes
             if (Files.isDirectory(file)) {
-                LocalExec.readStdoutIfPossible("explorer", "\"" + file + "\"");
+                LocalExec.executeAsync("explorer", "\"" + file + "\"");
             } else {
-                LocalExec.readStdoutIfPossible("explorer", "/select,", "\"" + file + "\"");
+                LocalExec.executeAsync("explorer", "/select,", "\"" + file + "\"");
             }
             return;
         }
 
-        if (!Desktop.getDesktop().isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
+        if (!isSupported(Desktop.Action.BROWSE_FILE_DIR)) {
             browseFile(file.getParent());
             return;
         }

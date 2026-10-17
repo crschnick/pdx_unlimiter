@@ -83,8 +83,7 @@ public class GuiImporterState {
     }
 
     private boolean shouldShow(ImportEntry entry, String lowerFilter) {
-        return entry.target().getName().toLowerCase().contains(lowerFilter)
-                && !entry.target.hasImportedSourceFile();
+        return entry.target().getName().toLowerCase().contains(lowerFilter) && !entry.target.hasImportedSourceFile();
     }
 
     public BooleanProperty selectAllProperty() {

@@ -1,5 +1,7 @@
 tasks.register('createPkg', Exec) {
     dependsOn baseDist
+    // The base dist must be fully finalized before copying it
+    mustRunAfter tasks.matching { it.name == 'trainAot' || it.name == 'notarize' }
     commandLine "$projectDir/pkg/build-pkg.sh",
                 versionString,
                 canonicalVersionString,

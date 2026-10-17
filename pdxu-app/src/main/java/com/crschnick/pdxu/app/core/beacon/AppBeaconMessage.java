@@ -62,6 +62,10 @@ public interface AppBeaconMessage {
 
         @Override
         public void handle() {
+            if (arguments == null) {
+                return;
+            }
+
             AppOpenArguments.handle(arguments);
         }
     }

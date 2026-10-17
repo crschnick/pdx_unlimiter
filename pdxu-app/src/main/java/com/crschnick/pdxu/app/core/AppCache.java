@@ -3,12 +3,12 @@ package com.crschnick.pdxu.app.core;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.util.JacksonMapper;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.io.FileUtils;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.type.TypeFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -48,7 +48,7 @@ public class AppCache {
     }
 
     public static <T> T getNonNull(String key, Class<?> type, Supplier<T> notPresent) {
-        return getNonNull(key, TypeFactory.defaultInstance().constructType(type), notPresent);
+        return getNonNull(key, TypeFactory.createDefaultInstance().constructType(type), notPresent);
     }
 
     @SuppressWarnings("unchecked")

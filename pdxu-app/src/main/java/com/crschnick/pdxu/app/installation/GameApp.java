@@ -1,7 +1,6 @@
 package com.crschnick.pdxu.app.installation;
 
 import com.crschnick.pdxu.app.core.AppNativeHook;
-import com.crschnick.pdxu.app.core.AppProperties;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.keyboard.NativeKeyListener;

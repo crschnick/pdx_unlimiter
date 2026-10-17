@@ -73,7 +73,7 @@ public class Ck3RulerComp extends SavegameInfoComp {
             box.getStyleClass().add(CLASS_RULER);
             rulerNode.getChildren().add(box);
         }
-        if(ruler.getHouse() != null) {
+        if (ruler.getHouse() != null) {
             var house = GameImage.imageNode(
                     Ck3CoatOfArmsCache.houseImage(ruler.getHouse(), GameFileContext.fromData(data)), "house-icon");
             GuiTooltips.install(house, AppI18n.get("house", ruler.getHouse().getName()));
