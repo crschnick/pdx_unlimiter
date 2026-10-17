@@ -9,6 +9,7 @@ import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.LinkedArrayNode;
+import com.crschnick.pdxu.io.node.NodeEnvironment;
 import com.crschnick.pdxu.io.node.NodeEvaluator;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
@@ -23,6 +24,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.imageio.ImageIO;
 
@@ -117,7 +119,7 @@ public class RenderCommand implements Runnable {
         var files = new ArrayList<Path>();
         CascadeDirectoryHelper.traverseDirectory(directory, context, files::add);
 
-        var all = Eu5TagRenderer.getCoatOfArmsNode(context);
+        var all = Eu5TagRenderer.loadCoatOfArmsNode(new NodeEnvironment(Map.of()), context);
         all.forEach(
                 (s, node) -> {
                     if (!node.isArray()) {
@@ -130,7 +132,7 @@ public class RenderCommand implements Runnable {
 
                     try {
                         System.out.println("Rendering " + s + " ...");
-                        var coa = Eu5TagRenderer.getCoatOfArms(node.getArrayNode(), all);
+                        var coa = Eu5TagRenderer.parseCoatOfArms(node.getArrayNode(), all);
                         var image = Eu5TagRenderer.renderImage(coa, context, (int) (1.5 * size), size);
                         consumer.accept(s, image);
                     } catch (Exception exception) {
@@ -220,7 +222,7 @@ public class RenderCommand implements Runnable {
         var files = new ArrayList<Path>();
         CascadeDirectoryHelper.traverseDirectory(directory, context, files::add);
 
-        var all = Vic3TagRenderer.getCoatOfArmsNode(context);
+        var all = Vic3TagRenderer.loadCoatOfArmsNode(new NodeEnvironment(Map.of()), context);
         all.forEach(
                 (s, node) -> {
                     if (!node.isArray()) {
@@ -233,7 +235,7 @@ public class RenderCommand implements Runnable {
 
                     try {
                         System.out.println("Rendering " + s + " ...");
-                        var coa = Vic3TagRenderer.getCoatOfArms(node.getArrayNode(), all);
+                        var coa = Vic3TagRenderer.parseCoatOfArms(node.getArrayNode(), all);
                         var image = Vic3TagRenderer.renderImage(coa, context, (int) (1.5 * size), size);
                         consumer.accept(s, image);
                     } catch (Exception exception) {

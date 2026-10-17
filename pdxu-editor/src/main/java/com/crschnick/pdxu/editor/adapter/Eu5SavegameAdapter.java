@@ -83,7 +83,7 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
                             var parsed = TextFormatParser.eu5()
                                     .parse(node.getKeyName().orElse("?"), s.getBytes(StandardCharsets.UTF_8), 0);
                             var coaNode = parsed.getNodeArray().getFirst().getArrayNode();
-                            return Eu5TagRenderer.getCoatOfArms(coaNode, ArrayNode.array(List.of()));
+                            return Eu5TagRenderer.parseCoatOfArms(coaNode, ArrayNode.array(List.of()));
                         } catch (Exception ex) {
                             return CoatOfArms.empty();
                         }

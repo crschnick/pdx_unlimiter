@@ -4,11 +4,11 @@ import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.LinkedArrayNode;
+import com.crschnick.pdxu.io.node.NodeEnvironment;
 import com.crschnick.pdxu.io.node.NodeEvaluator;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
 
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 
 public class Vic3TagRenderer {
 
-    public static CoatOfArms getCoatOfArms(ArrayNode node, ArrayNode all) {
+    public static CoatOfArms parseCoatOfArms(ArrayNode node, ArrayNode all) {
         var eval = node.copy().getArrayNode();
         NodeEvaluator.evaluateArrayNode(eval);
 
@@ -29,7 +29,7 @@ public class Vic3TagRenderer {
         return coa;
     }
 
-    public static ArrayNode getCoatOfArmsNode(GameFileContext context, ArrayNode... otherNodes) {
+    public static ArrayNode loadCoatOfArmsNode(NodeEnvironment env, GameFileContext context, ArrayNode... otherNodes) {
         var dir = Path.of("common").resolve("coat_of_arms").resolve("coat_of_arms");
         var files = new ArrayList<Path>();
         CascadeDirectoryHelper.traverseDirectory(dir, context, files::add);
@@ -47,7 +47,7 @@ public class Vic3TagRenderer {
                         }),
                         Arrays.stream(otherNodes).map(Optional::of))
                 .flatMap(Optional::stream)
-                .peek(arrayNode -> NodeEvaluator.evaluateArrayNode(arrayNode.getArrayNode()))
+                .peek(arrayNode -> NodeEvaluator.evaluateArrayNode(arrayNode.getArrayNode(), env))
                 .toList());
         return all;
     }

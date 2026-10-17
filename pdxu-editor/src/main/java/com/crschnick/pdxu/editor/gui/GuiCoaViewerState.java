@@ -90,15 +90,13 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
                                     editorRootNode.getBackingNode().copy().getArrayNode())
                             .toArray(ArrayNode[]::new);
 
-            var all = Vic3TagRenderer.getCoatOfArmsNode(GameFileContext.forGame(Game.VIC3), additional);
-            var allCopy = all.copy().getArrayNode();
             var env = new NodeEnvironment(Map.of());
-            NodeEvaluator.evaluateArrayNode(allCopy, env);
+            var all = Vic3TagRenderer.loadCoatOfArmsNode(env, GameFileContext.forGame(Game.VIC3), additional);
 
             var coaNode = editorNode.getBackingNode().copy().getArrayNode();
             NodeEvaluator.evaluateArrayNode(coaNode, env);
 
-            return Vic3TagRenderer.getCoatOfArms(coaNode, allCopy);
+            return Vic3TagRenderer.parseCoatOfArms(coaNode, all);
         }
     }
 
@@ -127,15 +125,13 @@ public abstract class GuiCoaViewerState<T extends GuiCoaDisplayType> {
                                     editorRootNode.getBackingNode().copy().getArrayNode())
                             .toArray(ArrayNode[]::new);
 
-            var all = Eu5TagRenderer.getCoatOfArmsNode(GameFileContext.forGame(Game.EU5), additional);
-            var allCopy = all.copy().getArrayNode();
             var env = new NodeEnvironment(Map.of());
-            NodeEvaluator.evaluateArrayNode(allCopy, env);
+            var all = Eu5TagRenderer.loadCoatOfArmsNode(env, GameFileContext.forGame(Game.EU5), additional);
 
             var coaNode = editorNode.getBackingNode().copy().getArrayNode();
             NodeEvaluator.evaluateArrayNode(coaNode, env);
 
-            return Eu5TagRenderer.getCoatOfArms(coaNode, allCopy);
+            return Eu5TagRenderer.parseCoatOfArms(coaNode, all);
         }
     }
 

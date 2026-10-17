@@ -9,6 +9,7 @@ import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.node.NodeEnvironment;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameColor;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
@@ -105,7 +106,7 @@ public class Eu5CoatOfArmsCache extends GameCacheManager.Cache {
             return cache.coatOfArmsNode;
         }
 
-        var all = Eu5TagRenderer.getCoatOfArmsNode(context);
+        var all = Eu5TagRenderer.loadCoatOfArmsNode(new NodeEnvironment(Map.of()), context);
         cache.coatOfArmsNode = all;
         return cache.coatOfArmsNode;
     }

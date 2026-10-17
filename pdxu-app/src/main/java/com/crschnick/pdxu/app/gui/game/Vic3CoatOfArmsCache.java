@@ -9,6 +9,7 @@ import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.io.node.Node;
+import com.crschnick.pdxu.io.node.NodeEnvironment;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
 import com.crschnick.pdxu.model.GameColor;
 import com.crschnick.pdxu.model.coa.CoatOfArms;
@@ -75,7 +76,7 @@ public class Vic3CoatOfArmsCache extends GameCacheManager.Cache {
             return cache.coatOfArmsNode;
         }
 
-        var all = Vic3TagRenderer.getCoatOfArmsNode(context);
+        var all = Vic3TagRenderer.loadCoatOfArmsNode(new NodeEnvironment(Map.of()), context);
         cache.coatOfArmsNode = all;
         return cache.coatOfArmsNode;
     }
@@ -88,14 +89,14 @@ public class Vic3CoatOfArmsCache extends GameCacheManager.Cache {
         }
 
         var context = GameFileContext.fromData(info.getData());
-        var all = getCoatOfArmsNode(context);
+        var allNode = getCoatOfArmsNode(context);
         try {
             Supplier<CoatOfArms> coa = tag == info.getData().getTag()
                     ? () -> info.getData().vic3().getCoatOfArms()
                     : () -> CoatOfArms.fromNode(
-                            all.getNodeForKeyIfExistent(tag.getTag()).orElseThrow(), s -> {
-                                var found = all.getNodesForKey(s);
-                                return found.size() > 0 ? found.getLast() : null;
+                            allNode.getNodeForKeyIfExistent(tag.getTag()).orElseThrow(), s -> {
+                                var found = allNode.getNodesForKey(s);
+                                return !found.isEmpty() ? found.getLast() : null;
                             });
             var img = Vic3TagRenderer.renderImage(coa.get(), context, (int) (IMG_SIZE * 1.5), IMG_SIZE);
             var convertedImage = ImageHelper.toFXImage(img);
