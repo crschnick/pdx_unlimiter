@@ -105,6 +105,11 @@ public abstract class GameDateType {
         }
 
         @Override
+        public String toShortDisplayString(GameDate date) {
+            return date.getYear() + "." + date.getMonth() + "." + date.getDay() + "." + (date.getHour() + 1);
+        }
+
+        @Override
         public String toLongString(Locale l, GameDate date) {
             return (date.getHour() + 1) + ":00, " + date.getDay() + " "
                     + Month.of(date.getMonth()).getDisplayName(TextStyle.FULL, l) + ", " + date.getYear();
@@ -141,6 +146,10 @@ public abstract class GameDateType {
     public abstract int getDaysInMonth(int month);
 
     public abstract String toShortString(GameDate date);
+
+    public String toShortDisplayString(GameDate date) {
+        return toShortString(date);
+    }
 
     public abstract String toLongString(Locale l, GameDate date);
 

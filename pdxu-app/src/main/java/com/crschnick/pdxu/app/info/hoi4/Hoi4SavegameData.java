@@ -55,7 +55,7 @@ public class Hoi4SavegameData extends SavegameData<Hoi4Tag> {
                 .filter(s -> !s.isBlank())
                 .orElse(null);
         date = GameDateType.HOI4.fromString(content.get().getNodeForKey("date").getString());
-        ironman = content.get().hasKey("Ironman");
+        ironman = content.get().hasKey("ironman");
         allTags = List.of(tag);
         mods = content.get().getNodeForKeyIfExistent("mods").map(Node::getNodeArray).orElse(List.of()).stream()
                 .map(Node::getString)

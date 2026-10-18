@@ -34,13 +34,14 @@ public final class TaggedNode extends Node {
                 return null;
             }
 
-            if (ctx.getData()[begin] != 'r' && ctx.getData()[begin] != 'h') {
+            var first = ctx.getData()[begin];
+            if (first != 'r' && first != 'h' && first != 'R' && first != 'H') {
                 return null;
             }
 
             var end = begin + length;
             for (var t : COLORS) {
-                if (Arrays.equals(t.getBytes(), 0, t.id.length(), ctx.getData(), begin, end)) {
+                if (matches(t, ctx.getData(), begin, end)) {
                     return t;
                 }
             }
@@ -49,21 +50,44 @@ public final class TaggedNode extends Node {
                 return null;
             }
 
-            if (ctx.getData()[begin] != 'r'
-                    && ctx.getData()[begin] != 'h'
-                    && ctx.getData()[begin] != 'l'
-                    && ctx.getData()[begin] != 'L') {
+            var first = ctx.getData()[begin];
+            if (first != 'r' && first != 'h' && first != 'R' && first != 'H' && first != 'l' && first != 'L') {
                 return null;
             }
 
             var end = begin + length;
             for (var t : ALL) {
-                if (Arrays.equals(t.getBytes(), 0, t.id.length(), ctx.getData(), begin, end)) {
+                if (matches(t, ctx.getData(), begin, end)) {
                     return t;
                 }
             }
         }
         return null;
+    }
+
+    private static boolean matches(TagType t, byte[] data, int begin, int end) {
+        var id = t.getBytes();
+        if (id.length != end - begin) {
+            return false;
+        }
+
+        for (int i = 0; i < id.length; i++) {
+            var b = data[begin + i];
+            if (b == id[i]) {
+                continue;
+            }
+
+            if (t.isCaseSensitive()) {
+                return false;
+            }
+
+            var dataChar = Character.toLowerCase((char) (b & 0xFF));
+            var idChar = Character.toLowerCase((char) (id[i] & 0xFF));
+            if (dataChar != idChar) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override
@@ -149,19 +173,25 @@ public final class TaggedNode extends Node {
     }
 
     public enum TagType {
-        RGB("rgb"),
-        HSV("hsv"),
-        HSV360("hsv360"),
-        HEX("hex"),
-        LIST("list"),
-        UPPERCASE_LIST("LIST");
+        RGB("rgb", false),
+        HSV("hsv", false),
+        HSV360("hsv360", false),
+        HEX("hex", false),
+        LIST("list", true),
+        UPPERCASE_LIST("LIST", true);
 
         private final String id;
         private final byte[] bytes;
+        private final boolean caseSensitive;
 
-        TagType(String id) {
+        TagType(String id, boolean caseSensitive) {
             this.id = id;
             this.bytes = id.getBytes(StandardCharsets.UTF_8);
+            this.caseSensitive = caseSensitive;
+        }
+
+        public boolean isCaseSensitive() {
+            return caseSensitive;
         }
 
         public String getId() {

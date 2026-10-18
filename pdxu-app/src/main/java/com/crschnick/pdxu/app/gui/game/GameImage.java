@@ -83,6 +83,19 @@ public class GameImage {
     public static Image STELLARIS_ICON_PLANETS;
 
     public static Image HOI4_ICON_IRONMAN;
+    public static Image HOI4_ICON_POLITICAL_POWER;
+    public static Image HOI4_ICON_STABILITY;
+    public static Image HOI4_ICON_WAR_SUPPORT;
+    public static Image HOI4_ICON_CIVILIAN_FACTORY;
+    public static Image HOI4_ICON_MILITARY_FACTORY;
+    public static Image HOI4_ICON_DOCKYARD;
+    public static Image HOI4_ICON_DIVISION;
+    public static Image HOI4_ICON_MANPOWER;
+    public static Image HOI4_ICON_IDEOLOGY_DEMOCRATIC;
+    public static Image HOI4_ICON_IDEOLOGY_COMMUNISM;
+    public static Image HOI4_ICON_IDEOLOGY_FASCISM;
+    public static Image HOI4_ICON_IDEOLOGY_NEUTRALITY;
+    public static Image HOI4_ICON_IDEOLOGY_UNKNOWN;
     public static Image HOI4_ICON_VERSION_WARNING;
     public static Image HOI4_ICON_DIFF_RECRUIT;
     public static Image HOI4_ICON_DIFF_REGULAR;
@@ -396,6 +409,23 @@ public class GameImage {
 
         HOI4_ICON_VERSION_WARNING = ImageHelper.loadImage(i.resolve("warning_icon.dds"));
         HOI4_ICON_IRONMAN = ImageHelper.loadImage(i.resolve("ironman_icon.dds"));
+        HOI4_ICON_POLITICAL_POWER = ImageHelper.loadImage(i.resolve("pol_power_icon.dds"));
+        HOI4_ICON_STABILITY = ImageHelper.loadImage(i.resolve("stability_icon.dds"));
+        HOI4_ICON_WAR_SUPPORT = ImageHelper.loadImage(i.resolve("war_support_icon.dds"));
+        var texticons = installPath.resolve("gfx").resolve("texticons");
+        HOI4_ICON_CIVILIAN_FACTORY = ImageHelper.loadImage(texticons.resolve("civ_factory.dds"));
+        HOI4_ICON_MILITARY_FACTORY = ImageHelper.loadImage(texticons.resolve("mil_factory.dds"));
+        HOI4_ICON_DOCKYARD = ImageHelper.loadImage(i.resolve("dockyard_icon.dds"));
+        HOI4_ICON_MANPOWER = ImageHelper.loadImage(i.resolve("manpower_icon.dds"));
+        var ideologies = i.resolve("ideologies");
+        HOI4_ICON_IDEOLOGY_DEMOCRATIC = ImageHelper.loadImage(ideologies.resolve("democratic_group.dds"));
+        HOI4_ICON_IDEOLOGY_COMMUNISM = ImageHelper.loadImage(ideologies.resolve("communism_group.dds"));
+        HOI4_ICON_IDEOLOGY_FASCISM = ImageHelper.loadImage(ideologies.resolve("fascism_group.dds"));
+        HOI4_ICON_IDEOLOGY_NEUTRALITY = ImageHelper.loadImage(ideologies.resolve("neutrality_group.dds"));
+        HOI4_ICON_IDEOLOGY_UNKNOWN = ImageHelper.loadImage(ideologies.resolve("unknown.dds"));
+        var divisionIcon = ImageHelper.loadImage(i.resolve("division_icon.dds"));
+        HOI4_ICON_DIVISION = ImageHelper.cut(
+                divisionIcon, new Rectangle2D(0, 0, divisionIcon.getWidth() / 2, divisionIcon.getHeight()));
         HOI4_ICON_DIFF_RECRUIT = ImageHelper.loadImage(i.resolve("difficulty_button_recruit.dds"));
         HOI4_ICON_DIFF_REGULAR = ImageHelper.loadImage(i.resolve("difficulty_button_regular.dds"));
         HOI4_ICON_DIFF_VETERAN = ImageHelper.loadImage(i.resolve("difficulty_button_veteran.dds"));

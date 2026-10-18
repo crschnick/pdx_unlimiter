@@ -52,6 +52,10 @@ public final class GameDate implements Comparable<GameDate> {
         return type.toShortString(this);
     }
 
+    public String toShortDisplayString() {
+        return type.toShortDisplayString(this);
+    }
+
     public String toDisplayString(Locale l) {
         return type.toLongString(l, this);
     }

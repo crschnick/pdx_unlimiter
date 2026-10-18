@@ -9,6 +9,7 @@ import com.crschnick.pdxu.model.GameVersion;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_COMPATIBLE;
 import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_INCOMPATIBLE;
@@ -29,26 +30,36 @@ public class VersionComp extends SavegameInfoComp {
 
     @Override
     public Region create(SavegameData<?> data) {
-        Label label = null;
+        String text;
+        String tooltip;
+        String styleClass;
         switch (SavegameCompatibility.determineForVersion(
                 data.installation().getDist().getGame(), version)) {
             case COMPATIBLE -> {
-                label = new Label("v" + version.toString());
-                GuiTooltips.install(label, AppI18n.get("compatible"));
-                label.getStyleClass().add(CLASS_COMPATIBLE);
+                text = "v" + version.toString();
+                tooltip = AppI18n.get("compatible");
+                styleClass = CLASS_COMPATIBLE;
             }
             case INCOMPATIBLE -> {
-                label = new Label("v" + version.toString() + " (!)");
-                GuiTooltips.install(label, AppI18n.get("incompatible"));
-                label.getStyleClass().add(CLASS_INCOMPATIBLE);
+                text = "v" + version.toString() + " (!)";
+                tooltip = AppI18n.get("incompatible");
+                styleClass = CLASS_INCOMPATIBLE;
             }
-            case UNKNOWN -> {
-                label = new Label("v" + version.toString() + " (?)");
-                GuiTooltips.install(label, AppI18n.get("unknownCompatibility"));
-                label.getStyleClass().add("unknown-compatible");
+            default -> {
+                text = "v" + version.toString() + " (?)";
+                tooltip = AppI18n.get("unknownCompatibility");
+                styleClass = "unknown-compatible";
             }
         }
-        label.setAlignment(Pos.CENTER);
-        return label;
+
+        var label = new Label(text);
+        label.setMinWidth(Region.USE_PREF_SIZE);
+        label.setEllipsisString("");
+
+        var stack = new StackPane(label);
+        stack.setAlignment(Pos.CENTER);
+        stack.getStyleClass().add(styleClass);
+        GuiTooltips.install(stack, tooltip);
+        return stack;
     }
 }
