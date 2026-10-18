@@ -101,6 +101,12 @@ public class AppInit {
 
     private static AppOperationMode getStartupMode() {
         var event = TrackEvent.withInfo("Startup mode determined");
+
+        if (AppProperties.get().isAotTrainMode()) {
+            event.tag("mode", "background").tag("reason", "aot").handle();
+            return AppOperationMode.BACKGROUND;
+        }
+
         if (AppMainWindow.get() != null && AppMainWindow.get().getStage().isShowing()) {
             event.tag("mode", "gui").tag("reason", "windowShowing").handle();
             return AppOperationMode.GUI;
