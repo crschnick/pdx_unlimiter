@@ -49,13 +49,14 @@ public class GuiEditorMenuBar {
                     var jumps = EditorSavegameAdapter.ALL
                             .get(state.getFileContext().getGame())
                             .createCommonJumps(state);
+                    var root = state.getBackingNode();
                     jumps.forEach((k, v) -> {
                         MenuItem j = new MenuItem(k);
                         j.setOnAction((a) -> {
                             state.getNavigation().navigateTo(v);
                         });
                         jump.getItems().add(j);
-                        j.setDisable(v == null);
+                        j.setDisable(v == null || !v.isValid(root));
                     });
                 } catch (Exception ex) {
                     ErrorEventFactory.fromThrowable(ex).handle();

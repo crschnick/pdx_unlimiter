@@ -16,6 +16,7 @@ public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
     Hoi4FactoriesComp factories;
     Hoi4DivisionsComp divisions;
     Hoi4ManpowerComp manpower;
+    Hoi4WarsComp wars;
     Hoi4IronmanComp ironman;
     ModComp mods;
     VersionComp version;

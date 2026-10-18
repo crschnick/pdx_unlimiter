@@ -91,6 +91,7 @@ public class GameImage {
     public static Image HOI4_ICON_DOCKYARD;
     public static Image HOI4_ICON_DIVISION;
     public static Image HOI4_ICON_MANPOWER;
+    public static Image HOI4_ICON_WAR;
     public static Image HOI4_ICON_IDEOLOGY_DEMOCRATIC;
     public static Image HOI4_ICON_IDEOLOGY_COMMUNISM;
     public static Image HOI4_ICON_IDEOLOGY_FASCISM;
@@ -417,6 +418,7 @@ public class GameImage {
         HOI4_ICON_MILITARY_FACTORY = ImageHelper.loadImage(texticons.resolve("mil_factory.dds"));
         HOI4_ICON_DOCKYARD = ImageHelper.loadImage(i.resolve("dockyard_icon.dds"));
         HOI4_ICON_MANPOWER = ImageHelper.loadImage(i.resolve("manpower_icon.dds"));
+        HOI4_ICON_WAR = ImageHelper.loadImage(i.resolve("diplo_war_large_icon.dds"));
         var ideologies = i.resolve("ideologies");
         HOI4_ICON_IDEOLOGY_DEMOCRATIC = ImageHelper.loadImage(ideologies.resolve("democratic_group.dds"));
         HOI4_ICON_IDEOLOGY_COMMUNISM = ImageHelper.loadImage(ideologies.resolve("communism_group.dds"));

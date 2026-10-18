@@ -1,0 +1,6 @@
+.hoi4 .tag-icon {
+-fx-min-width: 3em;
+-fx-max-width: 3em;
+-fx-min-height: 1.9em;
+-fx-max-height: 1.9em;
+}

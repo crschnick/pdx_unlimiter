@@ -8,6 +8,7 @@ import com.crschnick.pdxu.app.info.ck2.Ck2SavegameInfo;
 import com.crschnick.pdxu.app.info.ck3.Ck3SavegameInfo;
 import com.crschnick.pdxu.app.info.eu4.Eu4SavegameInfo;
 import com.crschnick.pdxu.app.info.eu5.Eu5SavegameInfo;
+import com.crschnick.pdxu.app.info.hoi4.Hoi4Names;
 import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameInfo;
 import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameInfo;
 import com.crschnick.pdxu.app.info.vic2.Vic2SavegameInfo;
@@ -123,22 +124,8 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
             @Override
             protected String getDefaultCampaignName(Hoi4SavegameInfo info) {
                 var tag = info.getData().getTag();
-                var cosmeticTag = info.getData().hoi4().getCosmeticTag();
-                var candidates = new ArrayList<String>();
-                for (var base : cosmeticTag != null ? List.of(cosmeticTag, tag.getTag()) : List.of(tag.getTag())) {
-                    if (tag.getIdeology() != null) {
-                        candidates.add(base + "_" + tag.getIdeology());
-                    }
-                    candidates.add(base);
-                }
-
-                for (var key : candidates) {
-                    var name = GameLocalisation.getLocalisedValue(key, info);
-                    if (!name.equals(key)) {
-                        return name;
-                    }
-                }
-                return tag.getTag();
+                return Hoi4Names.getCountryName(
+                        info.getData(), tag.getTag(), tag.getIdeology(), info.getData().hoi4().getCosmeticTag());
             }
         });
         ALL.put(Game.CK3, new SavegameStorage<>("ck3", GameDateType.CK3, SavegameType.CK3, Ck3SavegameInfo.class) {

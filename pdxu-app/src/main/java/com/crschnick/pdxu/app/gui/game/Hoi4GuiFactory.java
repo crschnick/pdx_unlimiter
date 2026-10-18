@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.gui.game;
 
+import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameInfo;
 import com.crschnick.pdxu.app.installation.GameFileContext;
@@ -22,6 +23,8 @@ import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
@@ -55,6 +58,25 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     @Override
     public Image tagImage(SavegameInfo<Hoi4Tag> info, Hoi4Tag tag) {
         return hoi4TagNode(GameImage.getHoi4TagPath(tag), info);
+    }
+
+    public static Image countryFlag(SavegameData<?> data, String tag, String ideology, String cosmeticTag) {
+        var ctx = GameFileContext.fromData(data);
+        var candidates = new ArrayList<String>();
+        for (var base : cosmeticTag != null ? List.of(cosmeticTag, tag) : List.of(tag)) {
+            if (ideology != null) {
+                candidates.add(base + "_" + ideology);
+            }
+            candidates.add(base);
+        }
+
+        for (var name : candidates) {
+            var file = CascadeDirectoryHelper.openFile(Path.of("gfx", "flags", name + ".tga"), ctx);
+            if (file.isPresent()) {
+                return ImageHelper.loadImage(file.get(), null);
+            }
+        }
+        return ImageHelper.DEFAULT_IMAGE;
     }
 
     private Image hoi4TagNode(Path path, SavegameInfo<Hoi4Tag> info) {

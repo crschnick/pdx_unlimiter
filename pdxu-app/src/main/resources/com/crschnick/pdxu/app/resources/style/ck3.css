@@ -28,7 +28,6 @@
 -fx-max-width: 2.5em;
 -fx-min-height: 2.5em;
 -fx-max-height: 2.5em;
--fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.8), 10, 0, 0, 0);
 }
 
 .ck3 .titles {

@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.editor;
 
+import com.crschnick.pdxu.editor.node.EditorCollectorNode;
 import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.editor.node.EditorRootNode;
@@ -111,10 +112,21 @@ public class EditorNavPath {
             var found = fastEditorNodeFind(state.getBackingNode(), current, sub);
             if (found.isEmpty()) {
                 return Optional.empty();
-            } else {
-                newPath.add(found.get());
-                current = found.get();
             }
+
+            var node = found.get();
+            if (node instanceof EditorCollectorNode) {
+                var match = node.expand().stream()
+                        .filter(child -> sub.isValid(child.getContent()))
+                        .findFirst();
+                if (match.isPresent()) {
+                    newPath.add(node);
+                    node = match.get();
+                }
+            }
+
+            newPath.add(node);
+            current = node;
         }
 
         return Optional.of(new EditorNavPath(newPath));
