@@ -101,7 +101,7 @@ public abstract class GameDateType {
 
         @Override
         public String toShortString(GameDate date) {
-            return date.getYear() + "." + date.getMonth() + "." + date.getDay() + "." + (date.getHour() + 1);
+            return date.getYear() + "." + date.getMonth() + "." + date.getDay() + "." + date.getHour();
         }
 
         @Override

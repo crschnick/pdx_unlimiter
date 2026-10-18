@@ -123,15 +123,22 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
             @Override
             protected String getDefaultCampaignName(Hoi4SavegameInfo info) {
                 var tag = info.getData().getTag();
-                if (tag.getIdeology() != null) {
-                    var ideologyKey = tag.getTag() + "_" + tag.getIdeology();
-                    var ideologyName = GameLocalisation.getLocalisedValue(ideologyKey, info);
-                    if (!ideologyName.equals(ideologyKey)) {
-                        return ideologyName;
+                var cosmeticTag = info.getData().hoi4().getCosmeticTag();
+                var candidates = new ArrayList<String>();
+                for (var base : cosmeticTag != null ? List.of(cosmeticTag, tag.getTag()) : List.of(tag.getTag())) {
+                    if (tag.getIdeology() != null) {
+                        candidates.add(base + "_" + tag.getIdeology());
                     }
+                    candidates.add(base);
                 }
 
-                return GameLocalisation.getLocalisedValue(tag.getTag(), info);
+                for (var key : candidates) {
+                    var name = GameLocalisation.getLocalisedValue(key, info);
+                    if (!name.equals(key)) {
+                        return name;
+                    }
+                }
+                return tag.getTag();
             }
         });
         ALL.put(Game.CK3, new SavegameStorage<>("ck3", GameDateType.CK3, SavegameType.CK3, Ck3SavegameInfo.class) {

@@ -84,6 +84,10 @@ public abstract class SavegameData<T> {
         return (Eu5SavegameData) this;
     }
 
+    public Hoi4SavegameData hoi4() {
+        return (Hoi4SavegameData) this;
+    }
+
     public GameInstallation installation() {
         return GameInstallation.ALL.get(GameFileContext.INFO_MAP.get(getClass()));
     }

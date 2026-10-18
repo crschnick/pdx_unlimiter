@@ -20,12 +20,17 @@ import java.util.stream.Collectors;
 public class Hoi4SavegameData extends SavegameData<Hoi4Tag> {
 
     protected Hoi4Tag tag;
+    protected String cosmeticTag;
     protected List<Hoi4Tag> allTags;
     private GameNamedVersion version;
 
     @Override
     public Hoi4Tag getTag() {
         return tag;
+    }
+
+    public String getCosmeticTag() {
+        return cosmeticTag;
     }
 
     @Override
@@ -44,6 +49,11 @@ public class Hoi4SavegameData extends SavegameData<Hoi4Tag> {
         tag = new Hoi4Tag(
                 content.get().getNodeForKey("player").getString(),
                 content.get().getNodeForKey("ideology").getString());
+        cosmeticTag = content.get()
+                .getNodeForKeyIfExistent("cosmetic_tag")
+                .map(Node::getString)
+                .filter(s -> !s.isBlank())
+                .orElse(null);
         date = GameDateType.HOI4.fromString(content.get().getNodeForKey("date").getString());
         ironman = content.get().hasKey("Ironman");
         allTags = List.of(tag);
