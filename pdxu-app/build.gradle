@@ -60,7 +60,7 @@ dependencies {
     implementation "org.apache.commons:commons-collections4:4.5.0"
     implementation 'io.github.ititus:ddsiio:4.0.0'
     implementation 'org.graalvm.polyglot:polyglot:25.0.1'
-    implementation 'org.graalvm.truffle:truffle-runtime:25.0.1'
+    implementation 'org.graalvm.truffle:truffle-runtime:25.4.4.1.1'
     implementation 'org.graalvm.js:js-language:25.0.1'
     implementation project(':pdxu-io')
     implementation project(':pdxu-model')
