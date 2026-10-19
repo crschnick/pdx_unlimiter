@@ -19,7 +19,7 @@ dependencies {
 
     compileOnly 'org.apache.commons:commons-lang3:3.21.0'
     compileOnly 'commons-io:commons-io:2.22.0'
-    compileOnly "org.apache.commons:commons-collections4:4.5.0"
+    compileOnly "org.apache.commons:commons-collections4:4.6.0"
     compileOnly 'io.github.mkpaz:atlantafx-base:2.1.0'
 
     compileOnly project(':pdxu-app')
