@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.gui.game.Hoi4GuiFactory;
 import com.crschnick.pdxu.app.info.DiplomacyRowComp;
 import com.crschnick.pdxu.app.info.SavegameData;
+import com.crschnick.pdxu.app.util.NumberFormatHelper;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 
@@ -79,16 +80,6 @@ public class Hoi4WarsComp extends DiplomacyRowComp<Hoi4WarsComp.Enemy> {
                 .orElse(0L);
     }
 
-    private static String formatCasualties(long value) {
-        if (value >= 1_000_000) {
-            return String.format("%.1fM", value / 1_000_000.0);
-        }
-        if (value >= 1_000) {
-            return (value / 1_000) + "k";
-        }
-        return String.valueOf(value);
-    }
-
     @Override
     protected Region mapTag(SavegameData<?> data, Enemy enemy) {
         return GameImage.imageNode(
@@ -98,8 +89,8 @@ public class Hoi4WarsComp extends DiplomacyRowComp<Hoi4WarsComp.Enemy> {
     @Override
     protected String mapTagTooltip(SavegameData<?> data, Enemy enemy) {
         return Hoi4Names.getCountryName(data, enemy.tag, enemy.ideology, enemy.cosmeticTag) + "\n"
-                + AppI18n.get("warCasualties") + ": " + formatCasualties(enemy.ownCasualties) + " / "
-                + formatCasualties(enemy.enemyCasualties);
+                + AppI18n.get("warCasualties") + ": " + NumberFormatHelper.formatCompact(enemy.ownCasualties) + " / "
+                + NumberFormatHelper.formatCompact(enemy.enemyCasualties);
     }
 
     @Override

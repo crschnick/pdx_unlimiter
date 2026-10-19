@@ -13,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -27,6 +28,18 @@ public class StellarisSavegameData extends SavegameData<StellarisTag> {
     @Override
     public StellarisTag getTag() {
         return tag;
+    }
+
+    public Optional<Node> getPlayerCountry(SavegameContent content) {
+        return content.get().getNodeForKeysIfExistent("country", String.valueOf(tag.getId()));
+    }
+
+    public double getPlayerValue(SavegameContent content, String key) {
+        return getPlayerCountry(content)
+                .flatMap(c -> c.getNodeForKeyIfExistent(key))
+                .filter(Node::isValue)
+                .map(Node::getDouble)
+                .orElse(0.0);
     }
 
     @Override
@@ -62,7 +75,14 @@ public class StellarisSavegameData extends SavegameData<StellarisTag> {
 
             allTags.add(StellarisTag.fromNode(Long.parseLong(k), v));
         });
-        tag = allTags.getFirst();
+        var playerId = content.get()
+                .getNodeForKeyIfExistent("player")
+                .filter(Node::isArray)
+                .flatMap(p -> p.getNodeArray().stream().findFirst())
+                .flatMap(p -> p.getNodeForKeyIfExistent("country"))
+                .filter(Node::isValue)
+                .map(Node::getLong);
+        tag = playerId.flatMap(id -> StellarisTag.getTag(allTags, id)).orElse(allTags.getFirst());
         tag.setName(content.get().getNodeForKey("name").getString());
         observer = false;
 

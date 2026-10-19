@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.info.vic3;
 
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
+import com.crschnick.pdxu.app.util.NumberFormatHelper;
 
 import javafx.scene.image.Image;
 
@@ -11,11 +12,7 @@ public class Vic3RadicalComp extends Vic3ChannelComp {
 
     @Override
     protected String getDisplayValue() {
-        if (value < 1000) {
-            return String.valueOf(Math.round(value));
-        }
-
-        return String.valueOf(Math.round(value / 1000)) + "K";
+        return NumberFormatHelper.formatCompact(value);
     }
 
     @Override

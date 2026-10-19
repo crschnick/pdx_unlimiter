@@ -1,6 +1,6 @@
 .vic3 .tag-icon {
--fx-min-width: 4em;
--fx-max-width: 4em;
--fx-min-height: 3em;
--fx-max-height: 3em;
+-fx-min-width: 3em;
+-fx-max-width: 3em;
+-fx-min-height: 2em;
+-fx-max-height: 2em;
 }

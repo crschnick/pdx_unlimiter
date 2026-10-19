@@ -6,11 +6,7 @@ import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.StackPane;
 
 public class StellarisFleetsComp extends SimpleInfoComp {
 
@@ -19,20 +15,6 @@ public class StellarisFleetsComp extends SimpleInfoComp {
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
         fleets = (int) content.get().getNodeForKeys("meta_fleets").getDouble();
-    }
-
-    @Override
-    public Region create(SavegameData<?> data) {
-        var r = super.create(data);
-        var img =
-                (ImageView) ((StackPane) ((Label) ((StackPane) r).getChildren().getFirst()).getGraphic())
-                        .getChildren()
-                        .getFirst();
-        img.fitWidthProperty().unbind();
-        img.fitHeightProperty().unbind();
-        img.setFitWidth(25);
-        img.setFitHeight(25);
-        return r;
     }
 
     @Override

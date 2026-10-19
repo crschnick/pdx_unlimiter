@@ -24,10 +24,46 @@ public class StellarisSavegameAdapter implements EditorSavegameAdapter {
 
         map.put("DLCs", NodePointer.builder().name("required_dlcs").build());
         map.put("Galaxy", NodePointer.builder().name("galaxy").build());
+        map.put("Galactic community", NodePointer.builder().name("galactic_community").build());
+        map.put("Wars", NodePointer.builder().name("war").build());
 
-        var country = NodePointer.builder().name("country").name("0").build();
+        var playerId =
+                NodePointer.builder().name("player").index(0).name("country").build();
+        var country =
+                NodePointer.builder().name("country").pointerEvaluation(playerId).build();
         map.put("Player country", country);
-
+        map.put(
+                "Player resources",
+                NodePointer.fromBase(country)
+                        .name("modules")
+                        .name("standard_economy_module")
+                        .name("resources")
+                        .build());
+        map.put("Player budget", NodePointer.fromBase(country).name("budget").build());
+        map.put("Player government", NodePointer.fromBase(country).name("government").build());
+        map.put("Player technology", NodePointer.fromBase(country).name("tech_status").build());
+        map.put(
+                "Player ruler",
+                NodePointer.builder()
+                        .name("leaders")
+                        .pointerEvaluation(
+                                NodePointer.fromBase(country).name("ruler").build())
+                        .build());
+        map.put(
+                "Player species",
+                NodePointer.builder()
+                        .name("species_db")
+                        .pointerEvaluation(NodePointer.fromBase(country)
+                                .name("founder_species_ref")
+                                .build())
+                        .build());
+        map.put(
+                "Player federation",
+                NodePointer.builder()
+                        .name("federation")
+                        .pointerEvaluation(
+                                NodePointer.fromBase(country).name("federation").build())
+                        .build());
         return map;
     }
 

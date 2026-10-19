@@ -24,7 +24,7 @@ public abstract class StellarisDiplomacyRowComp extends DiplomacyRowComp<Stellar
 
     @Override
     protected String mapTagTooltip(SavegameData<?> data, StellarisTag tag) {
-        return tag.getName();
+        return StellarisNames.getCountryName(data, tag);
     }
 
     @Override

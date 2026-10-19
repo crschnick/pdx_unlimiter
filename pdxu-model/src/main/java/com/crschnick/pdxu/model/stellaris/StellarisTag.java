@@ -19,6 +19,7 @@ public class StellarisTag {
     private String name;
 
     private long id;
+    private StellarisName nameData;
     private String iconCategory;
     private String iconFile;
 
@@ -34,6 +35,8 @@ public class StellarisTag {
         StellarisTag tag = new StellarisTag();
         tag.id = id;
         tag.name = "Unknown";
+        tag.nameData = StellarisName.fromNode(node.getNodeForKeyIfExistent("name").orElse(null))
+                .orElse(null);
 
         Node icon = flagNode.getNodeForKey("icon");
         tag.iconCategory = icon.getNodeForKey("category").getString();

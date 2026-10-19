@@ -11,3 +11,10 @@
    -fx-min-height: 1.2em;
    -fx-max-height: 1.2em;
    }
+
+.node-container.stellaris .image-icon {
+-fx-min-width: 2em;
+-fx-max-width: 2em;
+-fx-min-height: 2em;
+-fx-max-height: 2em;
+}

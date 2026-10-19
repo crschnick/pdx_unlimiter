@@ -33,8 +33,9 @@ public class StellarisAlliesComp extends StellarisDiplomacyRowComp {
     @Override
     protected List<StellarisTag> getTags(SavegameContent content, SavegameData<?> data) {
         var list = new ArrayList<StellarisTag>();
-        for (Node alli : content.get()
-                .getNodeForKeysIfExistent("country", "0", "relations_manager")
+        for (Node alli : data.stellaris()
+                .getPlayerCountry(content)
+                .flatMap(node -> node.getNodeForKeyIfExistent("relations_manager"))
                 .map(node -> node.getNodesForKey("relation"))
                 .orElse(List.of())) {
             if (alli.getNodeForKeyIfExistent("alliance").map(Node::getBoolean).orElse(false)) {

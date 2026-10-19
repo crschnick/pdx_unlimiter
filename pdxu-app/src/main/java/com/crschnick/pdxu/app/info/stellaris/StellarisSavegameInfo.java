@@ -20,6 +20,15 @@ public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
     StellarisAlloysComp alloys;
     StellarisInfluenceComp influence;
     StellarisUnityComp unity;
+    StellarisTradeComp trade;
+    StellarisPhysicsResearchComp physicsResearch;
+    StellarisSocietyResearchComp societyResearch;
+    StellarisEngineeringResearchComp engineeringResearch;
+    StellarisPowerComp power;
+    StellarisVictoryRankComp victoryRank;
+    StellarisPopsComp pops;
+    StellarisStarbaseCapacityComp starbaseCapacity;
+    StellarisNavalCapacityComp navalCapacity;
     StellarisAlliesComp allies;
     StellarisWarMultiComp wars;
     StellarisIronmanComp ironman;

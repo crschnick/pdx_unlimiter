@@ -2,22 +2,22 @@ package com.crschnick.pdxu.app.info.vic3;
 
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
+import com.crschnick.pdxu.app.util.NumberFormatHelper;
 
 import javafx.scene.image.Image;
 
-import java.util.Collections;
 import java.util.List;
 
 public class Vic3GdpComp extends Vic3ChannelComp {
 
     @Override
     protected String getDisplayValue() {
-        return Math.round((value / 1000000.0)) + "M";
+        return NumberFormatHelper.formatCompact(value);
     }
 
     @Override
     protected List<String> getNames() {
-        return Collections.singletonList("gdp");
+        return List.of("gdp");
     }
 
     @Override

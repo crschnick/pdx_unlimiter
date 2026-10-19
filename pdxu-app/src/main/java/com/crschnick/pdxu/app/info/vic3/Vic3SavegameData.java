@@ -15,6 +15,7 @@ import lombok.Getter;
 
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -31,6 +32,13 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
     private String ironmanName;
 
     public Vic3SavegameData() {}
+
+    public Optional<Node> getPlayerCountry(SavegameContent content) {
+        return content.get()
+                .getNodeForKeyIfExistent("country_manager")
+                .flatMap(cm -> cm.getNodeForKeyIfExistent("database"))
+                .flatMap(db -> db.getNodeForKeyIfExistent(tag.getId()));
+    }
 
     public Vic3Tag getTag() {
         return tag;

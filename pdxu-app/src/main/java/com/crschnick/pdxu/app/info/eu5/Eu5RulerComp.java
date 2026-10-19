@@ -1,6 +1,6 @@
 package com.crschnick.pdxu.app.info.eu5;
 
-import com.crschnick.pdxu.app.gui.GuiTooltips;
+import com.crschnick.pdxu.app.info.InfoNodes;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfoComp;
 import com.crschnick.pdxu.app.installation.GameLocalisation;
@@ -8,12 +8,8 @@ import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodePointer;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 
-import javafx.geometry.Pos;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,20 +52,10 @@ public class Eu5RulerComp extends SavegameInfoComp {
     }
 
     private static Region createPowersNode(int admP, int dipP, int milP) {
-        HBox box = new HBox();
-        box.setAlignment(Pos.CENTER);
-        Label adm = new Label(admP + "  ", imageNode(EU5_ICON_ADM, CLASS_POWER_ICON));
-        adm.setEllipsisString("");
-        box.getChildren().add(adm);
-
-        Label dip = new Label(dipP + "  ", imageNode(EU5_ICON_DIP, CLASS_POWER_ICON));
-        dip.setEllipsisString("");
-        box.getChildren().add(dip);
-
-        Label mil = new Label(String.valueOf(milP), imageNode(EU5_ICON_MIL, CLASS_POWER_ICON));
-        mil.setEllipsisString("");
-        box.getChildren().add(mil);
-        return box;
+        return InfoNodes.createValueRow(List.of(
+                new InfoNodes.ValueEntry(String.valueOf(admP), EU5_ICON_ADM),
+                new InfoNodes.ValueEntry(String.valueOf(dipP), EU5_ICON_DIP),
+                new InfoNodes.ValueEntry(String.valueOf(milP), EU5_ICON_MIL)));
     }
 
     protected Image getIcon() {
@@ -86,9 +72,6 @@ public class Eu5RulerComp extends SavegameInfoComp {
             return null;
         }
 
-        VBox box = new VBox();
-        var img = getIcon();
-
         var firstNames = new ArrayList<String>();
         for (String s : ruler.firstName().split("\\.")) {
             firstNames.add(GameLocalisation.getLocalisedValue(s, data));
@@ -98,20 +81,7 @@ public class Eu5RulerComp extends SavegameInfoComp {
                 + (ruler.nickname() != null
                         ? " (" + GameLocalisation.getLocalisedValue(ruler.nickname(), data) + ")"
                         : "");
-        var label = new Label(name);
-        label.setMinWidth(Region.USE_PREF_SIZE);
-        label.setEllipsisString("");
-
-        var hb = new HBox(imageNode(img, CLASS_RULER_ICON), label);
-        hb.setAlignment(Pos.CENTER);
-        hb.setSpacing(5);
-        box.getChildren().add(hb);
-
-        box.alignmentProperty().set(Pos.CENTER);
-        box.getChildren().add(createRulerStatsNode(ruler));
-        box.getStyleClass().add(CLASS_RULER);
-        GuiTooltips.install(box, name);
-        return box;
+        return InfoNodes.createRulerNode(getIcon(), name, name, createRulerStatsNode(ruler));
     }
 
     public static record Ruler(String firstName, String nickname, double adm, double dip, double mil) {

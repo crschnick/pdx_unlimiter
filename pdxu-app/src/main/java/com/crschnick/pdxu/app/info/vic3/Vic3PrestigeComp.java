@@ -2,17 +2,17 @@ package com.crschnick.pdxu.app.info.vic3;
 
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
+import com.crschnick.pdxu.app.util.NumberFormatHelper;
 
 import javafx.scene.image.Image;
 
-import java.util.Collections;
 import java.util.List;
 
 public class Vic3PrestigeComp extends Vic3ChannelComp {
 
     @Override
     protected List<String> getNames() {
-        return Collections.singletonList("prestige");
+        return List.of("prestige");
     }
 
     @Override
@@ -27,6 +27,6 @@ public class Vic3PrestigeComp extends Vic3ChannelComp {
 
     @Override
     protected String getDisplayValue() {
-        return String.valueOf(Math.round(value));
+        return NumberFormatHelper.formatCompact(value);
     }
 }

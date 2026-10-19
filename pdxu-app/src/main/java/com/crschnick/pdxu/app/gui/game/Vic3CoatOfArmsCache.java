@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.gui.game;
 
+import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameCacheManager;
@@ -16,10 +17,13 @@ import com.crschnick.pdxu.model.coa.CoatOfArms;
 import com.crschnick.pdxu.model.vic3.Vic3Tag;
 
 import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -70,6 +74,29 @@ public class Vic3CoatOfArmsCache extends GameCacheManager.Cache {
         return cache.colors;
     }
 
+    private static synchronized Optional<javafx.scene.paint.Color> getCountryColor(GameFileContext ctx, String tag) {
+        var cache = GameCacheManager.getInstance().get(Vic3CoatOfArmsCache.class);
+        if (cache.countryColors == null) {
+            var map = new HashMap<String, javafx.scene.paint.Color>();
+            CascadeDirectoryHelper.traverseDirectory(Path.of("common").resolve("country_definitions"), ctx, path -> {
+                try {
+                    TextFormatParser.vic3().parse(path).forEach((k, v) -> {
+                        var c = v.getNodeForKeyIfExistent("color");
+                        if (c.isPresent()) {
+                            map.put(k, fromGameColor(c.get().isTagged()
+                                    ? GameColor.fromColorNode(c.get())
+                                    : GameColor.fromRgbArray(c.get())));
+                        }
+                    });
+                } catch (Exception ex) {
+                    ErrorEventFactory.fromThrowable(ex).omit().handle();
+                }
+            });
+            cache.countryColors = map;
+        }
+        return Optional.ofNullable(cache.countryColors.get(tag));
+    }
+
     public static Node getCoatOfArmsNode(GameFileContext context) {
         var cache = GameCacheManager.getInstance().get(Vic3CoatOfArmsCache.class);
         if (cache.coatOfArmsNode != null) {
@@ -82,17 +109,38 @@ public class Vic3CoatOfArmsCache extends GameCacheManager.Cache {
     }
 
     public static Image tagFlag(SavegameInfo<Vic3Tag> info, Vic3Tag tag) {
+        return tagFlag(info.getData(), tag);
+    }
+
+    public static Image tagFlag(SavegameData<Vic3Tag> data, Vic3Tag tag) {
         var cache = GameCacheManager.getInstance().get(Vic3CoatOfArmsCache.class);
         var cachedImg = cache.flags.get(tag);
         if (cachedImg != null) {
             return cachedImg;
         }
 
-        var context = GameFileContext.fromData(info.getData());
+        var context = GameFileContext.fromData(data);
         var allNode = getCoatOfArmsNode(context);
+        var isPlayer = tag.equals(data.getTag());
+        if (!isPlayer && allNode.getNodeForKeyIfExistent(tag.getTag()).isEmpty()) {
+            var fallback = getCountryColor(context, tag.getTag())
+                    .<Image>map(color -> {
+                        var img = new WritableImage((int) (IMG_SIZE * 1.5), IMG_SIZE);
+                        for (int x = 0; x < img.getWidth(); x++) {
+                            for (int y = 0; y < img.getHeight(); y++) {
+                                img.getPixelWriter().setColor(x, y, color);
+                            }
+                        }
+                        return img;
+                    })
+                    .orElse(ImageHelper.DEFAULT_IMAGE);
+            cache.flags.put(tag, fallback);
+            return fallback;
+        }
+
         try {
-            Supplier<CoatOfArms> coa = tag == info.getData().getTag()
-                    ? () -> info.getData().vic3().getCoatOfArms()
+            Supplier<CoatOfArms> coa = isPlayer
+                    ? () -> data.vic3().getCoatOfArms()
                     : () -> CoatOfArms.fromNode(
                             allNode.getNodeForKeyIfExistent(tag.getTag()).orElseThrow(), s -> {
                                 var found = allNode.getNodesForKey(s);
@@ -112,6 +160,7 @@ public class Vic3CoatOfArmsCache extends GameCacheManager.Cache {
     private final Map<String, javafx.scene.paint.Color> colors = new ConcurrentHashMap<>();
     private final Map<Vic3Tag, Image> flags = new ConcurrentHashMap<>();
     private Node coatOfArmsNode;
+    private Map<String, javafx.scene.paint.Color> countryColors;
 
     public Vic3CoatOfArmsCache() {
         super(GameCacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);

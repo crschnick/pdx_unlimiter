@@ -24,6 +24,11 @@
     -fx-background-color: derive(-color-bg-default, -5%);
 }
 
+.editor-grid .button:hover {
+    -fx-background-color: -color-bg-subtle;
+    -fx-background-radius: 4;
+}
+
 
 .editor-grid .preview {
   -fx-font-family: "monospaced";

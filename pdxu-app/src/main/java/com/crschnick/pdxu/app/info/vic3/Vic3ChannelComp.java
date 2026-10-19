@@ -35,12 +35,17 @@ public abstract class Vic3ChannelComp extends SimpleInfoComp {
             return;
         }
 
-        value = NodePointer.fromBase(base)
+        var values = NodePointer.fromBase(base)
                 .name("values")
-                .index(index.getInteger() - 1)
                 .build()
                 .getIfPresent(content.get())
-                .map(Node::getDouble)
-                .orElse(0.0);
+                .filter(Node::isArray)
+                .map(Node::getNodeArray)
+                .orElse(List.of());
+        if (values.isEmpty() || index.getInteger() <= 0) {
+            return;
+        }
+
+        value = values.get((index.getInteger() - 1) % values.size()).getDouble();
     }
 }

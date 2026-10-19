@@ -81,6 +81,17 @@ public class GameImage {
     public static Image STELLARIS_ICON_FLEETS;
     public static Image STELLARIS_ICON_EMPIRE_SIZE;
     public static Image STELLARIS_ICON_PLANETS;
+    public static Image STELLARIS_ICON_PHYSICS_RESEARCH;
+    public static Image STELLARIS_ICON_SOCIETY_RESEARCH;
+    public static Image STELLARIS_ICON_ENGINEERING_RESEARCH;
+    public static Image STELLARIS_ICON_TRADE;
+    public static Image STELLARIS_ICON_MILITARY_POWER;
+    public static Image STELLARIS_ICON_ECONOMY_POWER;
+    public static Image STELLARIS_ICON_TECH_POWER;
+    public static Image STELLARIS_ICON_VICTORY;
+    public static Image STELLARIS_ICON_STARBASE;
+    public static Image STELLARIS_ICON_NAVAL_CAPACITY;
+    public static Image STELLARIS_ICON_POPS;
 
     public static Image HOI4_ICON_IRONMAN;
     public static Image HOI4_ICON_POLITICAL_POWER;
@@ -168,6 +179,15 @@ public class GameImage {
     public static Image VIC3_ICON_SOL;
     public static Image VIC3_ICON_RADICALS;
     public static Image VIC3_ICON_LOYALISTS;
+    public static Image VIC3_ICON_WAR;
+    public static Image VIC3_ICON_ALLIANCE;
+    public static Image VIC3_ICON_LITERACY;
+    public static Image VIC3_ICON_POPULATION;
+    public static Image VIC3_ICON_MONEY;
+    public static Image VIC3_ICON_RANK_1;
+    public static Image VIC3_ICON_RANK_2;
+    public static Image VIC3_ICON_RANK_3;
+    public static Image VIC3_ICON_RANK_4;
 
     public static void loadGameImages(Game g) {
         Map<Game, Runnable> loadFuncs = Map.of(
@@ -225,6 +245,17 @@ public class GameImage {
         VIC3_ICON_SOL = ImageHelper.loadImage(i.resolve("generic_icons").resolve("sol_icon.dds"));
         VIC3_ICON_LOYALISTS = ImageHelper.loadImage(i.resolve("generic_icons").resolve("population_loyalist.dds"));
         VIC3_ICON_RADICALS = ImageHelper.loadImage(i.resolve("generic_icons").resolve("population_radical.dds"));
+        VIC3_ICON_ALLIANCE = ImageHelper.loadImage(i.resolve("lens_toolbar_icons").resolve("alliance.dds"));
+        VIC3_ICON_LITERACY = ImageHelper.loadImage(i.resolve("generic_icons").resolve("literacy.dds"));
+        VIC3_ICON_POPULATION = ImageHelper.loadImage(i.resolve("generic_icons").resolve("population.dds"));
+        VIC3_ICON_MONEY = ImageHelper.loadImage(i.resolve("generic_icons").resolve("money.dds"));
+        var rankIcons = p.resolve("gfx").resolve("interface").resolve("flag");
+        VIC3_ICON_RANK_1 = ImageHelper.loadImage(rankIcons.resolve("power_rank_01.dds"));
+        VIC3_ICON_RANK_2 = ImageHelper.loadImage(rankIcons.resolve("power_rank_02.dds"));
+        VIC3_ICON_RANK_3 = ImageHelper.loadImage(rankIcons.resolve("power_rank_03.dds"));
+        VIC3_ICON_RANK_4 = ImageHelper.loadImage(rankIcons.resolve("power_rank_04.dds"));
+        VIC3_ICON_WAR = ImageHelper.loadImage(
+                p.resolve("gfx").resolve("interface").resolve("outliner").resolve("war_button_icon.dds"));
     }
 
     public static void loadCk3Images() {
@@ -376,7 +407,6 @@ public class GameImage {
         STELLARIS_ICON_WAR = ImageHelper.loadImage(it.resolve("waroverview").resolve("at_war_with_bg.dds"));
         STELLARIS_ICON_ALLIANCE = ImageHelper.loadImage(i.resolve("diplomacy").resolve("diplomacy_alliance.dds"));
         STELLARIS_ICON_ALLOYS = ImageHelper.loadImage(r.resolve("alloys.dds"));
-        STELLARIS_ICON_ALLOYS = ImageHelper.loadImage(r.resolve("alloys.dds"));
         STELLARIS_ICON_ENERGY = ImageHelper.loadImage(r.resolve("energy.dds"));
         STELLARIS_ICON_FOOD = ImageHelper.loadImage(r.resolve("food.dds"));
         STELLARIS_ICON_UNITY = ImageHelper.loadImage(r.resolve("unity.dds"));
@@ -386,6 +416,20 @@ public class GameImage {
         STELLARIS_ICON_CONSUMER_GOODS = ImageHelper.loadImage(r.resolve("consumer_goods.dds"));
         STELLARIS_ICON_FLEETS = ImageHelper.loadImage(i.resolve("fleet_size_icon.dds"));
         STELLARIS_ICON_EMPIRE_SIZE = ImageHelper.loadImage(i.resolve("empire_sprawl_icon.dds"));
+        STELLARIS_ICON_PHYSICS_RESEARCH = ImageHelper.loadImage(r.resolve("physics_research.dds"));
+        STELLARIS_ICON_SOCIETY_RESEARCH = ImageHelper.loadImage(r.resolve("society_research.dds"));
+        STELLARIS_ICON_ENGINEERING_RESEARCH = ImageHelper.loadImage(r.resolve("engineering_research.dds"));
+        STELLARIS_ICON_TRADE = ImageHelper.loadImage(r.resolve("trade.dds"));
+        var categories = it.resolve("espionage").resolve("asset_type_categories");
+        STELLARIS_ICON_MILITARY_POWER = ImageHelper.loadImage(categories.resolve("op_cat_military.dds"));
+        STELLARIS_ICON_ECONOMY_POWER = ImageHelper.loadImage(categories.resolve("op_cat_economy.dds"));
+        STELLARIS_ICON_TECH_POWER = ImageHelper.loadImage(categories.resolve("op_cat_technology.dds"));
+        STELLARIS_ICON_VICTORY = ImageHelper.loadImage(i.resolve("message").resolve("message_victory.dds"));
+        var starbase = ImageHelper.loadImage(i.resolve("starbase_outliner.dds"));
+        STELLARIS_ICON_STARBASE = ImageHelper.cut(
+                starbase, new Rectangle2D(0, 0, starbase.getWidth() / 16, starbase.getHeight()));
+        STELLARIS_ICON_NAVAL_CAPACITY = ImageHelper.loadImage(i.resolve("navy_size_icon.dds"));
+        STELLARIS_ICON_POPS = ImageHelper.loadImage(i.resolve("pop.dds"));
         STELLARIS_ICON_PLANETS = ImageHelper.loadImage(i.resolve("planet.dds"));
     }
 

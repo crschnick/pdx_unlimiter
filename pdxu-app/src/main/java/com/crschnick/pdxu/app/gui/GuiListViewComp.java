@@ -15,6 +15,7 @@ import javafx.scene.layout.Region;
 import lombok.AllArgsConstructor;
 
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -65,21 +66,23 @@ public class GuiListViewComp<T> extends SimpleComp {
                     .bind(getNode.apply(listView.getItems().getFirst()).heightProperty());
         };
 
-        var initialItems = List.copyOf(list);
-        Platform.runLater(() -> {
-            BindingsHelper.setContent(listView.getItems(), initialItems);
+        // Take a snapshot now, as the list might already have changed by the time the update runs.
+        // Items might also have been removed in the meantime, so only show items that still exist
+        Consumer<List<T>> update = newItems -> {
+            var retained = new HashSet<>(allItems.get());
+            nodes.keySet().removeIf(item -> !retained.contains(item));
+            BindingsHelper.setContent(
+                    listView.getItems(),
+                    newItems.stream().filter(retained::contains).toList());
             updateFixedSize.run();
-        });
+        };
+
+        var initialItems = List.copyOf(list);
+        Platform.runLater(() -> update.accept(initialItems));
 
         list.addListener((c, o, n) -> {
-            // Take snapshots now, as the lists might already have changed by the time the update runs
             var newItems = List.copyOf(n);
-            var retained = new HashSet<>(allItems.get());
-            Platform.runLater(() -> {
-                nodes.keySet().removeIf(item -> !retained.contains(item));
-                BindingsHelper.setContent(listView.getItems(), newItems);
-                updateFixedSize.run();
-            });
+            Platform.runLater(() -> update.accept(newItems));
         });
 
         return pane;

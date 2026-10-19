@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
+import com.crschnick.pdxu.app.util.NumberFormatHelper;
 import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 
@@ -38,7 +39,7 @@ public class Hoi4ManpowerComp extends SimpleInfoComp {
 
     @Override
     protected String getDisplayValue() {
-        return (value / 1000) + "k";
+        return NumberFormatHelper.formatCompact(value);
     }
 
     @Override

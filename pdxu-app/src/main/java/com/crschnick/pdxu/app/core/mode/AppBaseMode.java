@@ -62,6 +62,7 @@ public class AppBaseMode extends AppOperationMode {
 
         AppRosettaCheck.check();
         AppWindowsArmCheck.check();
+        AppHardwareAccelerationDisableCheck.check();
         AppMainWindow.loadingText("loadingUserInterface");
         PlatformInit.init(true);
         AppImages.init();

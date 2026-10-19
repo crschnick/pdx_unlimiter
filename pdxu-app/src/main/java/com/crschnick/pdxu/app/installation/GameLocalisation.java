@@ -7,6 +7,7 @@ import com.crschnick.pdxu.app.util.CascadeDirectoryHelper;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class GameLocalisation {
 
@@ -25,8 +26,28 @@ public class GameLocalisation {
                     GameLanguage.bySupportedLocale(AppPrefs.get().language().getValue()), ctx);
         }
 
-        return cache.strings.getOrDefault(key, key);
+        var value = cache.strings.getOrDefault(key, key);
+        for (int i = 0; i < 5; i++) {
+            var reference = REFERENCE_PATTERN.matcher(value);
+            if (!reference.matches()) {
+                break;
+            }
+
+            if (reference.group(3) != null) {
+                value = reference.group(3);
+                continue;
+            }
+
+            var referencedKey = reference.group(1) != null ? reference.group(1) : reference.group(2);
+            if (!cache.strings.containsKey(referencedKey)) {
+                break;
+            }
+            value = cache.strings.get(referencedKey);
+        }
+        return value;
     }
+
+    private static final Pattern REFERENCE_PATTERN = Pattern.compile("^(?:\\$([^$\\s]+)\\$|\\[([A-Za-z0-9_]+)\\]|\\[Concept\\('[^']*',\\s*'([^']*)'\\)\\])$");
 
     public static class LocalisationCache extends GameCacheManager.Cache {
 
