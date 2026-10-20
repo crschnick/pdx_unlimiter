@@ -15,9 +15,4 @@ public class Eu4HeirComp extends Eu4RulerComp {
     protected Image getIcon() {
         return GameImage.EU4_ICON_HEIR;
     }
-
-    @Override
-    protected Ruler getDefault() {
-        return null;
-    }
 }

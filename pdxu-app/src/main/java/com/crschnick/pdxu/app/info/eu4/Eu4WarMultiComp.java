@@ -1,5 +1,6 @@
 package com.crschnick.pdxu.app.info.eu4;
 
+import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
@@ -51,41 +52,28 @@ public class Eu4WarMultiComp extends SavegameInfoMultiComp {
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        List<War<Eu4Tag>> wars = new ArrayList<>();
+        var player = data.eu4().getTagName();
+        var wars = new ArrayList<War<Eu4Tag>>();
         for (Node war : content.get().getNodesForKey("active_war")) {
-            String title =
-                    war.getNodeForKeyIfExistent("name").map(Node::getString).orElse("MISSING NAME");
-            boolean isAttacker = false;
-            List<Eu4Tag> attackers = new ArrayList<>();
-            if (war.hasKey("attackers")) {
-                for (Node atk : war.getNodeForKey("attackers").getNodeArray()) {
-                    String attacker = atk.getString();
-                    attackers.add(Eu4Tag.getTag(data.eu4().getAllTags(), attacker));
-                    if (attacker.equals(data.eu4().getTagName())) {
-                        isAttacker = true;
-                    }
-                }
-            }
-
-            boolean isDefender = false;
-            List<Eu4Tag> defenders = new ArrayList<>();
-            if (war.hasKey("defenders")) {
-                for (Node def : war.getNodeForKey("defenders").getNodeArray()) {
-                    String defender = def.getString();
-                    defenders.add(Eu4Tag.getTag(data.eu4().getAllTags(), defender));
-                    if (defender.equals(data.eu4().getTagName())) {
-                        isDefender = true;
-                    }
-                }
-            }
-            if (isAttacker) {
+            var title = war.getNodeForKeyIfExistent("name")
+                    .map(Node::getString)
+                    .orElseGet(() -> AppI18n.get("atWarWith"));
+            var attackers = getParticipants(data, war, "attackers");
+            var defenders = getParticipants(data, war, "defenders");
+            if (attackers.stream().anyMatch(t -> t.getTag().equals(player))) {
                 wars.add(new War<>(title, attackers, defenders));
-            } else if (isDefender) {
+            } else if (defenders.stream().anyMatch(t -> t.getTag().equals(player))) {
                 wars.add(new War<>(title, defenders, attackers));
             }
         }
         comps = wars.stream().map(WarComp::new).toList();
         comps.forEach(warComp -> warComp.init(content, data));
+    }
+
+    private static List<Eu4Tag> getParticipants(SavegameData<?> data, Node war, String side) {
+        return war.getNodeForKeyIfExistent(side).map(Node::getNodeArray).orElse(List.of()).stream()
+                .map(n -> Eu4Tag.getTag(data.eu4().getAllTags(), n.getString()))
+                .toList();
     }
 
     @Override

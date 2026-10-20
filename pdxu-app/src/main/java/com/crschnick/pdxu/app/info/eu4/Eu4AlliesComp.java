@@ -33,14 +33,21 @@ public class Eu4AlliesComp extends Eu4DiplomacyRowComp {
     @Override
     protected List<Eu4Tag> getTags(SavegameContent content, SavegameData<?> data) {
         var list = new ArrayList<Eu4Tag>();
-        for (Node alli : content.get().getNodeForKey("diplomacy").getNodesForKey("alliance")) {
-            String first = alli.getNodeForKey("first").getString();
-            String second = alli.getNodeForKey("second").getString();
-            if (first.equals(data.eu4().getTagName())) {
-                list.add(Eu4Tag.getTag(data.eu4().getAllTags(), second));
-            }
-            if (second.equals(data.eu4().getTagName())) {
-                list.add(Eu4Tag.getTag(data.eu4().getAllTags(), first));
+        var diplomacy = content.get().getNodeForKeyIfExistent("diplomacy");
+        if (diplomacy.isEmpty()) {
+            return list;
+        }
+
+        var player = data.eu4().getTagName();
+        for (Node alliance : diplomacy.get().getNodesForKey("alliance")) {
+            var first = alliance.getNodeForKey("first").getString();
+            var second = alliance.getNodeForKey("second").getString();
+            var ally = first.equals(player) ? second : second.equals(player) ? first : null;
+            if (ally != null) {
+                var tag = Eu4Tag.getTag(data.eu4().getAllTags(), ally);
+                if (!list.contains(tag)) {
+                    list.add(tag);
+                }
             }
         }
         return list;

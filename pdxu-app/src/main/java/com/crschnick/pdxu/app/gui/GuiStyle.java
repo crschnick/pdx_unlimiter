@@ -17,6 +17,7 @@ public class GuiStyle {
     public static String CLASS_MARRIAGE = "marriage";
     public static String CLASS_GUARANTEE = "guarantee";
     public static String CLASS_VASSAL = "vassal";
+    public static final String CLASS_UNION = "union";
     public static String CLASS_TRUCE = "vassal";
     public static final String CLASS_IMAGE_ICON = "image-icon";
     public static final String CLASS_POWER_ICON = "power-icon";

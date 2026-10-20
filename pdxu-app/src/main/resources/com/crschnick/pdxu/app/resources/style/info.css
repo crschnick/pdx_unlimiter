@@ -26,3 +26,11 @@
 .alliance {
      -fx-background-color: #3d71a0;
 }
+
+.vassal {
+     -fx-background-color: #6d5a96;
+}
+
+.union {
+     -fx-background-color: #a07a3d;
+}

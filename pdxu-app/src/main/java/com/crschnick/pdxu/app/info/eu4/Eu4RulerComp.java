@@ -31,7 +31,7 @@ public class Eu4RulerComp extends SavegameInfoComp {
                 .getIfPresent(content.get());
         ruler = rulerNode
                 .flatMap(rn -> Ruler.fromCountryNode(rn, getRulerKey()))
-                .orElse(getDefault());
+                .orElse(null);
     }
 
     protected String getRulerKey() {
@@ -51,10 +51,6 @@ public class Eu4RulerComp extends SavegameInfoComp {
 
     protected Image getIcon() {
         return EU4_ICON_RULER;
-    }
-
-    protected Ruler getDefault() {
-        return new Ruler("MISSING", "MISSING RULER", -1, -1, -1);
     }
 
     @Override

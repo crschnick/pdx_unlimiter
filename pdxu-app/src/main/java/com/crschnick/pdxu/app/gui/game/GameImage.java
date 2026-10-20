@@ -161,6 +161,12 @@ public class GameImage {
     public static Image EU4_ICON_MANPOWER;
     public static Image EU4_ICON_PRESTIGE;
     public static Image EU4_ICON_STABILITY;
+    public static Image EU4_ICON_LEGITIMACY;
+    public static Image EU4_ICON_REPUBLICAN_TRADITION;
+    public static Image EU4_ICON_DEVOTION;
+    public static Image EU4_ICON_HORDE_UNITY;
+    public static Image EU4_ICON_MERITOCRACY;
+    public static Image EU4_ICON_INFLATION;
     public static Image EU4_ICON_ACHIEVEMENT;
     public static Image EU4_BACKGROUND;
     public static Image EU4_SHIELD_MASK;
@@ -542,6 +548,14 @@ public class GameImage {
         EU4_ICON_DUCATS = ImageHelper.loadImage(i.resolve("icon_gold.dds"));
         EU4_ICON_PRESTIGE = ImageHelper.loadImage(i.resolve("icon_prestige.dds"));
         EU4_ICON_STABILITY = ImageHelper.loadImage(i.resolve("icon_stability.dds"));
+        EU4_ICON_LEGITIMACY = ImageHelper.loadImage(i.resolve("ideas_EU4").resolve("legitimacy.dds"));
+        EU4_ICON_REPUBLICAN_TRADITION =
+                ImageHelper.loadImage(i.resolve("ideas_EU4").resolve("republican_tradition.dds"));
+        EU4_ICON_DEVOTION = ImageHelper.loadImage(i.resolve("ideas_EU4").resolve("devotion.dds"));
+        EU4_ICON_HORDE_UNITY = ImageHelper.loadImage(i.resolve("ideas_EU4").resolve("horde_unity.dds"));
+        EU4_ICON_MERITOCRACY = ImageHelper.loadImage(i.resolve("ideas_EU4").resolve("meritocracy.dds"));
+        EU4_ICON_INFLATION =
+                ImageHelper.loadImage(i.resolve("ideas_EU4").resolve("monthly_gold_inflation_modifier.dds"));
         EU4_ICON_ACHIEVEMENT = ImageHelper.loadImage(i.resolve("button_achievements.dds"));
 
         Function<Integer, Integer> rnwFilter = (Integer rgb) -> {
