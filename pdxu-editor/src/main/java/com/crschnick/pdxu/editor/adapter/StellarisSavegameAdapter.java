@@ -9,6 +9,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.Region;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 public class StellarisSavegameAdapter implements EditorSavegameAdapter {
@@ -42,6 +43,21 @@ public class StellarisSavegameAdapter implements EditorSavegameAdapter {
         map.put("Player budget", NodePointer.fromBase(country).name("budget").build());
         map.put("Player government", NodePointer.fromBase(country).name("government").build());
         map.put("Player technology", NodePointer.fromBase(country).name("tech_status").build());
+        map.put("Player policies", NodePointer.fromBase(country).name("active_policies").build());
+        map.put("Player traditions", NodePointer.fromBase(country).name("traditions").build());
+        map.put("Player ascension perks", NodePointer.fromBase(country).name("ascension_perks").build());
+        map.put("Player edicts", NodePointer.fromBase(country).name("edicts").build());
+        map.put("Player sectors", NodePointer.fromBase(country).name("sectors").build());
+        map.put("Player fleets", NodePointer.fromBase(country).name("fleets_manager").build());
+        map.put("Player relations", NodePointer.fromBase(country).name("relations_manager").build());
+        map.put("Player planets", NodePointer.fromBase(country).name("owned_planets").build());
+        map.put(
+                "Player capital",
+                NodePointer.builder()
+                        .name("planets")
+                        .name("planet")
+                        .pointerEvaluation(NodePointer.fromBase(country).name("capital").build())
+                        .build());
         map.put(
                 "Player ruler",
                 NodePointer.builder()
@@ -69,8 +85,46 @@ public class StellarisSavegameAdapter implements EditorSavegameAdapter {
 
     @Override
     public NodePointer createNodeJump(EditorState state, EditorRealNode node) {
-        return null;
+        if (!state.isSavegame()) {
+            return null;
+        }
+
+        var pointer = EditorSavegameAdapter.keyValueJump(node, (key, val) -> {
+            var path = DATABASES.get(key);
+            if (path == null || !val.matches("[0-9]+")) {
+                return null;
+            }
+
+            var builder = NodePointer.builder();
+            path.forEach(builder::name);
+            return builder.name(val).build();
+        });
+        return pointer != null && pointer.isValid(state.getBackingNode()) ? pointer : null;
     }
+
+    private static final Map<String, List<String>> DATABASES = Map.ofEntries(
+            Map.entry("owner", List.of("country")),
+            Map.entry("controller", List.of("country")),
+            Map.entry("country", List.of("country")),
+            Map.entry("original_owner", List.of("country")),
+            Map.entry("planet", List.of("planets", "planet")),
+            Map.entry("capital", List.of("planets", "planet")),
+            Map.entry("system", List.of("galactic_object")),
+            Map.entry("galactic_object", List.of("galactic_object")),
+            Map.entry("origin", List.of("galactic_object")),
+            Map.entry("fleet", List.of("fleet")),
+            Map.entry("ship", List.of("ships")),
+            Map.entry("leader", List.of("leaders")),
+            Map.entry("ruler", List.of("leaders")),
+            Map.entry("species", List.of("species_db")),
+            Map.entry("species_index", List.of("species_db")),
+            Map.entry("founder_species_ref", List.of("species_db")),
+            Map.entry("army", List.of("army")),
+            Map.entry("federation", List.of("federation")),
+            Map.entry("starbase", List.of("starbase_mgr", "starbases")),
+            Map.entry("sector", List.of("sectors")),
+            Map.entry("war", List.of("war")),
+            Map.entry("megastructure", List.of("megastructures")));
 
     @Override
     public Node createNodeTag(EditorState state, EditorRealNode node, Region valueDisplay) {

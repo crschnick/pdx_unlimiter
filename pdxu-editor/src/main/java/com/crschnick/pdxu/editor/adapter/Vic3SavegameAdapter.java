@@ -7,6 +7,7 @@ import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.gui.GuiCoaViewer;
 import com.crschnick.pdxu.editor.gui.GuiCoaViewerState;
 import com.crschnick.pdxu.editor.gui.GuiEditorNodeTagFactory;
+import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodePointer;
@@ -111,6 +112,38 @@ public class Vic3SavegameAdapter implements EditorSavegameAdapter {
                 NodePointer.builder().name("game_rules").name("setting").build());
         map.put("Ironman Settings", NodePointer.builder().name("ironman").build());
         map.put("Player country", country);
+        map.put("Player budget", NodePointer.fromBase(country).name("budget").build());
+        map.put("Player states", NodePointer.fromBase(country).name("states").build());
+        map.put(
+                "Player capital",
+                NodePointer.builder()
+                        .name("states")
+                        .name("database")
+                        .pointerEvaluation(NodePointer.fromBase(country).name("capital").build())
+                        .build());
+        map.put(
+                "Player ruler",
+                NodePointer.builder()
+                        .name("character_manager")
+                        .name("database")
+                        .pointerEvaluation(NodePointer.fromBase(country).name("ruler").build())
+                        .build());
+        map.put(
+                "Player heir",
+                NodePointer.builder()
+                        .name("character_manager")
+                        .name("database")
+                        .pointerEvaluation(NodePointer.fromBase(country).name("heir").build())
+                        .build());
+        map.put("Laws", NodePointer.builder().name("laws").name("database").build());
+        map.put(
+                "Interest groups",
+                NodePointer.builder().name("interest_groups").name("database").build());
+        map.put("Pacts", NodePointer.builder().name("pacts").name("database").build());
+        map.put(
+                "Diplomatic plays",
+                NodePointer.builder().name("diplomatic_plays").name("database").build());
+        map.put("Wars", NodePointer.builder().name("war_manager").name("database").build());
         return map;
     }
 
@@ -124,7 +157,7 @@ public class Vic3SavegameAdapter implements EditorSavegameAdapter {
         var parentKey = Optional.ofNullable(node.getParent()).flatMap(p -> p.getKeyName());
 
         if (keyOpt.isPresent() && node.getBackingNode().isValue()) {
-            return get(keyOpt.get(), node.getBackingNode().getString());
+            return get(node, keyOpt.get(), node.getBackingNode().getString());
         }
 
         if (keyOpt.isPresent()
@@ -132,49 +165,63 @@ public class Vic3SavegameAdapter implements EditorSavegameAdapter {
                 && node.getBackingNode().getArrayNode().size() == 1
                 && node.getBackingNode().getNodeArray().getFirst().isValue()) {
             return get(
+                    node,
                     keyOpt.get(),
                     node.getBackingNode().getNodeArray().getFirst().getString());
         }
 
         if (parentKey.isPresent() && node.getBackingNode().isValue()) {
-            return get(parentKey.get(), node.getBackingNode().getString());
+            return get(node, parentKey.get(), node.getBackingNode().getString());
         }
 
         return null;
     }
 
-    private static final List<String> STATE_KEYS = List.of("state");
-    private static final List<String> CULTURE_KEYS = List.of("culture");
-    private static final List<String> PROVINCE_KEYS = List.of("capital", "origin", "province", "provinces");
-    private static final List<String> COUNTRY_KEYS = List.of("country");
+    private static final Map<String, List<String>> DATABASES = Map.ofEntries(
+            Map.entry("state", List.of("states", "database")),
+            Map.entry("culture", List.of("cultures", "database")),
+            Map.entry("country", List.of("country_manager", "database")),
+            Map.entry("owner", List.of("country_manager", "database")),
+            Map.entry("character", List.of("character_manager", "database")),
+            Map.entry("ruler", List.of("character_manager", "database")),
+            Map.entry("heir", List.of("character_manager", "database")),
+            Map.entry("interest_group", List.of("interest_groups", "database")),
+            Map.entry("building", List.of("building_manager", "database")),
+            Map.entry("party", List.of("parties", "database")),
+            Map.entry("law", List.of("laws", "database")),
+            Map.entry("market", List.of("market_manager", "database")),
+            Map.entry("war", List.of("war_manager", "database")),
+            Map.entry("company", List.of("companies", "database")),
+            Map.entry("diplomatic_play", List.of("diplomatic_plays", "database")),
+            Map.entry("capital", List.of("provinces")),
+            Map.entry("origin", List.of("provinces")),
+            Map.entry("province", List.of("provinces")),
+            Map.entry("provinces", List.of("provinces")));
 
-    private NodePointer get(String key, String val) {
-        if (STATE_KEYS.contains(key)) {
-            return NodePointer.builder()
-                    .name("states")
-                    .name("database")
-                    .name(val)
-                    .build();
+    private static boolean isInside(EditorNode node, String key) {
+        for (var n = node.getParent(); n != null; n = n.getParent()) {
+            if (n.getKeyName().map(key::equals).orElse(false)) {
+                return true;
+            }
         }
-        if (CULTURE_KEYS.contains(key)) {
-            return NodePointer.builder()
-                    .name("cultures")
-                    .name("database")
-                    .name(val)
-                    .build();
-        }
-        if (PROVINCE_KEYS.contains(key)) {
-            return NodePointer.builder().name("provinces").name(val).build();
-        }
-        if (COUNTRY_KEYS.contains(key)) {
-            return NodePointer.builder()
-                    .name("country_manager")
-                    .name("database")
-                    .name(val)
-                    .build();
+        return false;
+    }
+
+    private NodePointer get(EditorRealNode node, String key, String val) {
+        if (val.isEmpty() || !val.chars().allMatch(Character::isDigit)) {
+            return null;
         }
 
-        return null;
+        var path = key.equals("capital") && isInside(node, "country_manager")
+                ? List.of("states", "database")
+                : DATABASES.get(key);
+        if (path == null) {
+            return null;
+        }
+
+        var builder = NodePointer.builder();
+        path.forEach(builder::name);
+        return builder.name(val).build();
     }
 
     @Override

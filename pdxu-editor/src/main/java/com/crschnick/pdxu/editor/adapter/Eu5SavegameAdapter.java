@@ -184,6 +184,75 @@ public class Eu5SavegameAdapter implements EditorSavegameAdapter {
                 .build();
         map.put("Player country heir", heirPointer);
 
+        var consortIdPointer =
+                NodePointer.builder().name("government").name("consort").build();
+        map.put(
+                "Player country consort",
+                NodePointer.builder()
+                        .name("character_db")
+                        .name("database")
+                        .pointerEvaluation(country, (cn) -> {
+                            var idNode = consortIdPointer.get(cn);
+                            return idNode != null ? idNode.getString() : null;
+                        })
+                        .build());
+        map.put(
+                "Player dynasty",
+                NodePointer.builder()
+                        .name("dynasty_manager")
+                        .name("database")
+                        .pointerEvaluation(NodePointer.fromBase(rulerPointer).name("dynasty").build())
+                        .build());
+
+        map.put("Player government", NodePointer.fromBase(country).name("government").build());
+        map.put(
+                "Player laws",
+                NodePointer.fromBase(country).name("government").name("implemented_laws").build());
+        map.put(
+                "Player reforms",
+                NodePointer.fromBase(country).name("government").name("implemented_reforms").build());
+        map.put(
+                "Player privileges",
+                NodePointer.fromBase(country)
+                        .name("government")
+                        .name("implemented_privileges")
+                        .build());
+        map.put(
+                "Player estates",
+                NodePointer.fromBase(country).name("government").name("estates").build());
+        map.put("Player currencies", NodePointer.fromBase(country).name("currency_data").build());
+        map.put("Player economy", NodePointer.fromBase(country).name("economy").build());
+        map.put("Player advances", NodePointer.fromBase(country).name("researched_advances").build());
+        map.put("Player institutions", NodePointer.fromBase(country).name("institutions").build());
+        map.put("Player locations", NodePointer.fromBase(country).name("owned_locations").build());
+        map.put("Player units", NodePointer.fromBase(country).name("units").build());
+        map.put(
+                "Player capital",
+                NodePointer.builder()
+                        .name("locations")
+                        .name("locations")
+                        .pointerEvaluation(NodePointer.fromBase(country).name("capital").build())
+                        .build());
+        map.put(
+                "Player culture",
+                NodePointer.builder()
+                        .name("culture_manager")
+                        .name("database")
+                        .pointerEvaluation(
+                                NodePointer.fromBase(country).name("primary_culture").build())
+                        .build());
+        map.put(
+                "Player religion",
+                NodePointer.builder()
+                        .name("religion_manager")
+                        .name("database")
+                        .pointerEvaluation(
+                                NodePointer.fromBase(country).name("primary_religion").build())
+                        .build());
+        map.put(
+                "Wars",
+                NodePointer.builder().name("war_manager").name("database").build());
+
         return map;
     }
 

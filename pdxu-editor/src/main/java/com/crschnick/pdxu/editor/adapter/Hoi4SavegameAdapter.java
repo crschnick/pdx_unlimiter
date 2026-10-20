@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 
 public class Hoi4SavegameAdapter implements EditorSavegameAdapter {
@@ -37,6 +38,21 @@ public class Hoi4SavegameAdapter implements EditorSavegameAdapter {
         map.put("Player politics", NodePointer.fromBase(country).name("politics").build());
         map.put("Player diplomacy", NodePointer.fromBase(country).name("diplomacy").build());
         map.put("Player units", NodePointer.fromBase(country).name("units").build());
+        map.put("Player technology", NodePointer.fromBase(country).name("technology").build());
+        map.put("Player production", NodePointer.fromBase(country).name("production").build());
+        map.put("Player focus", NodePointer.fromBase(country).name("focus").build());
+        map.put("Player resources", NodePointer.fromBase(country).name("resources").build());
+        map.put("Player buildings", NodePointer.fromBase(country).name("buildings").build());
+        map.put("Player characters", NodePointer.fromBase(country).name("characters").build());
+        map.put(
+                "Player intelligence agency",
+                NodePointer.fromBase(country).name("intelligence_agency").build());
+        map.put(
+                "Player capital",
+                NodePointer.builder()
+                        .name("states")
+                        .pointerEvaluation(NodePointer.fromBase(country).name("capital").build())
+                        .build());
 
         var root = state.getBackingNode();
         map.put("Player country leader", createLeaderPointer(root, country.get(root)));
@@ -108,8 +124,31 @@ public class Hoi4SavegameAdapter implements EditorSavegameAdapter {
 
     @Override
     public NodePointer createNodeJump(EditorState state, EditorRealNode node) {
-        return null;
+        if (!state.isSavegame()) {
+            return null;
+        }
+
+        return EditorSavegameAdapter.keyValueJump(node, (key, val) -> {
+            if (TAG_KEYS.contains(key) && val.matches("[A-Z][A-Z0-9]{2}")) {
+                return NodePointer.builder().name("countries").name(val).build();
+            }
+            if (!val.matches("[1-9][0-9]*")) {
+                return null;
+            }
+            if (STATE_KEYS.contains(key)) {
+                return NodePointer.builder().name("states").name(val).build();
+            }
+            if (PROVINCE_KEYS.contains(key)) {
+                return NodePointer.builder().name("provinces").name(val).build();
+            }
+            return null;
+        });
     }
+
+    private static final Set<String> TAG_KEYS =
+            Set.of("owner", "controller", "tag", "original_tag", "country", "player");
+    private static final Set<String> STATE_KEYS = Set.of("state", "capital", "original_capital");
+    private static final Set<String> PROVINCE_KEYS = Set.of("province", "location");
 
     @Override
     public javafx.scene.Node createNodeTag(EditorState state, EditorRealNode node, Region valueDisplay) {

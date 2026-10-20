@@ -249,6 +249,52 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
                 .build();
         map.put("Player dynasty coat of arms", dynastyCoa);
 
+        var character = NodePointer.builder().name("living").pointerEvaluation(player).build();
+        map.put(
+                "Player culture",
+                NodePointer.builder()
+                        .name("culture_manager")
+                        .name("cultures")
+                        .pointerEvaluation(NodePointer.fromBase(character).name("culture").build())
+                        .build());
+        if (state.getBackingNode().hasKey("rites")) {
+            var rite = NodePointer.builder()
+                    .name("rites")
+                    .name("database")
+                    .pointerEvaluation(NodePointer.fromBase(character).name("rite").build())
+                    .build();
+            map.put("Player rite", rite);
+            map.put(
+                    "Player faith",
+                    NodePointer.builder()
+                            .name("faiths")
+                            .name("database")
+                            .pointerEvaluation(NodePointer.fromBase(rite).name("faith").build())
+                            .build());
+        } else {
+            map.put(
+                    "Player faith",
+                    NodePointer.builder()
+                            .name("religion")
+                            .name("faiths")
+                            .pointerEvaluation(NodePointer.fromBase(character).name("faith").build())
+                            .build());
+        }
+        map.put("Player court", NodePointer.fromBase(character).name("court_data").build());
+        map.put(
+                "Player claims",
+                NodePointer.fromBase(character).name("alive_data").name("claim").build());
+        map.put(
+                "Player perks",
+                NodePointer.fromBase(character).name("alive_data").name("perk").build());
+        map.put(
+                "Player artifacts",
+                NodePointer.fromBase(character).name("alive_data").name("inventory").build());
+        map.put(
+                "Player children",
+                NodePointer.fromBase(character).name("family_data").name("child").build());
+        map.put("Wars", NodePointer.builder().name("wars").name("active_wars").build());
+
         return map;
     }
 
