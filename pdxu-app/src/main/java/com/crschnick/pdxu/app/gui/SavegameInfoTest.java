@@ -1,8 +1,10 @@
 package com.crschnick.pdxu.app.gui;
 
+import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.GameCacheManager;
+import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
@@ -23,6 +25,10 @@ public class SavegameInfoTest {
         var report = new StringBuilder();
         int total = 0;
         for (var storage : SavegameStorage.ALL.values()) {
+            var game = SavegameStorage.ALL.getKey(storage);
+            if (GameInstallation.ALL.containsKey(game)) {
+                GameImage.loadGameImages(game);
+            }
             GameCacheManager.getInstance().onGameChange();
             var count = test(storage, failures);
             total += count;

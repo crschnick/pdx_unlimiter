@@ -24,15 +24,18 @@ public class Eu5RulerComp extends SavegameInfoComp {
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        var countryId =
-                NodePointer.builder().name("played_country").name("country").build();
         var country = NodePointer.builder()
                 .name("countries")
                 .name("database")
-                .pointerEvaluation(countryId)
-                .build();
+                .name(String.valueOf(data.eu5().getTag().getId()))
+                .build()
+                .get(content.get());
+        if (country == null) {
+            return;
+        }
+
         for (String key : getKeys()) {
-            var found = Ruler.fromCountryNode(key, content.get(), country.get(content.get()));
+            var found = Ruler.fromCountryNode(key, content.get(), country);
             if (found.isPresent()) {
                 ruler = found.get();
                 break;

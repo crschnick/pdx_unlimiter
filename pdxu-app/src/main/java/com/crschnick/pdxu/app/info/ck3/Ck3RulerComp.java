@@ -18,7 +18,6 @@ import com.crschnick.pdxu.model.ck3.Ck3Person;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
@@ -31,14 +30,6 @@ import static com.crschnick.pdxu.app.gui.game.GameImage.*;
 public class Ck3RulerComp extends SavegameInfoComp {
 
     private static final int MAX_TRAITS = 8;
-
-    private static final List<Image> SKILL_ICONS = List.of(
-            CK3_SKILL_DIPLOMACY,
-            CK3_SKILL_MARTIAL,
-            CK3_SKILL_STEWARDSHIP,
-            CK3_SKILL_INTRIGUE,
-            CK3_SKILL_LEARNING,
-            CK3_SKILL_PROWESS);
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {}
@@ -54,7 +45,14 @@ public class Ck3RulerComp extends SavegameInfoComp {
         sources.addAll(
                 Ck3SkillModifierCache.getModifierSkillSources(ruler.getModifiers(), ruler.getPerks(), context));
         var skills = new ArrayList<InfoNodes.ValueEntry>();
-        for (int i = 0; i < SKILL_ICONS.size(); i++) {
+        var skillIcons = List.of(
+                CK3_SKILL_DIPLOMACY,
+                CK3_SKILL_MARTIAL,
+                CK3_SKILL_STEWARDSHIP,
+                CK3_SKILL_INTRIGUE,
+                CK3_SKILL_LEARNING,
+                CK3_SKILL_PROWESS);
+        for (int i = 0; i < skillIcons.size(); i++) {
             int base = i < ruler.getSkills().size() ? ruler.getSkills().get(i) : 0;
             var skillName = GameLocalisation.getLocalisedValue(Ck3TraitCache.SKILLS.get(i), data);
             var tooltip = new StringBuilder(skillName + ": " + AppI18n.get("baseValue", String.valueOf(base)));
@@ -73,7 +71,7 @@ public class Ck3RulerComp extends SavegameInfoComp {
                         .append(GameLocalisation.getLocalisedValue(source.nameKey(), data));
             }
             skills.add(new InfoNodes.ValueEntry(
-                    String.valueOf(Math.max(0, total)), SKILL_ICONS.get(i), tooltip.toString()));
+                    String.valueOf(Math.max(0, total)), skillIcons.get(i), tooltip.toString()));
         }
 
         var name = data.ck3().getTag().getName();
