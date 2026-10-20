@@ -22,7 +22,119 @@ public class Ck3TraitCache extends GameCacheManager.Cache {
 
     private static final Path TRAITS_DIR = Path.of("gfx", "interface", "icons", "traits");
 
-    private record Trait(String icon, List<String> names) {}
+    public static final List<String> SKILLS =
+            List.of("diplomacy", "martial", "stewardship", "intrigue", "learning", "prowess");
+
+    private record Threshold(double xp, int[] skills) {}
+
+    private record Trait(String icon, List<String> names, int[] skills, List<List<Threshold>> tracks) {}
+
+    public record SkillSource(String nameKey, int[] skills) {}
+
+    public static List<SkillSource> getTraitSkillSources(
+            List<String> traits, List<Double> xp, boolean female, GameFileContext ctx) {
+        var definitions = getTraits(ctx);
+        var trackCount = traits.stream()
+                .map(definitions::get)
+                .mapToInt(t -> t != null ? t.tracks().size() : 0)
+                .sum();
+        var applyTracks = trackCount == xp.size();
+
+        var sources = new ArrayList<SkillSource>();
+        var xpIndex = 0;
+        for (var trait : traits) {
+            var definition = definitions.get(trait);
+            if (definition == null) {
+                continue;
+            }
+
+            var skills = definition.skills().clone();
+            if (applyTracks) {
+                for (var track : definition.tracks()) {
+                    var value = xp.get(xpIndex++);
+                    track.stream()
+                            .filter(threshold -> threshold.xp() <= value)
+                            .reduce((first, second) -> second)
+                            .ifPresent(threshold -> add(skills, threshold.skills()));
+                }
+            }
+            sources.add(new SkillSource(traitNameKey(trait, female, ctx), skills));
+        }
+        return sources;
+    }
+
+    static void add(int[] target, int[] values) {
+        for (int i = 0; i < target.length; i++) {
+            target[i] += values[i];
+        }
+    }
+
+    static int[] getSkills(Node node, Map<String, Double> scriptValues) {
+        var skills = new int[SKILLS.size()];
+        for (int i = 0; i < SKILLS.size(); i++) {
+            skills[i] = node.getNodeForKeyIfExistent(SKILLS.get(i))
+                    .filter(Node::isValue)
+                    .map(n -> getValue(n.getString(), scriptValues))
+                    .orElse(0);
+        }
+        return skills;
+    }
+
+    private static int getValue(String value, Map<String, Double> scriptValues) {
+        try {
+            return (int) Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            return scriptValues.getOrDefault(value, 0.0).intValue();
+        }
+    }
+
+    private static List<Threshold> getTrack(Node track, Map<String, Double> scriptValues) {
+        var thresholds = new ArrayList<Threshold>();
+        track.forEach((key, modifiers) -> {
+            if (key == null || !modifiers.isArray()) {
+                return;
+            }
+
+            Double xp;
+            try {
+                xp = Double.parseDouble(key);
+            } catch (NumberFormatException e) {
+                xp = scriptValues.get(key);
+            }
+            if (xp != null) {
+                thresholds.add(new Threshold(xp, getSkills(modifiers, scriptValues)));
+            }
+        });
+        thresholds.sort(Comparator.comparingDouble(Threshold::xp));
+        return thresholds;
+    }
+
+    static synchronized Map<String, Double> getScriptValues(GameFileContext ctx) {
+        var cache = GameCacheManager.getInstance().get(Ck3TraitCache.class);
+        if (cache.scriptValues != null) {
+            return cache.scriptValues;
+        }
+
+        var map = new HashMap<String, Double>();
+        CascadeDirectoryHelper.traverseDirectory(Path.of("common").resolve("script_values"), ctx, path -> {
+            try {
+                TextFormatParser.ck3().parse(path).forEach((key, value) -> {
+                    if (key == null || !value.isValue()) {
+                        return;
+                    }
+
+                    try {
+                        map.putIfAbsent(key, Double.parseDouble(value.getString()));
+                    } catch (NumberFormatException ignored) {
+                    }
+                });
+            } catch (Exception ex) {
+                ErrorEventFactory.fromThrowable(ex).omit().handle();
+            }
+        });
+        cache.scriptValues = map;
+        return map;
+    }
 
     public static String traitNameKey(String trait, boolean female, GameFileContext ctx) {
         var definition = getTraits(ctx).get(trait);
@@ -74,6 +186,7 @@ public class Ck3TraitCache extends GameCacheManager.Cache {
         }
 
         var map = new HashMap<String, Trait>();
+        var scriptValues = getScriptValues(ctx);
         CascadeDirectoryHelper.traverseDirectory(Path.of("common").resolve("traits"), ctx, path -> {
             try {
                 TextFormatParser.ck3().parse(path).forEach((trait, node) -> {
@@ -86,7 +199,17 @@ public class Ck3TraitCache extends GameCacheManager.Cache {
                     var icon = !icons.isEmpty() ? icons.getFirst() : null;
                     var names = new ArrayList<String>();
                     node.getNodeForKeyIfExistent("name").ifPresent(n -> collectNames(n, names));
-                    map.put(trait, new Trait(icon, names));
+                    var tracks = new ArrayList<List<Threshold>>();
+                    node.getNodeForKeyIfExistent("track")
+                            .filter(Node::isArray)
+                            .ifPresent(track -> tracks.add(getTrack(track, scriptValues)));
+                    node.getNodeForKeyIfExistent("tracks").filter(Node::isArray).ifPresent(all -> all.forEach(
+                            (name, track) -> {
+                                if (name != null && track.isArray()) {
+                                    tracks.add(getTrack(track, scriptValues));
+                                }
+                            }));
+                    map.put(trait, new Trait(icon, names, getSkills(node, scriptValues), tracks));
                 });
             } catch (Exception ex) {
                 ErrorEventFactory.fromThrowable(ex).omit().handle();
@@ -116,6 +239,7 @@ public class Ck3TraitCache extends GameCacheManager.Cache {
 
     private final Map<String, Image> images = new ConcurrentHashMap<>();
     private Map<String, Trait> traits;
+    private Map<String, Double> scriptValues;
 
     public Ck3TraitCache() {
         super(GameCacheManager.Scope.SAVEGAME_CAMPAIGN_SPECIFIC);

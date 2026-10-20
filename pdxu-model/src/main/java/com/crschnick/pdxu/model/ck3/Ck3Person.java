@@ -5,6 +5,7 @@ import com.crschnick.pdxu.model.GameDate;
 import com.crschnick.pdxu.model.GameDateType;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class Ck3Person {
@@ -13,6 +14,9 @@ public class Ck3Person {
     private String firstName;
     private List<Integer> skills;
     private List<String> traits;
+    private List<Double> traitXp;
+    private List<String> modifiers;
+    private List<String> perks;
     private boolean female;
 
     public Ck3Person() {}
@@ -31,6 +35,25 @@ public class Ck3Person {
                 .filter(i -> i >= 0 && i < traitsLookup.size())
                 .map(traitsLookup::get)
                 .collect(Collectors.toList());
+        p.traitXp = n.getNodeForKeyIfExistent("trait_xp_amounts")
+                .map(Node::getNodeArray)
+                .orElse(List.of())
+                .stream()
+                .map(Node::getDouble)
+                .collect(Collectors.toList());
+        var alive = n.getNodeForKeyIfExistent("alive_data");
+        p.modifiers = alive.map(a -> a.getNodesForKey("modifier")).orElse(List.of()).stream()
+                .map(m -> m.getNodeForKeyIfExistent("modifier"))
+                .flatMap(Optional::stream)
+                .filter(Node::isValue)
+                .map(Node::getString)
+                .collect(Collectors.toList());
+        p.perks = alive.flatMap(a -> a.getNodeForKeyIfExistent("perk"))
+                .map(Node::getNodeArray)
+                .orElse(List.of())
+                .stream()
+                .map(Node::getString)
+                .collect(Collectors.toList());
         p.female = n.getNodeForKeyIfExistent("female").map(Node::getBoolean).orElse(false);
         p.firstName =
                 Ck3Strings.cleanCk3FormatData(n.getNodeForKey("first_name").getString());
@@ -39,6 +62,18 @@ public class Ck3Person {
 
     public GameDate getBirth() {
         return birth;
+    }
+
+    public List<Double> getTraitXp() {
+        return traitXp != null ? traitXp : List.of();
+    }
+
+    public List<String> getModifiers() {
+        return modifiers != null ? modifiers : List.of();
+    }
+
+    public List<String> getPerks() {
+        return perks != null ? perks : List.of();
     }
 
     public boolean isFemale() {

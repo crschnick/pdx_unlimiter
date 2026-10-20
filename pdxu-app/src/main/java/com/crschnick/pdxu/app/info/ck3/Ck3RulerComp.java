@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.info.ck3;
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.GuiTooltips;
 import com.crschnick.pdxu.app.gui.game.Ck3CoatOfArmsCache;
+import com.crschnick.pdxu.app.gui.game.Ck3SkillModifierCache;
 import com.crschnick.pdxu.app.gui.game.Ck3TraitCache;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.InfoNodes;
@@ -46,10 +47,33 @@ public class Ck3RulerComp extends SavegameInfoComp {
     public Region create(SavegameData<?> data) {
         var ruler = data.ck3().getTag().getRuler();
 
+        var context = GameFileContext.fromData(data);
+        var sources = new ArrayList<Ck3TraitCache.SkillSource>();
+        sources.addAll(Ck3TraitCache.getTraitSkillSources(
+                ruler.getTraits(), ruler.getTraitXp(), ruler.isFemale(), context));
+        sources.addAll(
+                Ck3SkillModifierCache.getModifierSkillSources(ruler.getModifiers(), ruler.getPerks(), context));
         var skills = new ArrayList<InfoNodes.ValueEntry>();
         for (int i = 0; i < SKILL_ICONS.size(); i++) {
-            int skill = i < ruler.getSkills().size() ? ruler.getSkills().get(i) : 0;
-            skills.add(new InfoNodes.ValueEntry(String.valueOf(skill), SKILL_ICONS.get(i)));
+            int base = i < ruler.getSkills().size() ? ruler.getSkills().get(i) : 0;
+            var skillName = GameLocalisation.getLocalisedValue(Ck3TraitCache.SKILLS.get(i), data);
+            var tooltip = new StringBuilder(skillName + ": " + AppI18n.get("baseValue", String.valueOf(base)));
+            int total = base;
+            for (var source : sources) {
+                var value = source.skills()[i];
+                if (value == 0) {
+                    continue;
+                }
+
+                total += value;
+                tooltip.append("\n")
+                        .append(value > 0 ? "+" : "")
+                        .append(value)
+                        .append(" ")
+                        .append(GameLocalisation.getLocalisedValue(source.nameKey(), data));
+            }
+            skills.add(new InfoNodes.ValueEntry(
+                    String.valueOf(Math.max(0, total)), SKILL_ICONS.get(i), tooltip.toString()));
         }
 
         var name = data.ck3().getTag().getName();
@@ -63,7 +87,7 @@ public class Ck3RulerComp extends SavegameInfoComp {
         }
 
         var house = GameImage.imageNode(
-                Ck3CoatOfArmsCache.houseImage(ruler.getHouse(), GameFileContext.fromData(data)), "house-icon");
+                Ck3CoatOfArmsCache.houseImage(ruler.getHouse(), context), "house-icon");
         GuiTooltips.install(house, AppI18n.get("house", ruler.getHouse().getName()));
         var box = new HBox(rulerNode, house);
         box.setSpacing(15);
