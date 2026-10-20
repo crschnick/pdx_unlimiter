@@ -14,7 +14,9 @@ public class Eu4VassalsComp extends Eu4SubjectsComp {
         return !Eu4PersonalUnionsComp.isPersonalUnion(subjectType)
                 && !subjectType.contains("colony")
                 && !subjectType.contains("tributary")
-                && !subjectType.equals("private_enterprise");
+                && !subjectType.equals("private_enterprise")
+                && !subjectType.equals("commercial_enterprise")
+                && !subjectType.equals("trade_protectorate");
     }
 
     @Override

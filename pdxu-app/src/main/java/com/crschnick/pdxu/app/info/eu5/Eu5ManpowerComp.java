@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
+import com.crschnick.pdxu.app.util.NumberFormatHelper;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 
 import javafx.scene.image.Image;
@@ -33,7 +34,7 @@ public class Eu5ManpowerComp extends SimpleInfoComp {
 
     @Override
     protected String getDisplayValue() {
-        return value + " / " + max;
+        return NumberFormatHelper.formatCompact(value) + " / " + NumberFormatHelper.formatCompact(max);
     }
 
     @Override

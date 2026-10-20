@@ -135,6 +135,13 @@ public class GameImage {
     public static Image EU5_ICON_STABILITY;
     public static Image EU5_ICON_POPULATION;
     public static Image EU5_ICON_LEGITIMACY;
+    public static Image EU5_ICON_REPUBLICAN_TRADITION;
+    public static Image EU5_ICON_DEVOTION;
+    public static Image EU5_ICON_HORDE_UNITY;
+    public static Image EU5_ICON_TRIBAL_COHESION;
+    public static Image EU5_ICON_LOCATIONS;
+    public static Image EU5_ICON_ADVANCES;
+    public static Image EU5_ICON_INFLATION;
 
     public static Image EU4_ICON_VASSAL;
     public static Image EU4_ICON_ALLIANCE;
@@ -518,6 +525,13 @@ public class GameImage {
         EU5_ICON_STABILITY = ImageHelper.loadImage(i.resolve("resources", "stability.dds"));
         EU5_ICON_POPULATION = ImageHelper.loadImage(i.resolve("resources", "total_population.dds"));
         EU5_ICON_LEGITIMACY = ImageHelper.loadImage(i.resolve("resources", "legitimacy.dds"));
+        EU5_ICON_REPUBLICAN_TRADITION = ImageHelper.loadImage(i.resolve("resources", "legitimacy", "republic.dds"));
+        EU5_ICON_DEVOTION = ImageHelper.loadImage(i.resolve("resources", "legitimacy", "theocracy.dds"));
+        EU5_ICON_HORDE_UNITY = ImageHelper.loadImage(i.resolve("resources", "legitimacy", "steppe_horde.dds"));
+        EU5_ICON_TRIBAL_COHESION = ImageHelper.loadImage(i.resolve("resources", "legitimacy", "tribe.dds"));
+        EU5_ICON_LOCATIONS = ImageHelper.loadImage(i.resolve("map_subdivisons", "location.dds"));
+        EU5_ICON_ADVANCES = ImageHelper.loadImage(i.resolve("alerts_icons", "advances.dds"));
+        EU5_ICON_INFLATION = ImageHelper.loadImage(i.resolve("text_icons", "inflation.dds"));
     }
 
     private static void loadEu4Images() {

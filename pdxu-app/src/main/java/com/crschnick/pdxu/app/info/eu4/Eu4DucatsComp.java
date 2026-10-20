@@ -14,6 +14,8 @@ public class Eu4DucatsComp extends SimpleInfoComp {
 
     private double value;
     private double loans;
+    private double income;
+    private double expense;
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
@@ -24,6 +26,12 @@ public class Eu4DucatsComp extends SimpleInfoComp {
                         .map(Node::getDouble)
                         .orElse(0.0))
                 .sum();
+        income = country.getNodeForKeysIfExistent("ledger", "lastmonthincome")
+                .map(Node::getDouble)
+                .orElse(0.0);
+        expense = country.getNodeForKeysIfExistent("ledger", "lastmonthexpense")
+                .map(Node::getDouble)
+                .orElse(0.0);
     }
 
     @Override
@@ -34,11 +42,15 @@ public class Eu4DucatsComp extends SimpleInfoComp {
     @Override
     protected String getDisplayValue() {
         return NumberFormatHelper.formatCompact(value)
+                + " (" + NumberFormatHelper.formatCompactSigned(income - expense) + ")"
                 + (loans != 0 ? " / " + NumberFormatHelper.formatCompact(-loans) : "");
     }
 
     @Override
     protected String getTooltip() {
-        return AppI18n.get("treasury") + (loans != 0 ? " / " + AppI18n.get("treasuryOwed") : "");
+        return AppI18n.get("treasury") + " (" + AppI18n.get("monthlyBalance") + ")"
+                + (loans != 0 ? " / " + AppI18n.get("treasuryOwed") : "")
+                + "\n" + AppI18n.get("monthlyIncome") + ": " + NumberFormatHelper.formatDecimal(income)
+                + "\n" + AppI18n.get("monthlyExpenses") + ": " + NumberFormatHelper.formatDecimal(expense);
     }
 }

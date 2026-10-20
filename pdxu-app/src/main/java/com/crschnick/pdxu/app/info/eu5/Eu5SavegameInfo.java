@@ -9,12 +9,16 @@ public class Eu5SavegameInfo extends SavegameInfo<Eu5Tag> {
     Eu5RulerComp ruler;
     Eu5HeirComp heir;
     Eu5DucatsComp ducats;
-    Eu5StabilityComp stability;
+    Eu5InflationComp inflation;
+    Eu5ManpowerComp manpower;
     Eu5PopulationComp population;
+    Eu5LocationsComp locations;
+    Eu5AdvancesComp advances;
+    Eu5StabilityComp stability;
     Eu5LegitimacyComp legitimacy;
     Eu5PrestigeComp prestige;
-    Eu5ManpowerComp manpower;
     Eu5AlliesMultiComp allies;
+    Eu5VassalMultiComp vassals;
     Eu5WarMultiComp wars;
     Eu5IronmanComp ironman;
     ModComp mods;

@@ -12,6 +12,7 @@ import javafx.scene.image.Image;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Eu5VassalMultiComp extends Eu5DiplomacyRowComp {
 
@@ -30,6 +31,25 @@ public class Eu5VassalMultiComp extends Eu5DiplomacyRowComp {
         return GameImage.EU5_ICON_VASSAL;
     }
 
+    private static final Set<String> IGNORED_TYPES = Set.of("tributary", "colonial_nation", "conquistador", "trade_company");
+
+    private static String getSubjectType(Node dependency) {
+        var targets = dependency.getNodeForKeyIfExistent("named_targets");
+        if (targets.isEmpty()) {
+            return "";
+        }
+
+        for (var target : targets.get().getNodeArray()) {
+            var flag = target.getNodeForKeyIfExistent("flag").map(Node::getString);
+            if (flag.isPresent() && flag.get().equals("subject_type")) {
+                return target.getNodeForKeysIfExistent("target", "object")
+                        .map(Node::getString)
+                        .orElse("");
+            }
+        }
+        return "";
+    }
+
     @Override
     protected List<Eu5Tag> getTags(SavegameContent content, SavegameData<?> data) {
         var list = new ArrayList<Eu5Tag>();
@@ -38,16 +58,16 @@ public class Eu5VassalMultiComp extends Eu5DiplomacyRowComp {
                 return;
             }
 
-            var type = node.getNodeForKeyIfExistent("subject_type")
-                    .map(Node::getString)
-                    .orElse(null);
-            if (!"vassal".equals(type)) {
-                // return;
+            if (IGNORED_TYPES.contains(getSubjectType(node))) {
+                return;
             }
 
             if (node.getNodeForKey("first").getLong() == data.eu5().getTag().getId()) {
-                list.add(Eu5Tag.getTag(
-                        data.eu5().getAllTags(), node.getNodeForKey("second").getLong()));
+                var tag = Eu5Tag.getTag(
+                        data.eu5().getAllTags(), node.getNodeForKey("second").getLong());
+                if (!list.contains(tag)) {
+                    list.add(tag);
+                }
             }
         });
         return list;

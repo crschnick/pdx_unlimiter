@@ -38,9 +38,6 @@ public class Eu5RulerComp extends SavegameInfoComp {
                 break;
             }
         }
-        if (ruler == null) {
-            ruler = getDefault();
-        }
     }
 
     protected List<String> getKeys() {
@@ -60,10 +57,6 @@ public class Eu5RulerComp extends SavegameInfoComp {
 
     protected Image getIcon() {
         return EU5_ICON_RULER;
-    }
-
-    protected Ruler getDefault() {
-        return new Ruler("MISSING", null, -1, -1, -1);
     }
 
     @Override

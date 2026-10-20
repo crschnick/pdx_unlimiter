@@ -43,14 +43,15 @@ public class Eu5AlliesMultiComp extends Eu5DiplomacyRowComp {
                 return;
             }
 
-            if (node.getNodeForKey("first").getLong() == data.eu5().getTag().getId()) {
-                list.add(Eu5Tag.getTag(
-                        data.eu5().getAllTags(), node.getNodeForKey("second").getLong()));
-            }
-
-            if (node.getNodeForKey("second").getLong() == data.eu5().getTag().getId()) {
-                list.add(Eu5Tag.getTag(
-                        data.eu5().getAllTags(), node.getNodeForKey("first").getLong()));
+            var player = data.eu5().getTag().getId();
+            var first = node.getNodeForKey("first").getLong();
+            var second = node.getNodeForKey("second").getLong();
+            var ally = first == player ? second : second == player ? first : -1;
+            if (ally != -1) {
+                var tag = Eu5Tag.getTag(data.eu5().getAllTags(), ally);
+                if (!list.contains(tag)) {
+                    list.add(tag);
+                }
             }
         });
         return list;
