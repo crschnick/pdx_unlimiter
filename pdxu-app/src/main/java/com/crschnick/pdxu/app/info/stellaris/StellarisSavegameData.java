@@ -53,20 +53,18 @@ public class StellarisSavegameData extends SavegameData<StellarisTag> {
     }
 
     @Override
-    protected void init(SavegameContent content) {
-        campaignHeuristic = SavegameType.STELLARIS.getCampaignIdHeuristic(content);
-
-        ironman = NodePointer.builder()
-                .name("galaxy")
-                .name("ironman")
-                .build()
-                .getIfPresent(content.get())
-                .map(Node::getBoolean)
+    public boolean isPlayableTag(SavegameContent content, StellarisTag tag) {
+        return content.get()
+                .getNodeForKeysIfExistent("country", String.valueOf(tag.getId()), "type")
+                .filter(Node::isValue)
+                .map(Node::getString)
+                .map("default"::equals)
                 .orElse(false);
-        date = GameDateType.STELLARIS.fromString(
-                content.get().getNodeForKey("date").getString());
+    }
 
-        allTags = new ArrayList<>();
+    @Override
+    protected void init(SavegameContent content) {
+        var allTags = new ArrayList<StellarisTag>();
         content.get().getNodeForKey("country").forEach((k, v) -> {
             // Invalid country node
             if (v.isValue()) {
@@ -82,8 +80,27 @@ public class StellarisSavegameData extends SavegameData<StellarisTag> {
                 .flatMap(p -> p.getNodeForKeyIfExistent("country"))
                 .filter(Node::isValue)
                 .map(Node::getLong);
-        tag = playerId.flatMap(id -> StellarisTag.getTag(allTags, id)).orElse(allTags.getFirst());
+        var tag = playerId.flatMap(id -> StellarisTag.getTag(allTags, id)).orElse(allTags.getFirst());
         tag.setName(content.get().getNodeForKey("name").getString());
+        init(content, tag, allTags);
+    }
+
+    @Override
+    protected void init(SavegameContent content, StellarisTag tag, List<StellarisTag> allTags) {
+        campaignHeuristic = SavegameType.STELLARIS.getCampaignIdHeuristic(content);
+
+        ironman = NodePointer.builder()
+                .name("galaxy")
+                .name("ironman")
+                .build()
+                .getIfPresent(content.get())
+                .map(Node::getBoolean)
+                .orElse(false);
+        date = GameDateType.STELLARIS.fromString(
+                content.get().getNodeForKey("date").getString());
+
+        this.allTags = allTags;
+        this.tag = tag;
         observer = false;
 
         mods = null;

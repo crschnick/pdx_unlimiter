@@ -39,14 +39,29 @@ public class Eu4SavegameData extends SavegameData<Eu4Tag> {
     }
 
     @Override
+    public boolean isPlayableTag(SavegameContent content, Eu4Tag tag) {
+        return content.get()
+                        .getNodeForKeysIfExistent("countries", tag.getTag(), "num_of_cities")
+                        .map(Node::getDouble)
+                        .orElse(0.0)
+                > 0;
+    }
+
+    @Override
     protected void init(SavegameContent content) {
-        allTags = new ArrayList<>();
+        var allTags = new ArrayList<Eu4Tag>();
         content.get().getNodeForKey("countries").forEach((k, v) -> {
             allTags.add(Eu4Tag.fromNode(k, v));
         });
 
         String player = content.get().getNodeForKey("player").getString();
-        tag = Eu4Tag.getTag(allTags, player);
+        init(content, Eu4Tag.getTag(allTags, player), allTags);
+    }
+
+    @Override
+    protected void init(SavegameContent content, Eu4Tag tag, List<Eu4Tag> allTags) {
+        this.allTags = allTags;
+        this.tag = tag;
 
         ironman = content.get()
                 .getNodeForKeyIfExistent("is_ironman")

@@ -16,10 +16,11 @@ public class Eu5LocationsComp extends SimpleInfoComp {
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        value = content.get()
+        var country = content.get()
                 .getNodeForKey("countries")
                 .getNodeForKey("database")
-                .getNodeForKey(data.eu5().getTag().getId() + "")
+                .getNodeForKey(data.eu5().getTag().getId() + "");
+        value = country
                 .getNodeForKeyIfExistent("owned_locations")
                 .map(n -> n.getNodeArray().size())
                 .orElse(0);

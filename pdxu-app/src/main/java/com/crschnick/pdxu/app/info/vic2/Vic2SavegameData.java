@@ -36,14 +36,18 @@ public class Vic2SavegameData extends SavegameData<Vic2Tag> {
     }
 
     @Override
+    public boolean isPlayableTag(SavegameContent content, Vic2Tag tag) {
+        return content.get()
+                        .getNodeForKeysIfExistent(tag.getTagId(), "capital")
+                        .filter(Node::isValue)
+                        .map(Node::getInteger)
+                        .orElse(0)
+                > 0;
+    }
+
+    @Override
     protected void init(SavegameContent content) throws SavegameInfoException {
-        campaignHeuristic = SavegameType.VIC2.getCampaignIdHeuristic(content);
-
-        ironman = false;
-        date = GameDateType.VIC2.fromString(content.get().getNodeForKey("date").getString());
-        binary = false;
-
-        allTags = new ArrayList<>();
+        var allTags = new ArrayList<Vic2Tag>();
         content.get().forEach((k, v) -> {
             if (!k.toUpperCase().equals(k) || k.length() != 3) {
                 return;
@@ -52,11 +56,24 @@ public class Vic2SavegameData extends SavegameData<Vic2Tag> {
             allTags.add(new Vic2Tag(k));
         });
         var playerTag = content.get().getNodeForKey("player").getString();
-        tag = allTags.stream()
+        var tag = allTags.stream()
                 .filter(t -> t.getTagId().equals(playerTag))
                 .findAny()
                 .orElseThrow(() -> new SavegameInfoException("No player tag found"));
+        init(content, tag, allTags);
+    }
 
+    @Override
+    protected void init(SavegameContent content, Vic2Tag tag, List<Vic2Tag> allTags) {
+        campaignHeuristic = SavegameType.VIC2.getCampaignIdHeuristic(content);
+
+        ironman = false;
+        date = GameDateType.VIC2.fromString(content.get().getNodeForKey("date").getString());
+        binary = false;
+
+        this.allTags = allTags;
+        this.tag = tag;
+        var playerTag = tag.getTagId();
         government = content.get()
                 .getNodeForKeysIfExistent(playerTag, "government")
                 .map(Node::getString)

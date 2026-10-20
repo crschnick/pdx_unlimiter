@@ -48,16 +48,39 @@ public class Eu5SavegameData extends SavegameData<Eu5Tag> {
     }
 
     @Override
-    protected void init(SavegameContent content) {
-        campaignHeuristic = SavegameType.EU5.getCampaignIdHeuristic(content);
-        allTags = Eu5Tag.allFromNode(content.get());
+    public boolean isPlayableTag(SavegameContent content, Eu5Tag tag) {
+        return content.get()
+                        .getNodeForKeysIfExistent("countries", "database", String.valueOf(tag.getId()))
+                        .filter(Node::isArray)
+                        .flatMap(c -> c.getNodeForKeyIfExistent("owned_locations"))
+                        .map(n -> n.getNodeArray().size())
+                        .orElse(0)
+                > 0;
+    }
 
+    @Override
+    protected void init(SavegameContent content) {
+        var allTags = Eu5Tag.allFromNode(content.get());
+        var tagId = getPlayerId(content);
+        init(content, tagId != null ? Eu5Tag.getTag(allTags, tagId) : null, allTags);
+    }
+
+    private static Long getPlayerId(SavegameContent content) {
         var countryId =
                 NodePointer.builder().name("played_country").name("country").build();
         var tagId = countryId.get(content.get());
-        tag = tagId != null ? Eu5Tag.getTag(allTags, tagId.getLong()) : null;
+        return tagId != null ? tagId.getLong() : null;
+    }
 
-        tagCoa = content.get()
+    @Override
+    protected void init(SavegameContent content, Eu5Tag tag, List<Eu5Tag> allTags) {
+        campaignHeuristic = SavegameType.EU5.getCampaignIdHeuristic(content);
+        this.allTags = allTags;
+        this.tag = tag;
+
+        var playerId = getPlayerId(content);
+        var isPlayer = tag != null && playerId != null && tag.getId() == playerId;
+        tagCoa = !isPlayer ? null : content.get()
                 .getNodeForKeysIfExistent("metadata", "flag")
                 .map(Node::getString)
                 .map(s -> {

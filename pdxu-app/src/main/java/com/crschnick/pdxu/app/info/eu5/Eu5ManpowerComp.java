@@ -16,19 +16,14 @@ public class Eu5ManpowerComp extends SimpleInfoComp {
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        var cd = content.get()
-                .getNodeForKey("countries")
-                .getNodeForKey("database")
-                .getNodeForKey(data.eu5().getTag().getId() + "")
-                .getNodeForKey("currency_data");
-        value = cd.hasKey("manpower") ? (int) (cd.getNodeForKey("manpower").getDouble() * 1000.0) : 0;
-
-        var tag = content.get()
+        var country = content.get()
                 .getNodeForKey("countries")
                 .getNodeForKey("database")
                 .getNodeForKey(data.eu5().getTag().getId() + "");
-        max = tag.hasKey("max_manpower")
-                ? (int) (tag.getNodeForKey("max_manpower").getDouble() * 1000.0)
+        var cd = country.getNodeForKey("currency_data");
+        value = cd.hasKey("manpower") ? (int) (cd.getNodeForKey("manpower").getDouble() * 1000.0) : 0;
+        max = country.hasKey("max_manpower")
+                ? (int) (country.getNodeForKey("max_manpower").getDouble() * 1000.0)
                 : 0;
     }
 

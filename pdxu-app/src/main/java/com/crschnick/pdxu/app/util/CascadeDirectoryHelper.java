@@ -40,6 +40,10 @@ public class CascadeDirectoryHelper {
         return openFile(file, getCascadingDirectories(ctx));
     }
 
+    public static Optional<Path> findFile(Path file, GameFileContext ctx) {
+        return findFile(file, getCascadingDirectories(ctx));
+    }
+
     private static List<Path> getCascadingDirectories(GameFileContext ctx) {
         List<GameMod> mods = List.of();
         try {
@@ -103,6 +107,14 @@ public class CascadeDirectoryHelper {
     }
 
     private static Optional<Path> openFile(Path file, List<Path> cascadingDirectories) {
+        var found = findFile(file, cascadingDirectories);
+        if (found.isEmpty()) {
+            TrackEvent.warn("File " + file.toString() + " not found");
+        }
+        return found;
+    }
+
+    private static Optional<Path> findFile(Path file, List<Path> cascadingDirectories) {
         for (Path dir : cascadingDirectories) {
             Optional<Path> r;
             if (Files.isRegularFile(dir)) {
@@ -116,7 +128,6 @@ public class CascadeDirectoryHelper {
                 return r;
             }
         }
-        TrackEvent.warn("File " + file.toString() + " not found");
         return Optional.empty();
     }
 

@@ -61,6 +61,14 @@ public abstract class SavegameData<T> {
 
     protected abstract void init(SavegameContent content) throws Exception;
 
+    public boolean isPlayableTag(SavegameContent content, T tag) {
+        return true;
+    }
+
+    protected void init(SavegameContent content, T tag, List<T> allTags) throws Exception {
+        throw new UnsupportedOperationException();
+    }
+
     public Eu4SavegameData eu4() {
         return (Eu4SavegameData) this;
     }

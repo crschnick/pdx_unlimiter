@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.core;
 
 import com.crschnick.pdxu.app.comp.Comp;
+import com.crschnick.pdxu.app.gui.AppTestComp;
 import com.crschnick.pdxu.app.gui.GuiLayoutComp;
 import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
 import com.crschnick.pdxu.app.installation.Game;
@@ -173,6 +174,13 @@ public class AppLayoutModel {
                             }
                             UserReportComp.show(event.build());
                         })));
+        if (AppProperties.get().isDevelopmentEnvironment()) {
+            l.add(new Entry(
+                    new ReadOnlyStringWrapper("Test"),
+                    new LabelGraphic.IconGraphic("mdi2t-test-tube"),
+                    new AppTestComp(),
+                    null));
+        }
         return l;
     }
 

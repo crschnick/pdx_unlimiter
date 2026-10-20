@@ -21,10 +21,11 @@ public class Eu5PopulationComp extends SimpleInfoComp {
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        value = content.get()
+        var country = content.get()
                 .getNodeForKey("countries")
                 .getNodeForKey("database")
-                .getNodeForKey(data.eu5().getTag().getId() + "")
+                .getNodeForKey(data.eu5().getTag().getId() + "");
+        value = country
                 .getNodeForKeyIfExistent("last_months_population")
                 .map(Node::getDouble)
                 .orElse(0.0)

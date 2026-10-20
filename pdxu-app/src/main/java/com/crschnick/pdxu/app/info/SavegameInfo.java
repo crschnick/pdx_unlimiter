@@ -13,10 +13,45 @@ import com.jfoenix.controls.JFXMasonryPane;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
 
 public abstract class SavegameInfo<T> {
+
+    private static final ThreadLocal<Consumer<Throwable>> COMP_ERROR_COLLECTOR = new ThreadLocal<>();
+
+    public static void collectCompErrors(Consumer<Throwable> collector, Runnable r) {
+        COMP_ERROR_COLLECTOR.set(collector);
+        try {
+            r.run();
+        } finally {
+            COMP_ERROR_COLLECTOR.remove();
+        }
+    }
+
+    private record SimulatedPlayer(Object tag, List<?> allTags) {}
+
+    private static final ThreadLocal<SimulatedPlayer> SIMULATED_PLAYER = new ThreadLocal<>();
+
+    public static void simulatePlayer(Object tag, List<?> allTags, Runnable r) {
+        SIMULATED_PLAYER.set(new SimulatedPlayer(tag, allTags));
+        try {
+            r.run();
+        } finally {
+            SIMULATED_PLAYER.remove();
+        }
+    }
+
+    private static void handleCompError(Throwable t) {
+        var collector = COMP_ERROR_COLLECTOR.get();
+        if (collector != null) {
+            collector.accept(t);
+        } else {
+            ErrorEventFactory.fromThrowable(t).handle();
+        }
+    }
 
     protected SavegameData<T> data;
 
@@ -26,7 +61,16 @@ public abstract class SavegameInfo<T> {
         this.data = getDataClass().getDeclaredConstructor().newInstance();
 
         try {
-            this.data.init(content);
+            var simulated = SIMULATED_PLAYER.get();
+            if (simulated != null) {
+                @SuppressWarnings("unchecked")
+                var tags = (List<T>) simulated.allTags();
+                @SuppressWarnings("unchecked")
+                var tag = (T) simulated.tag();
+                this.data.init(content, tag, tags);
+            } else {
+                this.data.init(content);
+            }
         } catch (InvocationTargetException e) {
             throw (Exception) e.getCause();
         }
@@ -47,9 +91,9 @@ public abstract class SavegameInfo<T> {
                 field.setAccessible(true);
                 field.set(this, c);
             } catch (InvocationTargetException e) {
-                ErrorEventFactory.fromThrowable(e.getCause()).handle();
+                handleCompError(e.getCause());
             } catch (Exception e) {
-                ErrorEventFactory.fromThrowable(e).handle();
+                handleCompError(e);
             }
         }
     }
@@ -81,7 +125,7 @@ public abstract class SavegameInfo<T> {
 
                     comps.add(c);
                 } catch (Exception ex) {
-                    ErrorEventFactory.fromThrowable(ex).handle();
+                    handleCompError(ex);
                 }
             }
 
@@ -100,7 +144,7 @@ public abstract class SavegameInfo<T> {
 
                     comps.addAll(created);
                 } catch (Exception ex) {
-                    ErrorEventFactory.fromThrowable(ex).handle();
+                    handleCompError(ex);
                 }
             }
         }
@@ -112,7 +156,7 @@ public abstract class SavegameInfo<T> {
                     addNode(container, region);
                 }
             } catch (Exception ex) {
-                ErrorEventFactory.fromThrowable(ex).handle();
+                handleCompError(ex);
             }
         }
 

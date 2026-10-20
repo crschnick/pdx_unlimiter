@@ -508,6 +508,19 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         saveData();
     }
 
+    public record ParsedSavegame(SavegameContent content, boolean melted) {}
+
+    public ParsedSavegame parseContent(SavegameEntry<T, I> e) throws Throwable {
+        var file = getSavegameFile(e);
+        var melted = type.isBinary(file);
+        var bytes = melted ? RakalyHelper.toEquivalentPlaintext(file) : Files.readAllBytes(file);
+        return new ParsedSavegame(type.determineStructure(bytes).parse(bytes).orThrow().content, melted);
+    }
+
+    public I createInfo(ParsedSavegame parsed) throws Throwable {
+        return infoFactory.apply(parsed.content(), parsed.melted());
+    }
+
     public synchronized void loadEntry(SavegameEntry<T, I> e) {
         if (!e.canLoad()) {
             return;

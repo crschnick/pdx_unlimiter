@@ -10,6 +10,7 @@ import com.crschnick.pdxu.model.hoi4.Hoi4Tag;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -43,20 +44,55 @@ public class Hoi4SavegameData extends SavegameData<Hoi4Tag> {
         return allTags;
     }
 
+    private static List<Hoi4Tag> createAllTags(SavegameContent content) {
+        var tags = new ArrayList<Hoi4Tag>();
+        content.get().getNodeForKeyIfExistent("countries").ifPresent(countries -> countries.forEach((k, v) -> {
+            if (k == null || !v.isArray()) {
+                return;
+            }
+
+            var ideology = v.getNodeForKeysIfExistent("politics", "ruling_party")
+                    .filter(Node::isValue)
+                    .map(Node::getString)
+                    .orElse(null);
+            tags.add(new Hoi4Tag(k, ideology));
+        }));
+        return tags;
+    }
+
+    @Override
+    public boolean isPlayableTag(SavegameContent content, Hoi4Tag tag) {
+        return content.get()
+                        .getNodeForKeysIfExistent("countries", tag.getTag(), "capital")
+                        .filter(Node::isValue)
+                        .map(Node::getInteger)
+                        .orElse(0)
+                > 0;
+    }
+
     @Override
     protected void init(SavegameContent content) {
-        campaignHeuristic = SavegameType.HOI4.getCampaignIdHeuristic(content);
-        tag = new Hoi4Tag(
+        var tag = new Hoi4Tag(
                 content.get().getNodeForKey("player").getString(),
                 content.get().getNodeForKey("ideology").getString());
-        cosmeticTag = content.get()
-                .getNodeForKeyIfExistent("cosmetic_tag")
+        init(content, tag, createAllTags(content));
+    }
+
+    @Override
+    protected void init(SavegameContent content, Hoi4Tag tag, List<Hoi4Tag> allTags) {
+        campaignHeuristic = SavegameType.HOI4.getCampaignIdHeuristic(content);
+        this.tag = tag;
+        this.allTags = allTags;
+        var isPlayer = tag.getTag().equals(content.get().getNodeForKey("player").getString());
+        cosmeticTag = (isPlayer
+                        ? content.get().getNodeForKeyIfExistent("cosmetic_tag")
+                        : content.get().getNodeForKeysIfExistent("countries", tag.getTag(), "cosmetic_tag"))
+                .filter(Node::isValue)
                 .map(Node::getString)
                 .filter(s -> !s.isBlank())
                 .orElse(null);
         date = GameDateType.HOI4.fromString(content.get().getNodeForKey("date").getString());
         ironman = content.get().hasKey("ironman");
-        allTags = List.of(tag);
         mods = content.get().getNodeForKeyIfExistent("mods").map(Node::getNodeArray).orElse(List.of()).stream()
                 .map(Node::getString)
                 .collect(Collectors.toCollection(LinkedHashSet::new));

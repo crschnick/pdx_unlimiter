@@ -24,7 +24,7 @@ public final class NodePointer {
 
         @Override
         public Node tryMatch(Node root, Node n) {
-            return n.getNodeForKeyIfExistent(name).orElse(null);
+            return n.isArray() ? n.getNodeForKeyIfExistent(name).orElse(null) : null;
         }
 
         @Override
@@ -42,7 +42,7 @@ public final class NodePointer {
 
         @Override
         public Node tryMatch(Node root, Node n) {
-            if (n.getNodeArray().size() > index && index >= 0) {
+            if (n.isArray() && n.getNodeArray().size() > index && index >= 0) {
                 return n.getNodeArray().get(index);
             }
             return null;
@@ -50,7 +50,7 @@ public final class NodePointer {
 
         @Override
         public String getKey(Node root, Node n) {
-            if (n.getNodeArray().size() > index && index >= 0) {
+            if (n.isArray() && n.getNodeArray().size() > index && index >= 0) {
                 return n.getArrayNode().getKeyAt(index);
             }
             return null;
@@ -67,7 +67,7 @@ public final class NodePointer {
         @Override
         public Node tryMatch(Node root, Node n) {
             var name = keySupplier.get();
-            if (name != null) {
+            if (name != null && n.isArray()) {
                 return n.getNodeForKeyIfExistent(name).orElse(null);
             }
             return null;
@@ -89,7 +89,7 @@ public final class NodePointer {
         @Override
         public Node tryMatch(Node root, Node n) {
             var name = keyFunc.apply(root, n);
-            if (name != null) {
+            if (name != null && n.isArray()) {
                 return n.getNodeForKeyIfExistent(name).orElse(null);
             }
             return null;
@@ -110,6 +110,10 @@ public final class NodePointer {
 
         @Override
         public Node tryMatch(Node root, Node n) {
+            if (!n.isArray()) {
+                return null;
+            }
+
             var res = n.getNodeArray().stream().filter(selector).findAny();
             return res.orElse(null);
         }

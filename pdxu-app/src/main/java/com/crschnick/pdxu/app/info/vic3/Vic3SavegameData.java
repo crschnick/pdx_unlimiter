@@ -13,6 +13,7 @@ import com.crschnick.pdxu.model.vic3.Vic3Tag;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -49,8 +50,60 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
         return version;
     }
 
+    private static List<Vic3Tag> createAllTags(SavegameContent content) {
+        var tags = new ArrayList<Vic3Tag>();
+        content.get().getNodeForKeysIfExistent("country_manager", "database").ifPresent(db -> db.forEach((k, v) -> {
+            if (k == null || !v.isArray()) {
+                return;
+            }
+
+            var definition = v.getNodeForKeyIfExistent("definition").filter(Node::isValue);
+            var government = v.getNodeForKeyIfExistent("government").filter(Node::isValue);
+            if (definition.isEmpty() || government.isEmpty()) {
+                return;
+            }
+
+            tags.add(new Vic3Tag(k, definition.get().getString(), government.get().getString()));
+        }));
+        return tags;
+    }
+
+    @Override
+    public boolean isPlayableTag(SavegameContent content, Vic3Tag tag) {
+        return content.get()
+                .getNodeForKeysIfExistent("country_manager", "database", tag.getId())
+                .filter(Node::isArray)
+                .map(c -> c.hasKey("capital"))
+                .orElse(false);
+    }
+
     @Override
     protected void init(SavegameContent content) {
+        var countryId = getPlayerId(content);
+        var country = countryId != null
+                ? content.get().getNodeForKeysIfExistent("country_manager", "database", countryId)
+                : Optional.<Node>empty();
+        var tag = country.filter(Node::isArray)
+                .map(c -> new Vic3Tag(
+                        countryId,
+                        c.getNodeForKey("definition").getString(),
+                        c.getNodeForKey("government").getString()))
+                .orElse(null);
+        init(content, tag, createAllTags(content));
+    }
+
+    private static String getPlayerId(SavegameContent content) {
+        var countryIdPointer = NodePointer.builder()
+                .name("previous_played")
+                .index(0)
+                .name("idtype")
+                .build();
+        var id = countryIdPointer.get(content.get());
+        return id != null ? id.getString() : null;
+    }
+
+    @Override
+    protected void init(SavegameContent content, Vic3Tag tag, List<Vic3Tag> allTags) {
         campaignHeuristic = SavegameType.VIC3.getCampaignIdHeuristic(content);
 
         var meta = content.get().getNodeForKey("meta_data");
@@ -64,28 +117,15 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
                 .filter(s -> !s.isEmpty())
                 .orElse(null);
 
-        coatOfArms = meta.getNodeForKeyIfExistent("flag")
-                .map(coatOfArms -> CoatOfArms.fromNode(coatOfArms, s -> null))
-                .orElse(CoatOfArms.empty());
+        var isPlayer = tag != null && tag.getId().equals(getPlayerId(content));
+        coatOfArms = isPlayer
+                ? meta.getNodeForKeyIfExistent("flag")
+                        .map(coatOfArms -> CoatOfArms.fromNode(coatOfArms, s -> null))
+                        .orElse(CoatOfArms.empty())
+                : CoatOfArms.empty();
 
-        var countryIdPointer = NodePointer.builder()
-                .name("previous_played")
-                .index(0)
-                .name("idtype")
-                .build();
-        var countryPointer = NodePointer.builder()
-                .name("country_manager")
-                .name("database")
-                .pointerEvaluation(countryIdPointer)
-                .build();
-        var country = countryPointer.get(content.get());
-        tag = country != null
-                ? new Vic3Tag(
-                        countryIdPointer.get(content.get()).getString(),
-                        country.getNodeForKey("definition").getString(),
-                        country.getNodeForKey("government").getString())
-                : null;
-        allTags = tag != null ? List.of(tag) : List.of();
+        this.tag = tag;
+        this.allTags = allTags;
         observer = tag == null;
 
         mods = content

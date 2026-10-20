@@ -72,7 +72,7 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
         }
 
         for (var name : candidates) {
-            var file = CascadeDirectoryHelper.openFile(Path.of("gfx", "flags", name + ".tga"), ctx);
+            var file = CascadeDirectoryHelper.findFile(Path.of("gfx", "flags", name + ".tga"), ctx);
             if (file.isPresent()) {
                 return ImageHelper.loadImage(file.get(), null);
             }
