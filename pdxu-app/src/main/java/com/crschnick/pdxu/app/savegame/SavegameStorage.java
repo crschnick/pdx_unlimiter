@@ -394,6 +394,30 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         SavegameCampaign<T, I> c = this.getSavegameCampaign(campainUuid).get();
         TrackEvent.debug("Adding new entry " + e.getName());
         addEntry(c, e);
+        deleteExcessEntries(c, e);
+    }
+
+    private void deleteExcessEntries(SavegameCampaign<T, I> c, SavegameEntry<T, I> added) {
+        if (!AppPrefs.get().enableMaxCampaignSaves().getValue()) {
+            return;
+        }
+
+        var max = Math.max(1, AppPrefs.get().maxCampaignSaves().getValue());
+        var excess = c.getSavegames().size() - max;
+        if (excess <= 0) {
+            return;
+        }
+
+        // Never delete the newly added entry, even if it is the oldest one
+        var toDelete = c.getSavegames().stream()
+                .filter(e -> e != added)
+                .sorted(Comparator.comparing(SavegameEntry::getDate))
+                .limit(excess)
+                .toList();
+        for (var e : toDelete) {
+            TrackEvent.debug("Deleting excess entry " + e.getName());
+            delete(e);
+        }
     }
 
     private void addEntry(SavegameCampaign<T, I> c, SavegameEntry<T, I> e) {

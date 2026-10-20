@@ -60,7 +60,12 @@ public class ImportsCategory extends AppPrefsCategory {
                         .pref(prefs.importOnNormalGameExit)
                         .addToggle(prefs.importOnNormalGameExit)
                         .pref(prefs.deleteOnImport)
-                        .addToggle(prefs.deleteOnImport));
+                        .addToggle(prefs.deleteOnImport)
+                        .pref(prefs.enableMaxCampaignSaves)
+                        .addToggle(prefs.enableMaxCampaignSaves)
+                        .pref(prefs.maxCampaignSaves)
+                        .addComp(new IntFieldComp(prefs.maxCampaignSaves, 1, Integer.MAX_VALUE).maxWidth(100))
+                        .disable(prefs.enableMaxCampaignSaves.not()));
         return builder.buildComp();
     }
 }

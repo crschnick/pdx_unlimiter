@@ -184,6 +184,18 @@ public final class AppPrefs {
             .valueClass(Integer.class)
             .requiresRestart(false)
             .build());
+    final BooleanProperty enableMaxCampaignSaves = map(Mapping.builder()
+            .property(new GlobalBooleanProperty(false))
+            .key("enableMaxCampaignSaves")
+            .valueClass(Boolean.class)
+            .requiresRestart(false)
+            .build());
+    final Property<Integer> maxCampaignSaves = map(Mapping.builder()
+            .property(new GlobalObjectProperty<>(10))
+            .key("maxCampaignSaves")
+            .valueClass(Integer.class)
+            .requiresRestart(false)
+            .build());
 
     final Property<EditorIndentation> editorIndentation = map(Mapping.builder()
             .property(new GlobalObjectProperty<>(EditorIndentation.ONE_TAB))
@@ -292,6 +304,14 @@ public final class AppPrefs {
 
     public ObservableValue<Integer> timedImportsInterval() {
         return timedImportsInterval;
+    }
+
+    public ObservableValue<Boolean> enableMaxCampaignSaves() {
+        return enableMaxCampaignSaves;
+    }
+
+    public ObservableValue<Integer> maxCampaignSaves() {
+        return maxCampaignSaves;
     }
 
     final BooleanProperty disableHardwareAcceleration = map(Mapping.builder()
