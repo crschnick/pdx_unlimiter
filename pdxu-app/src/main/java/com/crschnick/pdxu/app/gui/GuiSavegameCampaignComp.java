@@ -12,6 +12,7 @@ import com.crschnick.pdxu.app.savegame.SavegameContext;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 
 import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.SetChangeListener;
 import javafx.geometry.Insets;
@@ -20,6 +21,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
@@ -74,13 +76,17 @@ public class GuiSavegameCampaignComp<T, I extends SavegameInfo<T>> extends Simpl
             top.getChildren().add(name);
             AppFontSizes.xxl(name);
 
+            var skipConfirm = new SimpleBooleanProperty();
             var del = new IconButtonComp(new LabelGraphic.IconGraphic("mdi2t-trash-can-outline"), () -> {
-                        var confirm = AppDialog.confirm("deleteCampaign");
+                        var confirm = skipConfirm.get() || AppDialog.confirm("deleteCampaign");
+                        skipConfirm.set(false);
                         if (confirm) {
                             SavegameActions.delete(campaign);
                         }
                     })
                     .tooltipKey("delete")
+                    .apply(struc -> struc.get()
+                            .addEventFilter(MouseEvent.MOUSE_PRESSED, m -> skipConfirm.set(m.isShiftDown())))
                     .createRegion();
             top.getChildren().add(del);
 

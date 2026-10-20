@@ -44,6 +44,8 @@ import lombok.AllArgsConstructor;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 import java.time.Duration;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -78,6 +80,13 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
         {
             Label l = new Label(dateString);
             l.getStyleClass().add(CLASS_DATE);
+            context.getStorage().getSavegameFileModifiedTime(context.getCollection(), e).ifPresent(t -> {
+                var modified = t.toInstant()
+                        .atZone(ZoneId.systemDefault())
+                        .toOffsetDateTime()
+                        .truncatedTo(ChronoUnit.SECONDS);
+                GuiTooltips.install(l, AppI18n.get("savegameFileModified", modified.toString()));
+            });
 
             var tagImage = context.getGuiFactory().createImage(e);
             HBox tagBar = new HBox(tagImage.getValue(), l);
@@ -188,7 +197,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
             Button del = new Button(null, new FontIcon());
             del.setGraphic(new FontIcon("mdi2t-trash-can-outline"));
             del.setOnMouseClicked((m) -> {
-                var confirm = AppDialog.confirm("deleteSavegame");
+                var confirm = m.isShiftDown() || AppDialog.confirm("deleteSavegame");
                 if (confirm) {
                     SavegameActions.delete(e);
                 }

@@ -3,7 +3,6 @@ package com.crschnick.pdxu.app.core;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameCacheManager;
-import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.savegame.SavegameCampaign;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
@@ -19,8 +18,6 @@ import javafx.collections.SetChangeListener;
 
 import lombok.Getter;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.attribute.FileTime;
 import java.time.Duration;
 import java.util.ArrayList;
@@ -160,14 +157,8 @@ public class SavegameManagerState<T, I extends SavegameInfo<T>> {
         var modTimes = new HashMap<SavegameEntry<T, I>, FileTime>();
         var storage = SavegameStorage.get(game);
         newEntries.sort(Comparator.<SavegameEntry<T, I>, GameDate>comparing(SavegameEntry::getDate)
-                .thenComparing(entry -> modTimes.computeIfAbsent(entry, e -> {
-                    try {
-                        return Files.getLastModifiedTime(storage.getSavegameFile(col, e));
-                    } catch (IOException ex) {
-                        ErrorEventFactory.fromThrowable(ex).handle();
-                        return FileTime.fromMillis(0);
-                    }
-                }))
+                .thenComparing(entry -> modTimes.computeIfAbsent(entry, e -> storage.getSavegameFileModifiedTime(col, e)
+                        .orElse(FileTime.fromMillis(0))))
                 .reversed());
 
         // Avoid list updates if nothing changed

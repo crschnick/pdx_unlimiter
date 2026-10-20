@@ -50,6 +50,7 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
@@ -600,6 +601,15 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         return getSavegameDataDirectory(e).resolve(getSaveFileName());
     }
 
+    public Optional<FileTime> getSavegameFileModifiedTime(SavegameCampaign<?, ?> c, SavegameEntry<?, ?> e) {
+        try {
+            return Optional.of(Files.getLastModifiedTime(getSavegameFile(c, e)));
+        } catch (IOException ex) {
+            ErrorEventFactory.fromThrowable(ex).handle();
+            return Optional.empty();
+        }
+    }
+
     public Path getSavegameFile(SavegameCampaign<?, ?> c, SavegameEntry<?, ?> e) {
         return path.resolve(c.getUuid().toString())
                 .resolve(e.getUuid().toString())
@@ -745,8 +755,10 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         String checksum;
         byte[] bytes;
         boolean melted;
+        FileTime lastModified;
         try {
             bytes = Files.readAllBytes(file);
+            lastModified = Files.getLastModifiedTime(file);
             checksum = checksum(bytes);
             TrackEvent.debug("Checksum is " + checksum);
             if (checkDuplicate) {
@@ -793,7 +805,15 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
 
                 var targetId = customCampaignId != null ? customCampaignId : type.getCampaignIdHeuristic(s.content);
                 addEntryToCollection(
-                        targetId, file -> Files.write(file, bytes), checksum, info, sourceFileChecksum, null);
+                        targetId,
+                        target -> {
+                            Files.write(target, bytes);
+                            Files.setLastModifiedTime(target, lastModified);
+                        },
+                        checksum,
+                        info,
+                        sourceFileChecksum,
+                        null);
             }
 
             @Override
