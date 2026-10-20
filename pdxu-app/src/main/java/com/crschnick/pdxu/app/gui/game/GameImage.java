@@ -182,6 +182,16 @@ public class GameImage {
     public static Image EU4_SMALL_SHIELD_FRAME;
 
     public static Image CK2_BACKGROUND;
+    public static Image CK2_ICON_GOLD;
+    public static Image CK2_ICON_PRESTIGE;
+    public static Image CK2_ICON_PIETY;
+    public static Image CK2_ICON_IRONMAN;
+    public static Image CK2_ICON_RULER;
+    public static Image CK2_SKILL_DIPLOMACY;
+    public static Image CK2_SKILL_MARTIAL;
+    public static Image CK2_SKILL_STEWARDSHIP;
+    public static Image CK2_SKILL_INTRIGUE;
+    public static Image CK2_SKILL_LEARNING;
 
     public static Image VIC2_BACKGROUND;
 
@@ -457,6 +467,28 @@ public class GameImage {
         var installPath = GameInstallation.ALL.get(Game.CK2).getInstallDir();
         CK2_BACKGROUND = ImageHelper.loadImage(
                 GameInstallation.ALL.get(Game.CK2).getType().chooseBackgroundImage(installPath));
+
+        Path i = installPath.resolve("gfx").resolve("interface");
+        CK2_ICON_GOLD = ImageHelper.loadImage(i.resolve("icon_gold.dds"));
+        CK2_ICON_PRESTIGE = ImageHelper.loadImage(i.resolve("icon_prestige.dds"));
+        CK2_ICON_PIETY = ImageHelper.loadImage(i.resolve("icon_piety.dds"));
+        var ironman = ImageHelper.loadImage(i.resolve("ironman_icon.dds"));
+        CK2_ICON_IRONMAN =
+                ImageHelper.cut(ironman, new Rectangle2D(0, 0, ironman.getWidth() / 2, ironman.getHeight()));
+
+        var crown = ImageHelper.loadImage(i.resolve("crown_focus.dds"));
+        CK2_ICON_RULER = ImageHelper.cut(crown, new Rectangle2D(0, 0, crown.getWidth() / 2, crown.getHeight()));
+
+        var skills = ImageHelper.loadImage(i.resolve("attribute_strip.dds"));
+        var skillWidth = skills.getWidth() / 5;
+        CK2_SKILL_DIPLOMACY = ImageHelper.cut(skills, new Rectangle2D(0, 0, skillWidth, skills.getHeight()));
+        CK2_SKILL_MARTIAL = ImageHelper.cut(skills, new Rectangle2D(skillWidth, 0, skillWidth, skills.getHeight()));
+        CK2_SKILL_STEWARDSHIP =
+                ImageHelper.cut(skills, new Rectangle2D(skillWidth * 2, 0, skillWidth, skills.getHeight()));
+        CK2_SKILL_INTRIGUE =
+                ImageHelper.cut(skills, new Rectangle2D(skillWidth * 3, 0, skillWidth, skills.getHeight()));
+        CK2_SKILL_LEARNING =
+                ImageHelper.cut(skills, new Rectangle2D(skillWidth * 4, 0, skillWidth, skills.getHeight()));
     }
 
     private static void loadVic2Images() {

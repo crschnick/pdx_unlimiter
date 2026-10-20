@@ -12,6 +12,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,6 +40,13 @@ public class Ck2SavegameData extends SavegameData<Ck2Tag> {
     @Override
     public List<Ck2Tag> getAllTags() {
         return allTags;
+    }
+
+    public Optional<Node> getPlayerCharacter(SavegameContent content) {
+        return content.get()
+                .getNodeForKeysIfExistent("player", "id")
+                .map(Node::getString)
+                .flatMap(id -> content.get().getNodeForKeysIfExistent("character", id));
     }
 
     @Override

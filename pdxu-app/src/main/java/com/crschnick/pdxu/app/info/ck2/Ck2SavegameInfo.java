@@ -8,6 +8,11 @@ import com.crschnick.pdxu.model.ck2.Ck2Tag;
 
 public class Ck2SavegameInfo extends SavegameInfo<Ck2Tag> {
 
+    Ck2RulerComp ruler;
+    Ck2GoldComp gold;
+    Ck2PrestigeComp prestige;
+    Ck2PietyComp piety;
+    Ck2IronmanComp ironman;
     VersionComp version;
 
     public Ck2SavegameInfo() {}
