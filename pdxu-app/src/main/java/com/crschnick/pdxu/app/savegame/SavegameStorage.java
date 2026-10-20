@@ -177,7 +177,19 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         ALL.put(Game.VIC2, new SavegameStorage<>("vic2", GameDateType.VIC2, SavegameType.VIC2, Vic2SavegameInfo.class) {
             @Override
             protected String getDefaultCampaignName(Vic2SavegameInfo info) {
-                return "Unknown";
+                var tag = info.getData().getTag().getTagId();
+                var government = info.getData().vic2().getGovernment();
+                var name = GameLocalisation.getLocalisedValue(tag, info);
+                if (government != null) {
+                    var key = tag + "_" + government;
+                    var governmentName = GameLocalisation.getLocalisedValue(key, info);
+                    if (!governmentName.equals(key)) {
+                        name = governmentName;
+                    }
+                }
+
+                var region = info.getData().vic2().getDomainRegion();
+                return region != null ? name.replace("$REGION$", region) : name;
             }
         });
         ALL.put(Game.EU5, new SavegameStorage<>("eu5", GameDateType.EU5, SavegameType.EU5, Eu5SavegameInfo.class) {

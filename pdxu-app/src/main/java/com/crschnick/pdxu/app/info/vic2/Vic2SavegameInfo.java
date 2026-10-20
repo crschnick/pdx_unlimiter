@@ -8,6 +8,13 @@ import com.crschnick.pdxu.model.vic2.Vic2Tag;
 
 public class Vic2SavegameInfo extends SavegameInfo<Vic2Tag> {
 
+    Vic2TreasuryComp treasury;
+    Vic2PrestigeComp prestige;
+    Vic2InfamyComp infamy;
+    Vic2PluralityComp plurality;
+    Vic2ResearchPointsComp researchPoints;
+    Vic2LeadershipComp leadership;
+    Vic2DiplomaticPointsComp diplomaticPoints;
     VersionComp version;
 
     public Vic2SavegameInfo() {}

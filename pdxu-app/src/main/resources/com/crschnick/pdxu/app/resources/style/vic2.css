@@ -1,0 +1,6 @@
+.node-container.vic2 .image-icon {
+-fx-min-width: 1.5em;
+-fx-max-width: 1.5em;
+-fx-min-height: 1.5em;
+-fx-max-height: 1.5em;
+}

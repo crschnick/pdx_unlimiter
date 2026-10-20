@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.info.vic2;
 
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SavegameInfoException;
+import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 import com.crschnick.pdxu.io.savegame.SavegameType;
 import com.crschnick.pdxu.model.GameDateType;
@@ -12,12 +13,15 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @JsonTypeName("vic2")
 public class Vic2SavegameData extends SavegameData<Vic2Tag> {
 
     private GameVersion version;
     private Vic2Tag tag;
+    private String government;
+    private String domainRegion;
     private List<Vic2Tag> allTags;
 
     public Vic2SavegameData() {}
@@ -53,11 +57,33 @@ public class Vic2SavegameData extends SavegameData<Vic2Tag> {
                 .findAny()
                 .orElseThrow(() -> new SavegameInfoException("No player tag found"));
 
+        government = content.get()
+                .getNodeForKeysIfExistent(playerTag, "government")
+                .map(Node::getString)
+                .orElse(null);
+
+        domainRegion = content.get()
+                .getNodeForKeysIfExistent(playerTag, "domain_region")
+                .map(Node::getString)
+                .orElse(null);
+
         mods = null;
         dlcs = null;
 
         // Hardcode version
         version = new GameVersion(3, 4, 0, 0);
+    }
+
+    public String getDomainRegion() {
+        return domainRegion;
+    }
+
+    public String getGovernment() {
+        return government;
+    }
+
+    public Optional<Node> getPlayerCountry(SavegameContent content) {
+        return content.get().getNodeForKeyIfExistent(tag.getTagId());
     }
 
     public List<Vic2Tag> getAllTags() {

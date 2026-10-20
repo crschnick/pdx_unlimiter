@@ -4,15 +4,20 @@ import com.crschnick.pdxu.app.gui.GuiStyle;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.info.vic2.Vic2SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
+import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.vic2.Vic2Tag;
 
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 
 public class Vic2GuiFactory extends GameGuiFactory<Vic2Tag, Vic2SavegameInfo> {
@@ -49,6 +54,12 @@ public class Vic2GuiFactory extends GameGuiFactory<Vic2Tag, Vic2SavegameInfo> {
 
     @Override
     public Background createEntryInfoBackground(SavegameInfo<Vic2Tag> info) {
-        return null;
+        var ctx = GameFileContext.fromData(info.getData());
+        return Vic2CountryColorCache.getColor(ctx, info.getData().getTag().getTagId())
+                .map(c -> new Background(new BackgroundFill(
+                        ColorHelper.withAlpha(ColorHelper.fromGameColor(c), 0.33),
+                        new CornerRadii(4, 4, 0, 0, false),
+                        Insets.EMPTY)))
+                .orElse(null);
     }
 }

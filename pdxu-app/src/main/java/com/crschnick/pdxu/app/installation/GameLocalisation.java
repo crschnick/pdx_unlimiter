@@ -63,6 +63,11 @@ public class GameLocalisation {
                     .getInstallDir()
                     .resolve(ctx.getInstall().getType().getLocalisationsDirectory());
             CascadeDirectoryHelper.traverseDirectory(dir, ctx, file -> {
+                if (file.getFileName().toString().endsWith(".csv")) {
+                    GameLocalisationHelper.loadCsvTranslations(file, lang).forEach(strings::putIfAbsent);
+                    return;
+                }
+
                 if (!GameLocalisationHelper.isLanguage(file, lang)) {
                     return;
                 }

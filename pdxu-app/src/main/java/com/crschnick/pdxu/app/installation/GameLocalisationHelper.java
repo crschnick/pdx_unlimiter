@@ -11,6 +11,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -52,6 +53,36 @@ public class GameLocalisationHelper {
     }
 
     private static final Pattern PATTERN = Pattern.compile("^\\s*([^\\s:#\"]+):(\\d*)\\s*\"(.+)\"\\s*(?:#[^\"]*)?$");
+
+    public static Map<String, String> loadCsvTranslations(Path file, GameLanguage lang) {
+        var column = switch (lang) {
+            case FRENCH -> 2;
+            case GERMAN -> 3;
+            case SPANISH -> 5;
+            default -> 1;
+        };
+
+        Map<String, String> map = new HashMap<>();
+        try {
+            for (var line : Files.readAllLines(file, Charset.forName("windows-1252"))) {
+                if (line.isBlank() || line.startsWith("#")) {
+                    continue;
+                }
+
+                var split = line.split(";", -1);
+                if (split.length < 2 || split[0].isBlank()) {
+                    continue;
+                }
+
+                var value = column < split.length && !split[column].isBlank() ? split[column] : split[1];
+                map.putIfAbsent(split[0], value);
+            }
+        } catch (IOException e) {
+            ErrorEventFactory.fromThrowable(e).handle();
+            return Map.of();
+        }
+        return map;
+    }
 
     public static Map<String, String> loadTranslations(Path file) {
         Map<String, String> map = new HashMap<>();

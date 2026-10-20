@@ -194,6 +194,13 @@ public class GameImage {
     public static Image CK2_SKILL_LEARNING;
 
     public static Image VIC2_BACKGROUND;
+    public static Image VIC2_ICON_MONEY;
+    public static Image VIC2_ICON_PRESTIGE;
+    public static Image VIC2_ICON_INFAMY;
+    public static Image VIC2_ICON_RESEARCH_POINTS;
+    public static Image VIC2_ICON_LEADERSHIP;
+    public static Image VIC2_ICON_DIPLOMATIC_POINTS;
+    public static Image VIC2_ICON_PLURALITY;
 
     public static Image VIC3_BACKGROUND;
     public static Image VIC3_ICON_IRONMAN;
@@ -498,6 +505,15 @@ public class GameImage {
         VIC2_BACKGROUND = ImageHelper.cut(
                 VIC2_BACKGROUND,
                 new Rectangle2D(100, 100, VIC2_BACKGROUND.getWidth() - 200, VIC2_BACKGROUND.getHeight() - 200));
+
+        Path i = installPath.resolve("gfx").resolve("interface");
+        VIC2_ICON_MONEY = ImageHelper.loadImage(i.resolve("icon_money_big.dds"));
+        VIC2_ICON_PRESTIGE = ImageHelper.loadImage(i.resolve("topbar_prestige.dds"));
+        VIC2_ICON_INFAMY = ImageHelper.loadImage(i.resolve("icon_infamy_small.dds"));
+        VIC2_ICON_RESEARCH_POINTS = ImageHelper.loadImage(i.resolve("topbar_researchpoints.dds"));
+        VIC2_ICON_LEADERSHIP = ImageHelper.loadImage(i.resolve("topbar_leadership.dds"));
+        VIC2_ICON_DIPLOMATIC_POINTS = ImageHelper.loadImage(i.resolve("topbar_diplopts.dds"));
+        VIC2_ICON_PLURALITY = ImageHelper.loadImage(i.resolve("politics_pluralism.dds"));
     }
 
     private static void loadHoi4Images() {

@@ -3,14 +3,19 @@ package com.crschnick.pdxu.app.gui.game;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.info.ck2.Ck2SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.installation.GameInstallation;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
+import com.crschnick.pdxu.app.util.ColorHelper;
 import com.crschnick.pdxu.app.util.ImageHelper;
 import com.crschnick.pdxu.model.ck2.Ck2Tag;
 
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.Pane;
 
 public class Ck2GuiFactory extends GameGuiFactory<Ck2Tag, Ck2SavegameInfo> {
@@ -39,6 +44,12 @@ public class Ck2GuiFactory extends GameGuiFactory<Ck2Tag, Ck2SavegameInfo> {
 
     @Override
     public Background createEntryInfoBackground(SavegameInfo<Ck2Tag> info) {
-        return null;
+        var ctx = GameFileContext.fromData(info.getData());
+        return Ck2TitleColorCache.getColor(ctx, info.getData().getTag().getPrimaryTitle())
+                .map(c -> new Background(new BackgroundFill(
+                        ColorHelper.withAlpha(ColorHelper.fromGameColor(c), 0.33),
+                        new CornerRadii(4, 4, 0, 0, false),
+                        Insets.EMPTY)))
+                .orElse(null);
     }
 }
