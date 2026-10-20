@@ -8,6 +8,7 @@
 
 .loading {
 -fx-background-color: #FFFFFFcc;
+    -fx-background-radius: 6 0 0 0;
 }
 
 .root:dark .loading {

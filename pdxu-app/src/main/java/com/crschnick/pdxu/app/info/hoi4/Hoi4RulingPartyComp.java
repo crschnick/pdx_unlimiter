@@ -26,24 +26,23 @@ public class Hoi4RulingPartyComp extends SimpleInfoComp {
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
         tag = data.hoi4().getTag().getTag();
-        var politics = content.get()
-                .getNodeForKey("countries")
-                .getNodeForKey(tag)
-                .getNodeForKeyIfExistent("politics");
+        var politics =
+                content.get().getNodeForKey("countries").getNodeForKey(tag).getNodeForKeyIfExistent("politics");
         rulingParty = politics.flatMap(p -> p.getNodeForKeyIfExistent("ruling_party"))
                 .map(Node::getString)
                 .orElse(null);
         popularities = new LinkedHashMap<>();
-        politics.flatMap(p -> p.getNodeForKeyIfExistent("parties")).ifPresent(parties -> parties.forEach((k, v) -> {
-            if (k != null && v.isArray()) {
-                popularities.put(
-                        k,
-                        v.getNodeForKeyIfExistent("popularity")
-                                .filter(Node::isValue)
-                                .map(Node::getDouble)
-                                .orElse(0.0));
-            }
-        }));
+        politics.flatMap(p -> p.getNodeForKeyIfExistent("parties"))
+                .ifPresent(parties -> parties.forEach((k, v) -> {
+                    if (k != null && v.isArray()) {
+                        popularities.put(
+                                k,
+                                v.getNodeForKeyIfExistent("popularity")
+                                        .filter(Node::isValue)
+                                        .map(Node::getDouble)
+                                        .orElse(0.0));
+                    }
+                }));
     }
 
     private static String getPartyName(SavegameData<?> data, String tag, String ideology) {

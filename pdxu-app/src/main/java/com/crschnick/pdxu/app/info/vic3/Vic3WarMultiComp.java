@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 public class Vic3WarMultiComp extends SavegameInfoMultiComp {
 
     @NoArgsConstructor
@@ -94,7 +93,8 @@ public class Vic3WarMultiComp extends SavegameInfoMultiComp {
                     .map(enemy -> Vic3DiplomacyRowComp.getCountry(data, countries.get(), enemy))
                     .flatMap(Optional::stream)
                     .toList();
-            var title = Optional.ofNullable(Vic3Names.resolve(data, war.getNodeForKeyIfExistent("name").orElse(null)))
+            var title = Optional.ofNullable(Vic3Names.resolve(
+                            data, war.getNodeForKeyIfExistent("name").orElse(null)))
                     .orElseGet(() -> createDefaultTitle(data, countries.get(), attackers, defenders));
             comps.add(new WarComp(title, participants));
         });
@@ -119,7 +119,10 @@ public class Vic3WarMultiComp extends SavegameInfoMultiComp {
 
     private static List<String> getSide(Node play, String leaderKey, String othersKey) {
         var side = new ArrayList<String>();
-        play.getNodeForKeyIfExistent(leaderKey).filter(Node::isValue).map(Node::getString).ifPresent(side::add);
+        play.getNodeForKeyIfExistent(leaderKey)
+                .filter(Node::isValue)
+                .map(Node::getString)
+                .ifPresent(side::add);
         play.getNodeForKeyIfExistent(othersKey).filter(Node::isArray).ifPresent(others -> {
             for (var other : others.getNodeArray()) {
                 if (other.isValue() && !side.contains(other.getString())) {

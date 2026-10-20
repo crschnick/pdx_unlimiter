@@ -1,8 +1,8 @@
-.ck3 .skill-icon {
--fx-min-width: 2.5em;
--fx-max-width: 2.5em;
--fx-min-height: 2.5em;
--fx-max-height: 2.5em;
+.ck3 .power-icon {
+-fx-min-width: 1.8em;
+-fx-max-width: 1.8em;
+-fx-min-height: 1.8em;
+-fx-max-height: 1.8em;
 }
 
 .ck3 .house-icon {
@@ -19,10 +19,6 @@
 -fx-max-height: 2.5em;
 }
 
-.ck3 .ruler-name {
--fx-font-size: 1.1em;
-}
-
 .ck3 .tag-icon {
 -fx-min-width: 2.5em;
 -fx-max-width: 2.5em;
@@ -36,4 +32,10 @@
 
 .ck3 .claims {
       -fx-background-color: #966e6a;
+}
+.ck3 .trait-icon {
+-fx-min-width: 2.3em;
+-fx-max-width: 2.3em;
+-fx-min-height: 2.3em;
+-fx-max-height: 2.3em;
 }

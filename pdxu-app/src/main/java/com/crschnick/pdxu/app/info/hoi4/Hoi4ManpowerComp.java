@@ -17,24 +17,26 @@ public class Hoi4ManpowerComp extends SimpleInfoComp {
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
         var tag = data.hoi4().getTag().getTag();
-        content.get().getNodeForKeyIfExistent("states").ifPresent(states -> states.forEach((k, state) -> {
-            if (!state.isArray()) {
-                return;
-            }
+        content.get()
+                .getNodeForKeyIfExistent("states")
+                .ifPresent(states -> states.forEach((k, state) -> {
+                    if (!state.isArray()) {
+                        return;
+                    }
 
-            var controller = state.getNodeForKeyIfExistent("controller")
-                    .or(() -> state.getNodeForKeyIfExistent("owner"))
-                    .map(Node::getString);
-            if (controller.isEmpty() || !controller.get().equals(tag)) {
-                return;
-            }
+                    var controller = state.getNodeForKeyIfExistent("controller")
+                            .or(() -> state.getNodeForKeyIfExistent("owner"))
+                            .map(Node::getString);
+                    if (controller.isEmpty() || !controller.get().equals(tag)) {
+                        return;
+                    }
 
-            value += state.getNodeForKeyIfExistent("manpower_pool")
-                    .flatMap(pool -> pool.getNodeForKeyIfExistent("available"))
-                    .filter(Node::isValue)
-                    .map(available -> (long) available.getDouble())
-                    .orElse(0L);
-        }));
+                    value += state.getNodeForKeyIfExistent("manpower_pool")
+                            .flatMap(pool -> pool.getNodeForKeyIfExistent("available"))
+                            .filter(Node::isValue)
+                            .map(available -> (long) available.getDouble())
+                            .orElse(0L);
+                }));
     }
 
     @Override

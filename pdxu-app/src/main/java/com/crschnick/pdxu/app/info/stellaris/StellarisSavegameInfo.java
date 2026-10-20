@@ -10,25 +10,24 @@ import com.crschnick.pdxu.model.stellaris.StellarisTag;
 @SuppressWarnings("unused")
 public class StellarisSavegameInfo extends SavegameInfo<StellarisTag> {
 
+    StellarisVictoryRankComp victoryRank;
+    StellarisPowerComp power;
     StellarisEmpireSizeComp empireSize;
+    StellarisPopsComp pops;
     StellarisPlanetsComp planets;
     StellarisFleetsComp fleets;
+    StellarisStarbaseCapacityComp starbaseCapacity;
     StellarisEnergyComp energy;
     StellarisMineralsComp minerals;
+    StellarisAlloysComp alloys;
     StellarisFoodComp food;
     StellarisConsumerGoodsComp consumerGoods;
-    StellarisAlloysComp alloys;
     StellarisInfluenceComp influence;
     StellarisUnityComp unity;
     StellarisTradeComp trade;
     StellarisPhysicsResearchComp physicsResearch;
     StellarisSocietyResearchComp societyResearch;
     StellarisEngineeringResearchComp engineeringResearch;
-    StellarisPowerComp power;
-    StellarisVictoryRankComp victoryRank;
-    StellarisPopsComp pops;
-    StellarisStarbaseCapacityComp starbaseCapacity;
-    StellarisNavalCapacityComp navalCapacity;
     StellarisAlliesComp allies;
     StellarisWarMultiComp wars;
     StellarisIronmanComp ironman;

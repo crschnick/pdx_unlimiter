@@ -3,6 +3,7 @@ package com.crschnick.pdxu.editor;
 import com.crschnick.pdxu.editor.node.EditorCollectorNode;
 import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
+import com.crschnick.pdxu.editor.node.EditorSimpleNode;
 import com.crschnick.pdxu.editor.node.EditorRootNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.node.NodePointer;
@@ -65,6 +66,12 @@ public class EditorNavPath {
                         current, s.getBackingNode().getArrayNode(), key);
             } else {
                 var exp = current.expand();
+                if (sub.getPath().getFirst() instanceof NodePointer.IndexElement(int index)) {
+                    return exp.stream()
+                            .filter(en -> en instanceof EditorSimpleNode simple
+                                    && simple.getRawIndexInParentNode() == index)
+                            .findFirst();
+                }
                 for (var en : exp) {
                     if (sub.isValid(en.getContent())) {
                         return Optional.of(en);

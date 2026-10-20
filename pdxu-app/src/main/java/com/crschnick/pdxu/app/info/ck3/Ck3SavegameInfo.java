@@ -11,10 +11,12 @@ public class Ck3SavegameInfo extends SavegameInfo<Ck3Tag> {
     Ck3PrestigeComp prestige;
     Ck3PietyComp piety;
     Ck3SoldiersComp soldiers;
+    Ck3LeviesComp levies;
     Ck3TitlesComp titles;
     Ck3ClaimsComp claims;
-    Ck3WarMultiComp wars;
     Ck3AlliesComp allies;
+    Ck3WarMultiComp wars;
+    Ck3AchievementOkComp achievementOk;
     Ck3IronmanComp ironman;
     ModComp mods;
     DlcComp dlcs;

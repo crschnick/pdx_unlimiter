@@ -174,6 +174,17 @@ public class EditorExternalState {
         }
     }
 
+    public void openTextFile(String name, String content) {
+        Path file = TEMP.resolve(FileSystemHelper.getFileSystemCompatibleName(name) + " - " + UUID.randomUUID() + ".txt");
+        try {
+            FileUtils.forceMkdirParent(file.toFile());
+            Files.writeString(file, content);
+            openFile(file.toString());
+        } catch (IOException ex) {
+            ErrorEventFactory.fromThrowable(ex).handle();
+        }
+    }
+
     public void clearEditorLeftovers(EditorState destroyed) {
         openEntries.removeIf(e -> e.state.equals(destroyed));
     }

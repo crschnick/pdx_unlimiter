@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.editor;
 
 import com.crschnick.pdxu.editor.node.EditorNode;
+import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.NodePointer;
 
 import javafx.beans.binding.Bindings;
@@ -119,8 +120,24 @@ public class EditorNavigation {
 
     public boolean navigateTo(NodePointer pointer) {
         var np = EditorNavPath.createNavPath(state, pointer);
-        np.ifPresent(this::navigateTo);
-        return np.isPresent();
+        if (np.isEmpty()) {
+            return false;
+        }
+
+        var target = np.get().getEditorNode();
+        if (target instanceof EditorRealNode real && !real.getBackingNode().isArray()) {
+            var parentPath = new ArrayList<>(np.get().getPath());
+            parentPath.removeLast();
+            removeHistoryAfterPos();
+            var newLoc = state.getContent().navigateAndFocus(new EditorNavPath(parentPath), target);
+            this.current.set(newLoc);
+            this.history.add(newLoc);
+            historyPos.set(historyPos.get() + 1);
+            return true;
+        }
+
+        navigateTo(np.get());
+        return true;
     }
 
     public void navigateToChild(EditorNode newNode) {

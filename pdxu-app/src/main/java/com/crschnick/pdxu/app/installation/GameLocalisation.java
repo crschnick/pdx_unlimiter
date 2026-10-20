@@ -47,7 +47,8 @@ public class GameLocalisation {
         return value;
     }
 
-    private static final Pattern REFERENCE_PATTERN = Pattern.compile("^(?:\\$([^$\\s]+)\\$|\\[([A-Za-z0-9_]+)\\]|\\[Concept\\('[^']*',\\s*'([^']*)'\\)\\])$");
+    private static final Pattern REFERENCE_PATTERN =
+            Pattern.compile("^(?:\\$([^$\\s]+)\\$|\\[([A-Za-z0-9_]+)\\]|\\[Concept\\('[^']*',\\s*'([^']*)'\\)\\])$");
 
     public static class LocalisationCache extends GameCacheManager.Cache {
 

@@ -7,19 +7,19 @@ import com.crschnick.pdxu.model.vic3.Vic3Tag;
 @SuppressWarnings("unused")
 public class Vic3SavegameInfo extends SavegameInfo<Vic3Tag> {
 
-    Vic3AchievementOkComp achievementOk;
-    Vic3IronmanComp ironman;
     Vic3RankComp rank;
+    Vic3PrestigeComp prestige;
     Vic3GdpComp gdp;
     Vic3TreasuryComp treasury;
     Vic3PopulationComp population;
-    Vic3LiteracyComp literacy;
     Vic3SolComp sol;
-    Vic3PrestigeComp prestige;
-    Vic3LoyalistComp loyalist;
+    Vic3LiteracyComp literacy;
     Vic3RadicalComp radical;
+    Vic3LoyalistComp loyalist;
     Vic3AlliesComp allies;
     Vic3WarMultiComp wars;
+    Vic3AchievementOkComp achievementOk;
+    Vic3IronmanComp ironman;
     ModComp mods;
     DlcComp dlcs;
     VersionComp version;

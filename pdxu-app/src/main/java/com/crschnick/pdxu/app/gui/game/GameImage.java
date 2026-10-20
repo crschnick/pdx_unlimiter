@@ -25,6 +25,8 @@ public class GameImage {
 
     private static final Map<Image, Rectangle2D> VIEWPORTS = new HashMap<>();
     public static Image CK3_ICON_IRONMAN;
+    public static Image CK3_ICON_ACHIEVEMENT_ELIGIBLE;
+    public static Image CK3_ICON_ACHIEVEMENT_INELIGIBLE;
     public static Image CK3_ICON_RULER;
     public static Image CK3_ICON_HEIR;
     public static Image CK3_ICON_TITLES;
@@ -60,6 +62,7 @@ public class GameImage {
     public static Image CK3_ICON_GOLD;
     public static Image CK3_ICON_PRESTIGE;
     public static Image CK3_ICON_SOLDIERS;
+    public static Image CK3_ICON_LEVIES;
     public static Image CK3_ICON_PIETY;
     public static Image CK3_ICON_RENOWN;
     public static Image CK3_ICON_HEALTH;
@@ -90,7 +93,6 @@ public class GameImage {
     public static Image STELLARIS_ICON_TECH_POWER;
     public static Image STELLARIS_ICON_VICTORY;
     public static Image STELLARIS_ICON_STARBASE;
-    public static Image STELLARIS_ICON_NAVAL_CAPACITY;
     public static Image STELLARIS_ICON_POPS;
 
     public static Image HOI4_ICON_IRONMAN;
@@ -245,7 +247,8 @@ public class GameImage {
         VIC3_ICON_SOL = ImageHelper.loadImage(i.resolve("generic_icons").resolve("sol_icon.dds"));
         VIC3_ICON_LOYALISTS = ImageHelper.loadImage(i.resolve("generic_icons").resolve("population_loyalist.dds"));
         VIC3_ICON_RADICALS = ImageHelper.loadImage(i.resolve("generic_icons").resolve("population_radical.dds"));
-        VIC3_ICON_ALLIANCE = ImageHelper.loadImage(i.resolve("lens_toolbar_icons").resolve("alliance.dds"));
+        VIC3_ICON_ALLIANCE =
+                ImageHelper.loadImage(i.resolve("lens_toolbar_icons").resolve("alliance.dds"));
         VIC3_ICON_LITERACY = ImageHelper.loadImage(i.resolve("generic_icons").resolve("literacy.dds"));
         VIC3_ICON_POPULATION = ImageHelper.loadImage(i.resolve("generic_icons").resolve("population.dds"));
         VIC3_ICON_MONEY = ImageHelper.loadImage(i.resolve("generic_icons").resolve("money.dds"));
@@ -264,6 +267,10 @@ public class GameImage {
         Path i = p.resolve("gfx").resolve("interface").resolve("icons");
 
         CK3_ICON_IRONMAN = ImageHelper.loadImage(i.resolve("meta").resolve("icon_ironman.dds"));
+        CK3_ICON_ACHIEVEMENT_ELIGIBLE =
+                ImageHelper.loadImage(i.resolve("meta").resolve("icon_achievements_enabled.dds"));
+        CK3_ICON_ACHIEVEMENT_INELIGIBLE =
+                ImageHelper.loadImage(i.resolve("meta").resolve("icon_achievements_disabled.dds"));
 
         CK3_BACKGROUND = ImageHelper.loadImage(
                 GameInstallation.ALL.get(Game.CK3).getType().chooseBackgroundImage(installPath));
@@ -385,6 +392,7 @@ public class GameImage {
                 i.resolve("currencies").resolve("icon_piety_christian_01.dds"),
                 i.resolve("modifiers").resolve("icon_piety_christian_01.dds"));
         CK3_ICON_SOLDIERS = ImageHelper.loadImage(i.resolve("icon_soldier.dds"));
+        CK3_ICON_LEVIES = ImageHelper.loadImage(i.resolve("icon_levies.dds"));
         CK3_ICON_RENOWN = loadApplicable(
                 i.resolve("currencies").resolve("icon_dynasty_prestige_01.dds"),
                 i.resolve("modifiers").resolve("icon_dynasty_prestige_01.dds"));
@@ -426,9 +434,8 @@ public class GameImage {
         STELLARIS_ICON_TECH_POWER = ImageHelper.loadImage(categories.resolve("op_cat_technology.dds"));
         STELLARIS_ICON_VICTORY = ImageHelper.loadImage(i.resolve("message").resolve("message_victory.dds"));
         var starbase = ImageHelper.loadImage(i.resolve("starbase_outliner.dds"));
-        STELLARIS_ICON_STARBASE = ImageHelper.cut(
-                starbase, new Rectangle2D(0, 0, starbase.getWidth() / 16, starbase.getHeight()));
-        STELLARIS_ICON_NAVAL_CAPACITY = ImageHelper.loadImage(i.resolve("navy_size_icon.dds"));
+        STELLARIS_ICON_STARBASE =
+                ImageHelper.cut(starbase, new Rectangle2D(0, 0, starbase.getWidth() / 16, starbase.getHeight()));
         STELLARIS_ICON_POPS = ImageHelper.loadImage(i.resolve("pop.dds"));
         STELLARIS_ICON_PLANETS = ImageHelper.loadImage(i.resolve("planet.dds"));
     }

@@ -30,7 +30,8 @@ public class Eu4ManpowerComp extends SimpleInfoComp {
 
     @Override
     protected String getDisplayValue() {
-        return NumberFormatHelper.formatCompact(value * 1000.0) + " / " + NumberFormatHelper.formatCompact(max * 1000.0);
+        return NumberFormatHelper.formatCompact(value * 1000.0) + " / "
+                + NumberFormatHelper.formatCompact(max * 1000.0);
     }
 
     @Override

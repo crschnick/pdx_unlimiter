@@ -15,8 +15,8 @@ import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.scene.image.Image;
 import javafx.geometry.Insets;
+import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
@@ -47,7 +47,8 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
         var cosmeticTag = info.getData().hoi4().getCosmeticTag();
         var color = Optional.ofNullable(cosmeticTag)
                 .flatMap(t -> Hoi4CountryColorCache.getColor(ctx, t))
-                .or(() -> Hoi4CountryColorCache.getColor(ctx, info.getData().getTag().getTag()));
+                .or(() -> Hoi4CountryColorCache.getColor(
+                        ctx, info.getData().getTag().getTag()));
         return color.map(c -> new Background(new BackgroundFill(
                         ColorHelper.withAlpha(ColorHelper.fromGameColor(c), 0.33),
                         new CornerRadii(4, 4, 0, 0, false),

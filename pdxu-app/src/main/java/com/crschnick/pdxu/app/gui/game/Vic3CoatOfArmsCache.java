@@ -83,9 +83,12 @@ public class Vic3CoatOfArmsCache extends GameCacheManager.Cache {
                     TextFormatParser.vic3().parse(path).forEach((k, v) -> {
                         var c = v.getNodeForKeyIfExistent("color");
                         if (c.isPresent()) {
-                            map.put(k, fromGameColor(c.get().isTagged()
-                                    ? GameColor.fromColorNode(c.get())
-                                    : GameColor.fromRgbArray(c.get())));
+                            map.put(
+                                    k,
+                                    fromGameColor(
+                                            c.get().isTagged()
+                                                    ? GameColor.fromColorNode(c.get())
+                                                    : GameColor.fromRgbArray(c.get())));
                         }
                     });
                 } catch (Exception ex) {

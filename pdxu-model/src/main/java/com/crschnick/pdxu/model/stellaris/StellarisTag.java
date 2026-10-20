@@ -35,7 +35,8 @@ public class StellarisTag {
         StellarisTag tag = new StellarisTag();
         tag.id = id;
         tag.name = "Unknown";
-        tag.nameData = StellarisName.fromNode(node.getNodeForKeyIfExistent("name").orElse(null))
+        tag.nameData = StellarisName.fromNode(
+                        node.getNodeForKeyIfExistent("name").orElse(null))
                 .orElse(null);
 
         Node icon = flagNode.getNodeForKey("icon");

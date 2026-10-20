@@ -22,22 +22,24 @@ public class Hoi4FactoriesComp extends SavegameInfoComp {
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
         var tag = data.hoi4().getTag().getTag();
-        content.get().getNodeForKeyIfExistent("states").ifPresent(states -> states.forEach((k, state) -> {
-            if (!state.isArray()) {
-                return;
-            }
+        content.get()
+                .getNodeForKeyIfExistent("states")
+                .ifPresent(states -> states.forEach((k, state) -> {
+                    if (!state.isArray()) {
+                        return;
+                    }
 
-            var owner = state.getNodeForKeyIfExistent("owner").map(Node::getString);
-            if (owner.isEmpty() || !owner.get().equals(tag)) {
-                return;
-            }
+                    var owner = state.getNodeForKeyIfExistent("owner").map(Node::getString);
+                    if (owner.isEmpty() || !owner.get().equals(tag)) {
+                        return;
+                    }
 
-            state.getNodeForKeyIfExistent("buildings").ifPresent(buildings -> {
-                civilian += getLevel(buildings, "industrial_complex");
-                military += getLevel(buildings, "arms_factory");
-                dockyards += getLevel(buildings, "dockyard");
-            });
-        }));
+                    state.getNodeForKeyIfExistent("buildings").ifPresent(buildings -> {
+                        civilian += getLevel(buildings, "industrial_complex");
+                        military += getLevel(buildings, "arms_factory");
+                        dockyards += getLevel(buildings, "dockyard");
+                    });
+                }));
     }
 
     private static int getLevel(Node buildings, String type) {

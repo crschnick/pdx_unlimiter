@@ -21,9 +21,7 @@ public class Vic3AlliesComp extends Vic3DiplomacyRowComp {
         tags = new ArrayList<>();
         var playerId = data.vic3().getTag().getId();
         var countries = getCountries(content);
-        var pacts = content.get()
-                .getNodeForKeyIfExistent("pacts")
-                .flatMap(p -> p.getNodeForKeyIfExistent("database"));
+        var pacts = content.get().getNodeForKeyIfExistent("pacts").flatMap(p -> p.getNodeForKeyIfExistent("database"));
         if (countries.isEmpty() || pacts.isEmpty()) {
             return;
         }
@@ -34,7 +32,8 @@ public class Vic3AlliesComp extends Vic3DiplomacyRowComp {
                 return;
             }
 
-            var action = pact.getNodeForKeyIfExistent("action").filter(Node::isValue).map(Node::getString);
+            var action =
+                    pact.getNodeForKeyIfExistent("action").filter(Node::isValue).map(Node::getString);
             if (action.isEmpty() || !ALLIANCE_PACTS.contains(action.get())) {
                 return;
             }

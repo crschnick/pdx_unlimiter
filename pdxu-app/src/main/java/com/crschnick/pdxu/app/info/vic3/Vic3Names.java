@@ -36,7 +36,8 @@ public class Vic3Names {
                     continue;
                 }
 
-                var varKey = v.getNodeForKeyIfExistent("key").filter(Node::isValue).map(Node::getString);
+                var varKey =
+                        v.getNodeForKeyIfExistent("key").filter(Node::isValue).map(Node::getString);
                 var value = v.getNodeForKeyIfExistent("value").map(n -> resolve(data, n));
                 if (varKey.isPresent() && value.isPresent() && value.get() != null) {
                     vars.put(varKey.get(), value.get());

@@ -106,7 +106,10 @@ public class Ck3Tag {
                         CoatOfArms.fromNode(
                                 n.getNodeForKey("meta_data").getNodeForKey("meta_house_coat_of_arms"), null))
                 : null;
-        var person = Ck3Person.fromNode(personNode, house);
+        var traitsLookup = n.getNodeForKeyIfExistent("traits_lookup").map(Node::getNodeArray).orElse(List.of()).stream()
+                .map(Node::getString)
+                .toList();
+        var person = Ck3Person.fromNode(personNode, house, traitsLookup);
         var titles = Ck3Title.createTitleMap(n, coaMap);
 
         var tagTitles = new ArrayList<Ck3Title>();

@@ -10,12 +10,12 @@ import com.crschnick.pdxu.model.hoi4.Hoi4Tag;
 public class Hoi4SavegameInfo extends SavegameInfo<Hoi4Tag> {
 
     Hoi4RulingPartyComp rulingParty;
-    Hoi4PoliticalPowerComp politicalPower;
-    Hoi4StabilityComp stability;
-    Hoi4WarSupportComp warSupport;
     Hoi4FactoriesComp factories;
     Hoi4DivisionsComp divisions;
     Hoi4ManpowerComp manpower;
+    Hoi4StabilityComp stability;
+    Hoi4WarSupportComp warSupport;
+    Hoi4PoliticalPowerComp politicalPower;
     Hoi4WarsComp wars;
     Hoi4IronmanComp ironman;
     ModComp mods;

@@ -23,7 +23,12 @@ public class GameDistLauncher {
             if (AppPrefs.get().launchIrony().getValue() && IronyHelper.canLaunchIrony()) {
                 IronyHelper.launchEntry(game, false);
             } else {
-                GameInstallation.ALL.get(game).getDist().startLauncher(Map.of());
+                var installation = GameInstallation.ALL.get(game);
+                if (installation.getDist().supportsLauncher()) {
+                    installation.getDist().startLauncher(Map.of());
+                } else if (installation.getDist().supportsDirectLaunch()) {
+                    installation.startDirectly(false);
+                }
             }
         } catch (IOException ex) {
             ErrorEventFactory.fromThrowable(ex).handle();

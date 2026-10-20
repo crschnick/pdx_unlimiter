@@ -7,8 +7,10 @@ import com.crschnick.pdxu.editor.EditorState;
 import com.crschnick.pdxu.editor.gui.GuiCoaViewer;
 import com.crschnick.pdxu.editor.gui.GuiCoaViewerState;
 import com.crschnick.pdxu.editor.gui.GuiEditorNodeTagFactory;
+import com.crschnick.pdxu.editor.node.EditorNode;
 import com.crschnick.pdxu.editor.node.EditorRealNode;
 import com.crschnick.pdxu.io.node.ArrayNode;
+import com.crschnick.pdxu.io.node.Node;
 import com.crschnick.pdxu.io.node.NodePointer;
 
 import javafx.scene.control.Button;
@@ -49,6 +51,21 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
         }
     }
 
+    static class TraitListButton extends GuiEditorNodeTagFactory {
+        @Override
+        public boolean checkIfApplicable(EditorState state, EditorRealNode node) {
+            return node.getKeyName().map(TRAIT_KEYS::contains).orElse(false);
+        }
+
+        @Override
+        public javafx.scene.Node create(EditorState state, EditorRealNode node, Region valueDisplay) {
+            var b = new Button(null, new FontIcon("mdi-format-list-numbers"));
+            GuiTooltips.install(b, "Open the trait id list in the external editor");
+            b.setOnAction(e -> state.getExternalState().openTextFile("Trait ids", getTraitMapping(node)));
+            return b;
+        }
+    }
+
     static class ImagePreview extends GuiEditorNodeTagFactory.ImagePreviewNodeTagFactory {
 
         private final String nodeName;
@@ -73,10 +90,33 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
     }
 
     private static final Set<String> CACHED_KEYS = Set.of("domain_limit");
+    private static final Set<String> TRAIT_KEYS = Set.of("traits", "recessive_traits");
+
+    private static String getTraitMapping(EditorRealNode node) {
+        EditorNode root = node;
+        while (root.getParent() != null) {
+            root = root.getParent();
+        }
+
+        var lookup = root.isReal()
+                ? ((EditorRealNode) root).getBackingNode().getNodeForKeyIfExistent("traits_lookup")
+                : Optional.<Node>empty();
+        if (lookup.isEmpty() || !lookup.get().isArray()) {
+            return "No traits_lookup found";
+        }
+
+        var traits = lookup.get().getNodeArray();
+        var entries = new ArrayList<String>();
+        for (int i = 0; i < traits.size(); i++) {
+            entries.add(i + ": " + traits.get(i).getString());
+        }
+        return String.join("\n", entries);
+    }
 
     private static final List<GuiEditorNodeTagFactory> FACTORIES = List.of(
             new CoaPreview(),
             new GuiEditorNodeTagFactory.CacheTagFactory(CACHED_KEYS),
+            new TraitListButton(),
             new ImagePreview(Path.of("gfx").resolve("coat_of_arms").resolve("patterns"), "pattern", "mdi-file"),
             new ImagePreview(Path.of("gfx").resolve("coat_of_arms").resolve("colored_emblems"), "texture", "mdi-file"),
             new GuiEditorNodeTagFactory.InfoNodeTagFactory(
@@ -128,6 +168,13 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
         map.put(
                 "Player character",
                 NodePointer.builder().name("living").pointerEvaluation(player).build());
+        map.put(
+                "Player character traits",
+                NodePointer.builder()
+                        .name("living")
+                        .pointerEvaluation(player)
+                        .name("traits")
+                        .build());
         map.put(
                 "Player realm",
                 NodePointer.builder()
@@ -273,6 +320,16 @@ public class Ck3SavegameAdapter implements EditorSavegameAdapter {
     private static final List<String> COURT_POSITIONS_KEYS = List.of("court_positions");
 
     private NodePointer get(String key, String val) {
+        if (TRAIT_KEYS.contains(key)) {
+            try {
+                return NodePointer.builder()
+                        .name("traits_lookup")
+                        .index(Integer.parseInt(val))
+                        .build();
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
         if (DYNASTY_KEYS.contains(key)) {
             return NodePointer.builder()
                     .name("dynasties")

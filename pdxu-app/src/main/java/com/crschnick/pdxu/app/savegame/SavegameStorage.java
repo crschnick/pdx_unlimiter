@@ -125,7 +125,10 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
             protected String getDefaultCampaignName(Hoi4SavegameInfo info) {
                 var tag = info.getData().getTag();
                 return Hoi4Names.getCountryName(
-                        info.getData(), tag.getTag(), tag.getIdeology(), info.getData().hoi4().getCosmeticTag());
+                        info.getData(),
+                        tag.getTag(),
+                        tag.getIdeology(),
+                        info.getData().hoi4().getCosmeticTag());
             }
         });
         ALL.put(Game.CK3, new SavegameStorage<>("ck3", GameDateType.CK3, SavegameType.CK3, Ck3SavegameInfo.class) {

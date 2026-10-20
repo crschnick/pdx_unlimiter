@@ -1,13 +1,13 @@
 package com.crschnick.pdxu.app.info.ck3;
 
 import com.crschnick.pdxu.app.core.AppI18n;
+import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
+import com.crschnick.pdxu.app.util.NumberFormatHelper;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 
 import javafx.scene.image.Image;
-
-import static com.crschnick.pdxu.app.gui.game.GameImage.CK3_ICON_SOLDIERS;
 
 public class Ck3SoldiersComp extends SimpleInfoComp {
 
@@ -20,12 +20,12 @@ public class Ck3SoldiersComp extends SimpleInfoComp {
 
     @Override
     protected String getDisplayValue() {
-        return String.valueOf(soldiers);
+        return NumberFormatHelper.formatCompact(soldiers);
     }
 
     @Override
     protected Image getImage() {
-        return CK3_ICON_SOLDIERS;
+        return GameImage.CK3_ICON_SOLDIERS;
     }
 
     @Override

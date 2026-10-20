@@ -11,8 +11,9 @@ public class AppAotTrain {
 
     public static void runTrainingMode() throws Throwable {
         // Some runners don't support graphics properly
-        var graphics = OsType.ofLocal() != OsType.LINUX &&
-                !(OsType.ofLocal() == OsType.MACOS && AppProperties.get().getArch().equals("x86_64"));
+        var graphics = OsType.ofLocal() != OsType.LINUX
+                && !(OsType.ofLocal() == OsType.MACOS
+                        && AppProperties.get().getArch().equals("x86_64"));
         if (graphics) {
             AppOperationMode.switchToSyncOrThrow(AppOperationMode.GUI);
             ThreadHelper.sleep(5000);

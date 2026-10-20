@@ -40,7 +40,8 @@ public class StellarisName {
                     continue;
                 }
 
-                var varKey = v.getNodeForKeyIfExistent("key").filter(Node::isValue).map(Node::getString);
+                var varKey =
+                        v.getNodeForKeyIfExistent("key").filter(Node::isValue).map(Node::getString);
                 var value = v.getNodeForKeyIfExistent("value").flatMap(StellarisName::fromNode);
                 if (varKey.isPresent() && value.isPresent()) {
                     name.variables.add(new Variable(varKey.get(), value.get()));

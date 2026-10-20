@@ -1,31 +1,30 @@
 package com.crschnick.pdxu.app.info.ck3;
 
 import com.crschnick.pdxu.app.core.AppI18n;
+import com.crschnick.pdxu.app.gui.game.GameImage;
 import com.crschnick.pdxu.app.info.SavegameData;
 import com.crschnick.pdxu.app.info.SimpleInfoComp;
 import com.crschnick.pdxu.io.savegame.SavegameContent;
 
 import javafx.scene.image.Image;
 
-import static com.crschnick.pdxu.app.gui.game.GameImage.CK3_ICON_PRESTIGE;
-
 public class Ck3PrestigeComp extends SimpleInfoComp {
 
-    private Integer prestige;
+    private int value;
 
     @Override
     protected void init(SavegameContent content, SavegameData<?> data) {
-        prestige = data.ck3().getTag() != null ? data.ck3().getTag().getPrestige() : null;
+        value = data.ck3().getTag().getPrestige();
     }
 
     @Override
     protected String getDisplayValue() {
-        return prestige != null ? String.valueOf(prestige) : null;
+        return String.valueOf(value);
     }
 
     @Override
     protected Image getImage() {
-        return CK3_ICON_PRESTIGE;
+        return GameImage.CK3_ICON_PRESTIGE;
     }
 
     @Override
