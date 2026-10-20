@@ -124,6 +124,10 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
         ALL.put(Game.HOI4, new SavegameStorage<>("hoi4", GameDateType.HOI4, SavegameType.HOI4, Hoi4SavegameInfo.class) {
             @Override
             protected String getDefaultCampaignName(Hoi4SavegameInfo info) {
+                if (info.getData().isObserver()) {
+                    return "Observer";
+                }
+
                 var tag = info.getData().getTag();
                 return Hoi4Names.getCountryName(
                         info.getData(),

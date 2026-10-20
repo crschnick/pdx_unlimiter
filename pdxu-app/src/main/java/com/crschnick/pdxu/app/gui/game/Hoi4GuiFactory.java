@@ -43,6 +43,10 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
 
     @Override
     public Background createEntryInfoBackground(SavegameInfo<Hoi4Tag> info) {
+        if (info.getData().getTag() == null) {
+            return null;
+        }
+
         var ctx = GameFileContext.fromData(info.getData());
         var cosmeticTag = info.getData().hoi4().getCosmeticTag();
         var color = Optional.ofNullable(cosmeticTag)
@@ -58,6 +62,10 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
 
     @Override
     public Image tagImage(SavegameInfo<Hoi4Tag> info, Hoi4Tag tag) {
+        if (tag == null) {
+            return ImageHelper.DEFAULT_IMAGE;
+        }
+
         return hoi4TagNode(GameImage.getHoi4TagPath(tag), info);
     }
 

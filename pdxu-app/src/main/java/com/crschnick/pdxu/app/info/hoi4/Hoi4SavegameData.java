@@ -72,9 +72,11 @@ public class Hoi4SavegameData extends SavegameData<Hoi4Tag> {
 
     @Override
     protected void init(SavegameContent content) {
-        var tag = new Hoi4Tag(
-                content.get().getNodeForKey("player").getString(),
-                content.get().getNodeForKey("ideology").getString());
+        var player = content.get().getNodeForKey("player").getString();
+        // The player country might not have an entry, e.g. after it got annexed
+        var tag = content.get().getNodeForKeysIfExistent("countries", player).isPresent()
+                ? new Hoi4Tag(player, content.get().getNodeForKey("ideology").getString())
+                : null;
         init(content, tag, createAllTags(content));
     }
 
@@ -83,14 +85,17 @@ public class Hoi4SavegameData extends SavegameData<Hoi4Tag> {
         campaignHeuristic = SavegameType.HOI4.getCampaignIdHeuristic(content);
         this.tag = tag;
         this.allTags = allTags;
-        var isPlayer = tag.getTag().equals(content.get().getNodeForKey("player").getString());
-        cosmeticTag = (isPlayer
-                        ? content.get().getNodeForKeyIfExistent("cosmetic_tag")
-                        : content.get().getNodeForKeysIfExistent("countries", tag.getTag(), "cosmetic_tag"))
-                .filter(Node::isValue)
-                .map(Node::getString)
-                .filter(s -> !s.isBlank())
-                .orElse(null);
+        observer = tag == null;
+        if (tag != null) {
+            var isPlayer = tag.getTag().equals(content.get().getNodeForKey("player").getString());
+            cosmeticTag = (isPlayer
+                            ? content.get().getNodeForKeyIfExistent("cosmetic_tag")
+                            : content.get().getNodeForKeysIfExistent("countries", tag.getTag(), "cosmetic_tag"))
+                    .filter(Node::isValue)
+                    .map(Node::getString)
+                    .filter(s -> !s.isBlank())
+                    .orElse(null);
+        }
         date = GameDateType.HOI4.fromString(content.get().getNodeForKey("date").getString());
         ironman = content.get().hasKey("ironman");
         mods = content.get().getNodeForKeyIfExistent("mods").map(Node::getNodeArray).orElse(List.of()).stream()
