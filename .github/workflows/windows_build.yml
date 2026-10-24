@@ -55,7 +55,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
-          java-version: '25.0.2'
+          java-version-file: '.java-version'
           distribution: 'zulu'
           cache: gradle
           java-package: jdk
@@ -64,7 +64,7 @@ jobs:
       - name: Set up ARM JDK
         uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
-          java-version: '25.0.2'
+          java-version-file: '.java-version'
           distribution: 'liberica'
           cache: gradle
           java-package: jdk+fx
@@ -97,6 +97,7 @@ jobs:
 
       - name: Upload Steam build
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ contains(runner.arch, 'X64') == true }}
         with:
           name: windows-steam
           retention-days: 1

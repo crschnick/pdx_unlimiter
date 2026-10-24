@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         os:
-          - ubuntu-latest
+          - ubuntu-26.04
     runs-on: ${{ matrix.os }}
     permissions:
       actions: none
@@ -37,7 +37,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
-          java-version: '25.0.2'
+          java-version-file: '.java-version'
           distribution: 'zulu'
           java-package: jdk
           cache: gradle
@@ -58,6 +58,7 @@ jobs:
 
       - name: Upload Steam build
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: ${{ contains(runner.arch, 'X64') == true }}
         with:
           name: linux-steam
           retention-days: 1
