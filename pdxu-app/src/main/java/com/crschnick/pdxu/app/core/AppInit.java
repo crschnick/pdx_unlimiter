@@ -44,6 +44,13 @@ public class AppInit {
             return;
         }
 
+        // Audio clip playback fails on systems without a working audio device, we can't do anything about that
+        if (ex.getClass().getName().equals("com.sun.media.jfxmedia.MediaException")
+                && ex.getMessage() != null
+                && ex.getMessage().contains("Could not create player")) {
+            return;
+        }
+
         // Handle any startup uncaught errors
         if (AppOperationMode.isInStartup() && thread.threadId() == 1) {
             ex.printStackTrace();

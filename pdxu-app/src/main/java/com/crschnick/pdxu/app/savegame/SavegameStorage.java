@@ -425,8 +425,9 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
     }
 
     private void addEntry(SavegameCampaign<T, I> c, SavegameEntry<T, I> e) {
-        c.add(e);
+        // Index first, as adding the entry to the campaign triggers listeners that look up its campaign
         indexEntry(c, e);
+        c.add(e);
     }
 
     private void removeEntry(SavegameCampaign<T, I> c, SavegameEntry<T, I> e) {

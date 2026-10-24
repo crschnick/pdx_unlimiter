@@ -422,6 +422,12 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
 
     @Override
     protected Region createSimple() {
+        // The entry might have been deleted in the meantime
+        var context = SavegameContext.getContextIfExistent(e).orElse(null);
+        if (context == null) {
+            return new VBox();
+        }
+
         VBox entryNode = new VBox();
         entryNode.setAlignment(Pos.CENTER);
         entryNode.setFillWidth(true);
@@ -431,7 +437,6 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
 
         setupDragAndDrop(entryNode, e);
 
-        var context = SavegameContext.getContext(e);
         var infoActions = new ArrayList<Consumer<SavegameContext<T, I>>>();
         var topBar = setupTopBar(e, context, infoActions);
         entryNode.getChildren().add(topBar);

@@ -1,5 +1,7 @@
 package com.crschnick.pdxu.app.issue;
 
+import com.crschnick.pdxu.io.parser.ParseException;
+
 import java.util.Arrays;
 import java.util.IdentityHashMap;
 import java.util.Locale;
@@ -57,6 +59,13 @@ public class ErrorEventFactory {
         }
 
         if (t instanceof SSLHandshakeException) {
+            b.expected();
+        }
+
+        // Archives placed in game or mod directories are not our issue
+        if (t instanceof ParseException
+                && t.getMessage() != null
+                && t.getMessage().endsWith("not a text file")) {
             b.expected();
         }
 

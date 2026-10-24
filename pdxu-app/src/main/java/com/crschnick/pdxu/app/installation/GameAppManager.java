@@ -26,6 +26,7 @@ public final class GameAppManager {
     private Instant lastKill;
     private boolean active = false;
     private Thread thread;
+    private boolean audioUnsupported = false;
 
     private GameAppManager() {}
 
@@ -133,12 +134,18 @@ public final class GameAppManager {
         }
     }
 
-    public void playImportSound() {
-        if (AppPrefs.get().playSoundOnBackgroundImport().getValue()) {
-            var clip = new AudioClip(AppResources.getResourceURL(AppResources.MAIN_MODULE, "sound/import.wav")
-                    .orElseThrow()
-                    .toString());
-            clip.play(0.2);
+    public synchronized void playImportSound() {
+        if (AppPrefs.get().playSoundOnBackgroundImport().getValue() && !audioUnsupported) {
+            try {
+                var clip = new AudioClip(AppResources.getResourceURL(AppResources.MAIN_MODULE, "sound/import.wav")
+                        .orElseThrow()
+                        .toString());
+                clip.play(0.2);
+            } catch (LinkageError ex) {
+                // The native media library is not available on some systems
+                audioUnsupported = true;
+                ErrorEventFactory.fromThrowable(ex).discard().handle();
+            }
         }
     }
 
