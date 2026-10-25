@@ -83,6 +83,7 @@ jobs:
           RELEASE: ${{ contains(github.event.head_commit.message, '[release]') == true }}
 
       - name: Stop gradle daemon
+        if: always()
         run: ./gradlew.bat --stop
 
       - name: Upload artifacts
