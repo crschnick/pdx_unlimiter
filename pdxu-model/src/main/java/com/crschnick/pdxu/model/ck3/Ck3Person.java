@@ -26,7 +26,7 @@ public class Ck3Person {
         if (n.hasKey("dynasty_house")) {
             p.house = house;
         }
-        p.birth = GameDateType.CK3.fromString(n.getNodeForKey("birth").getString());
+        p.birth = n.getNodeForKeyIfExistent("birth").flatMap(Ck3Person::parseDate).orElse(null);
         p.skills = n.getNodeForKey("skill").getNodeArray().stream()
                 .map(Node::getInteger)
                 .collect(Collectors.toList());
@@ -58,6 +58,28 @@ public class Ck3Person {
         p.firstName =
                 Ck3Strings.cleanCk3FormatData(n.getNodeForKey("first_name").getString());
         return p;
+    }
+
+    private static Optional<GameDate> parseDate(Node n) {
+        if (n.isValue()) {
+            try {
+                return Optional.of(GameDateType.CK3.fromString(n.getString()));
+            } catch (RuntimeException e) {
+                return Optional.empty();
+            }
+        }
+
+        // Newer versions may store the date in a nested block, e.g. birth={ date=... }
+        if (n.isArray()) {
+            for (var child : n.getNodeArray()) {
+                var date = parseDate(child);
+                if (date.isPresent()) {
+                    return date;
+                }
+            }
+        }
+
+        return Optional.empty();
     }
 
     public GameDate getBirth() {

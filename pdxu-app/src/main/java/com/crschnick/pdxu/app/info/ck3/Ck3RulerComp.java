@@ -75,11 +75,13 @@ public class Ck3RulerComp extends SavegameInfoComp {
         }
 
         var name = data.ck3().getTag().getName();
-        var age = GameDate.yearsBetween(ruler.getBirth(), data.ck3().getDate());
+        var title = ruler.getBirth() != null
+                ? name + ", " + GameDate.yearsBetween(ruler.getBirth(), data.ck3().getDate())
+                : name;
         var stats = new VBox(InfoNodes.createValueRow(skills), createTraitsNode(data, ruler));
         stats.setSpacing(5);
         stats.setAlignment(Pos.CENTER);
-        var rulerNode = InfoNodes.createRulerNode(CK3_ICON_RULER, name + ", " + age, null, stats);
+        var rulerNode = InfoNodes.createRulerNode(CK3_ICON_RULER, title, null, stats);
         if (ruler.getHouse() == null) {
             return rulerNode;
         }

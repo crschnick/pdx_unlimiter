@@ -103,8 +103,10 @@ public class Ck3Tag {
                         Ck3Strings.cleanCk3FormatData(n.getNodeForKey("meta_data")
                                 .getNodeForKey("meta_house_name")
                                 .getString()),
-                        CoatOfArms.fromNode(
-                                n.getNodeForKey("meta_data").getNodeForKey("meta_house_coat_of_arms"), null))
+                        n.getNodeForKey("meta_data")
+                                .getNodeForKeyIfExistent("meta_house_coat_of_arms")
+                                .map(coaNode -> CoatOfArms.fromNode(coaNode, null))
+                                .orElseGet(CoatOfArms::empty))
                 : null;
         var traitsLookup = n.getNodeForKeyIfExistent("traits_lookup").map(Node::getNodeArray).orElse(List.of()).stream()
                 .map(Node::getString)
@@ -117,10 +119,12 @@ public class Ck3Tag {
         personNode.getNodeForKeysIfExistent("landed_data", "domain").ifPresent(domain -> {
             tagTitles.addAll(domain.getNodeArray().stream()
                     .map(idNode -> titles.get(idNode.getLong()))
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList()));
             personNode.getNodeForKeysIfExistent("alive_data", "claim").ifPresent(claims -> {
                 tagClaims.addAll(claims.getNodeArray().stream()
                         .map(c -> titles.get(c.getNodeForKey("title").getLong()))
+                        .filter(Objects::nonNull)
                         .collect(Collectors.toList()));
             });
         });
