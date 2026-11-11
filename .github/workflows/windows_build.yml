@@ -58,7 +58,6 @@ jobs:
           java-version-file: '.java-version'
           distribution: 'zulu'
           cache: gradle
-          java-package: jdk
         if: ${{ contains(runner.arch, 'X64') == true }}
 
       - name: Set up ARM JDK

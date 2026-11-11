@@ -58,7 +58,6 @@ jobs:
         with:
           java-version-file: '.java-version'
           distribution: 'zulu'
-          java-package: jdk
           cache: gradle
 
       - name: Install create-dmg

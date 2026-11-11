@@ -133,7 +133,7 @@ public class Eu5SavegameData extends SavegameData<Eu5Tag> {
             version = new GameVersion(
                     Integer.parseInt(m.group(1)),
                     Integer.parseInt(m.group(2)),
-                    m.groupCount() > 2 ? Integer.parseInt(m.group(3)) : 0,
+                    m.group(3) != null ? Integer.parseInt(m.group(3)) : 0,
                     0);
         } else {
             throw new IllegalArgumentException("Could not parse EU5 version string: " + string);

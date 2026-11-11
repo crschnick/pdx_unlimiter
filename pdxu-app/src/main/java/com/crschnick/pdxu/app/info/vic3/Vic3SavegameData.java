@@ -151,13 +151,14 @@ public class Vic3SavegameData extends SavegameData<Vic3Tag> {
     }
 
     private void initVersion(Node n) {
-        Pattern p = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)(?:\\.(\\d+))?");
+        Pattern p = Pattern.compile("(\\d+)\\.(\\d+)(?:\\.(\\d+))?(?:\\.(\\d+))?");
         var v = n.getNodeForKey("meta_data").getNodeForKey("version").getString();
         Matcher m = p.matcher(v);
         if (m.matches()) {
+            var third = m.group(3) != null ? Integer.parseInt(m.group(3)) : 0;
             var fourth = m.group(4) != null ? Integer.parseInt(m.group(4)) : 0;
             version = new GameVersion(
-                    Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), Integer.parseInt(m.group(3)), fourth);
+                    Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)), third, fourth);
         } else {
             throw new IllegalArgumentException("Could not parse VIC3 version string: " + v);
         }
