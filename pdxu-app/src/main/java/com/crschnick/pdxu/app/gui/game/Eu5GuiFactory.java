@@ -12,6 +12,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -24,11 +25,16 @@ public class Eu5GuiFactory extends GameGuiFactory<Eu5Tag, Eu5SavegameInfo> {
     @Override
     public Pane background() {
         var bg = GameImage.backgroundNode(GameImage.EU5_BACKGROUND);
+
+        var adjust = new ColorAdjust();
+        adjust.setSaturation(-1.0);
+        adjust.setContrast(0.5);
+        adjust.setBrightness(-0.5);
+        bg.setEffect(adjust);
+
         bg.opacityProperty()
                 .bind(Bindings.createDoubleBinding(
-                        () -> {
-                            return AppPrefs.get().theme().getValue().isDark() ? 0.07 : 0.17;
-                        },
+                        () -> AppPrefs.get().theme().getValue().isDark() ? 0.1 : 0.2,
                         AppPrefs.get().theme()));
         return bg;
     }

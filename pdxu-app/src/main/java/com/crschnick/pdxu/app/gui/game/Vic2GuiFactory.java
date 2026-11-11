@@ -13,6 +13,7 @@ import com.crschnick.pdxu.model.vic2.Vic2Tag;
 
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
+import javafx.scene.effect.ColorAdjust;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
@@ -43,11 +44,16 @@ public class Vic2GuiFactory extends GameGuiFactory<Vic2Tag, Vic2SavegameInfo> {
     @Override
     public Pane background() {
         var bg = GameImage.backgroundNode(GameImage.VIC2_BACKGROUND);
+
+        var adjust = new ColorAdjust();
+        adjust.setSaturation(-1.0);
+        adjust.setContrast(0.5);
+        adjust.setBrightness(-0.5);
+        bg.setEffect(adjust);
+
         bg.opacityProperty()
                 .bind(Bindings.createDoubleBinding(
-                        () -> {
-                            return AppPrefs.get().theme().getValue().isDark() ? 0.04 : 0.16;
-                        },
+                        () -> AppPrefs.get().theme().getValue().isDark() ? 0.07 : 0.15,
                         AppPrefs.get().theme()));
         return bg;
     }

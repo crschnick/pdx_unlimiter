@@ -9,6 +9,7 @@ import com.crschnick.pdxu.model.stellaris.StellarisTag;
 
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -25,11 +26,18 @@ public class StellarisGuiFactory extends GameGuiFactory<StellarisTag, StellarisS
     @Override
     public Pane background() {
         var bg = GameImage.backgroundNode(GameImage.STELLARIS_BACKGROUND);
+
+        // Desaturate and darken / lighten the image instead of relying only on opacity,
+        // so that the artwork keeps more of its contrast without fighting the UI colors
+        var adjust = new ColorAdjust();
+        adjust.setSaturation(-1.0);
+        adjust.setContrast(0.5);
+        adjust.setBrightness(-0.5);
+        bg.setEffect(adjust);
+
         bg.opacityProperty()
                 .bind(Bindings.createDoubleBinding(
-                        () -> {
-                            return AppPrefs.get().theme().getValue().isDark() ? 0.05 : 0.13;
-                        },
+                        () -> AppPrefs.get().theme().getValue().isDark() ? 0.1 : 0.2,
                         AppPrefs.get().theme()));
         return bg;
     }

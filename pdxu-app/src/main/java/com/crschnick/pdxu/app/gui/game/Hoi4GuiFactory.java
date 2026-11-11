@@ -16,6 +16,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Insets;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -32,11 +33,16 @@ public class Hoi4GuiFactory extends GameGuiFactory<Hoi4Tag, Hoi4SavegameInfo> {
     @Override
     public Pane background() {
         var bg = GameImage.backgroundNode(GameImage.HOI4_BACKGROUND);
+
+        var adjust = new ColorAdjust();
+        adjust.setSaturation(-1.0);
+        adjust.setContrast(0.5);
+        adjust.setBrightness(-0.5);
+        bg.setEffect(adjust);
+
         bg.opacityProperty()
                 .bind(Bindings.createDoubleBinding(
-                        () -> {
-                            return AppPrefs.get().theme().getValue().isDark() ? 0.05 : 0.13;
-                        },
+                        () -> AppPrefs.get().theme().getValue().isDark() ? 0.05 : 0.2,
                         AppPrefs.get().theme()));
         return bg;
     }

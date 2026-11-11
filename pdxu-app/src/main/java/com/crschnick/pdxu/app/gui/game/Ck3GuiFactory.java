@@ -8,6 +8,7 @@ import com.crschnick.pdxu.model.ck3.Ck3Tag;
 
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -29,12 +30,17 @@ public class Ck3GuiFactory extends GameGuiFactory<Ck3Tag, Ck3SavegameInfo> {
 
     @Override
     public Pane background() {
-        var bg = GameImage.backgroundNode(CK3_BACKGROUND);
+        var bg = GameImage.backgroundNode(GameImage.CK3_BACKGROUND);
+
+        var adjust = new ColorAdjust();
+        adjust.setSaturation(-1.0);
+        adjust.setContrast(0.5);
+        adjust.setBrightness(-0.5);
+        bg.setEffect(adjust);
+
         bg.opacityProperty()
                 .bind(Bindings.createDoubleBinding(
-                        () -> {
-                            return AppPrefs.get().theme().getValue().isDark() ? 0.05 : 0.15;
-                        },
+                        () -> AppPrefs.get().theme().getValue().isDark() ? 0.1 : 0.2,
                         AppPrefs.get().theme()));
         return bg;
     }

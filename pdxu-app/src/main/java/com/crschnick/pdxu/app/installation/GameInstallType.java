@@ -25,6 +25,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 public interface GameInstallType {
@@ -76,26 +77,17 @@ public interface GameInstallType {
         }
 
         @Override
-        public Path chooseBackgroundImage(Path p) {
-            // Prefer launcher image!
-            var launcherBg = getLauncherDataPath(p).resolve("launcher-assets").resolve("app-background.png");
-            if (Files.exists(launcherBg)) {
-                return launcherBg;
+        public List<Path> getBackgroundImageCandidates(Path p) {
+            // Only use the launcher image, which is added to the pool automatically
+            var candidates = new ArrayList<Path>();
+            if (findLauncherBackgroundImage(p).isEmpty()) {
+                // Older launcher and Windows Store layouts that don't have a theme file
+                candidates.add(getLauncherDataPath(p).resolve("launcher-assets").resolve("app-background.png"));
+                candidates.add(getWindowsStoreLauncherDataPath(p)
+                        .resolve("launcher-assets")
+                        .resolve("app-background.png"));
             }
-
-            var launcherBgNew = getLauncherDataPath(p).resolve("assets").resolve("app-background.png");
-            if (Files.exists(launcherBgNew)) {
-                return launcherBgNew;
-            }
-
-            var launcherWindowsBg = getWindowsStoreLauncherDataPath(p)
-                    .resolve("launcher-assets")
-                    .resolve("app-background.png");
-            if (Files.exists(launcherWindowsBg)) {
-                return launcherWindowsBg;
-            }
-
-            return null;
+            return candidates;
         }
 
         @Override
@@ -172,9 +164,8 @@ public interface GameInstallType {
         }
 
         @Override
-        public Path chooseBackgroundImage(Path p) {
-            int i = new Random().nextInt(8) + 1;
-            return p.resolve("gfx").resolve("loadingscreens").resolve("load_" + i + ".dds");
+        public List<Path> getBackgroundImageCandidates(Path p) {
+            return GameInstallType.numberedImages(p.resolve("gfx").resolve("loadingscreens"), "load_", 1, 9);
         }
 
         @Override
@@ -282,9 +273,21 @@ public interface GameInstallType {
         }
 
         @Override
-        public Path chooseBackgroundImage(Path p) {
-            int i = new Random().nextInt(16) + 1;
-            return p.resolve("gfx").resolve("loadingscreens").resolve("load_" + i + ".dds");
+        public List<Path> getBackgroundImageCandidates(Path p) {
+            var dir = p.resolve("gfx").resolve("loadingscreens");
+            var candidates = GameInstallType.numberedImages(dir, "load_", 1, 20);
+            // Some files are capitalized, e.g. Load_19.dds, which matters on case-sensitive file systems
+            candidates.replaceAll(file -> {
+                if (!Files.exists(file)) {
+                    var capitalized = dir.resolve(
+                            "L" + file.getFileName().toString().substring(1));
+                    if (Files.exists(capitalized)) {
+                        return capitalized;
+                    }
+                }
+                return file;
+            });
+            return candidates;
         }
 
         @Override
@@ -325,14 +328,16 @@ public interface GameInstallType {
 
     GameInstallType CK3 = new StandardInstallType("binaries/ck3") {
         @Override
-        public Path chooseBackgroundImage(Path p) {
-            String[] bgs = new String[] {"assassin", "baghdad", "castle", "council", "duel"};
-            return p.resolve("game")
+        public List<Path> getBackgroundImageCandidates(Path p) {
+            var dir = p.resolve("game")
                     .resolve("gfx")
                     .resolve("interface")
                     .resolve("illustrations")
-                    .resolve("loading_screens")
-                    .resolve(bgs[new Random().nextInt(bgs.length)] + ".dds");
+                    .resolve("loading_screens");
+            var candidates = Stream.of("assassin", "baghdad", "castle", "council", "duel")
+                    .map(s -> dir.resolve(s + ".dds"))
+                    .collect(Collectors.toCollection(ArrayList::new));
+            return candidates;
         }
 
         @Override
@@ -460,9 +465,9 @@ public interface GameInstallType {
         }
 
         @Override
-        public Path chooseBackgroundImage(Path p) {
-            int i = new Random().nextInt(20) + 1;
-            return p.resolve("gfx").resolve("loadingscreens").resolve("load_" + i + ".dds");
+        public List<Path> getBackgroundImageCandidates(Path p) {
+            // load_0 is only the game logo
+            return GameInstallType.numberedImages(p.resolve("gfx").resolve("loadingscreens"), "load_", 1, 20);
         }
 
         @Override
@@ -567,9 +572,8 @@ public interface GameInstallType {
         }
 
         @Override
-        public Path chooseBackgroundImage(Path p) {
-            int i = new Random().nextInt(7) + 1;
-            return p.resolve("gfx").resolve("loadingscreens").resolve("load_" + i + ".dds");
+        public List<Path> getBackgroundImageCandidates(Path p) {
+            return GameInstallType.numberedImages(p.resolve("gfx").resolve("loadingscreens"), "load_", 1, 7);
         }
 
         @Override
@@ -631,9 +635,9 @@ public interface GameInstallType {
         }
 
         @Override
-        public Path chooseBackgroundImage(Path p) {
-            int i = new Random().nextInt(9);
-            return p.resolve("game").resolve("gfx").resolve("loadingscreens").resolve("victoria3_load_" + i + ".dds");
+        public List<Path> getBackgroundImageCandidates(Path p) {
+            return GameInstallType.numberedImages(
+                            p.resolve("game").resolve("gfx").resolve("loadingscreens"), "victoria3_load_", 0, 9);
         }
 
         @Override
@@ -897,7 +901,7 @@ public interface GameInstallType {
         }
 
         @Override
-        public Path chooseBackgroundImage(Path p) {
+        public List<Path> getBackgroundImageCandidates(Path p) {
             var def = p.resolve("game")
                     .resolve("loading_screen")
                     .resolve("gfx")
@@ -915,7 +919,11 @@ public interface GameInstallType {
                     try (var imgStream = Files.list(numberDir.resolve("images"))) {
                         var imgs = imgStream.toList();
                         for (Path img : imgs) {
-                            if (img.getFileName().toString().matches(".+_00\\.dds")) {
+                            // Base layer, either named like x_00.dds or x_00_metadata_os3840x2160_d0x0.dds
+                            // Only use the scenes that work well as a background
+                            if (img.getFileName()
+                                    .toString()
+                                    .matches("loading_screen_damascus_ambassadors_00(_metadata_.+)?\\.dds")) {
                                 available.add(img);
                             }
                         }
@@ -923,15 +931,13 @@ public interface GameInstallType {
                 }
             } catch (IOException e) {
                 ErrorEventFactory.fromThrowable(e).handle();
-                return def;
             }
 
             if (available.isEmpty()) {
-                return def;
+                available.add(def);
             }
 
-            var rand = new Random();
-            return available.get(rand.nextInt(available.size()));
+            return available;
         }
 
         @Override
@@ -1013,7 +1019,93 @@ public interface GameInstallType {
         }
     };
 
-    Path chooseBackgroundImage(Path p);
+    /**
+     * The game-specific images that can be used as a background. They don't have to exist.
+     */
+    List<Path> getBackgroundImageCandidates(Path p);
+
+    /**
+     * All existing background images, i.e. the launcher background image, if available, plus the existing candidates.
+     */
+    default List<Path> getBackgroundImagePool(Path p) {
+        var pool = new ArrayList<Path>();
+        findLauncherBackgroundImage(p).ifPresent(pool::add);
+        getBackgroundImageCandidates(p).stream().filter(Files::isRegularFile).forEach(pool::add);
+        return pool;
+    }
+
+    /**
+     * Picks a random image out of the pool.
+     * If the pool is empty, returns the first candidate so that the missing file is still reported when loading.
+     */
+    default Path chooseBackgroundImage(Path p) {
+        var pool = getBackgroundImagePool(p);
+        if (pool.isEmpty()) {
+            var candidates = getBackgroundImageCandidates(p);
+            return candidates.isEmpty() ? null : candidates.getFirst();
+        }
+        return pool.get(new Random().nextInt(pool.size()));
+    }
+
+    static List<Path> numberedImages(Path dir, String prefix, int from, int toInclusive) {
+        var list = new ArrayList<Path>();
+        for (int i = from; i <= toInclusive; i++) {
+            list.add(dir.resolve(prefix + i + ".dds"));
+        }
+        return list;
+    }
+
+    /**
+     * Resolves the background image used by the Paradox launcher.
+     * The launcher downloads its themes and caches them as %APPDATA%/Paradox Interactive/launcher-v2/cache/<gameId>-background.
+     * If that cache is not available, falls back to the theme shipped with the installation by following
+     * launcher-settings.json -> themeFile -> background.backgroundImage.
+     */
+    default Optional<Path> findLauncherBackgroundImage(Path p) {
+        var launcherSettings = getLauncherDataPath(p).resolve("launcher-settings.json");
+        if (!Files.isRegularFile(launcherSettings)) {
+            return Optional.empty();
+        }
+
+        try {
+            var settings = JacksonMapper.getDefault().readTree(launcherSettings.toFile());
+
+            var gameIdNode = settings.get("gameId");
+            if (OsType.ofLocal() == OsType.WINDOWS && gameIdNode != null && gameIdNode.isString()) {
+                var cached = AppSystemInfo.ofWindows()
+                        .getRoamingAppData()
+                        .resolve("Paradox Interactive")
+                        .resolve("launcher-v2")
+                        .resolve("cache")
+                        .resolve(gameIdNode.stringValue() + "-background");
+                if (Files.isRegularFile(cached)) {
+                    return Optional.of(cached);
+                }
+            }
+
+            var themeFileNode = settings.get("themeFile");
+            if (themeFileNode == null || !themeFileNode.isString()) {
+                return Optional.empty();
+            }
+
+            var themeFile = launcherSettings.getParent().resolve(themeFileNode.stringValue()).normalize();
+            if (!Files.isRegularFile(themeFile)) {
+                return Optional.empty();
+            }
+
+            var theme = JacksonMapper.getDefault().readTree(themeFile.toFile());
+            var bgNode = theme.path("background").get("backgroundImage");
+            if (bgNode == null || !bgNode.isString()) {
+                return Optional.empty();
+            }
+
+            var bg = themeFile.getParent().resolve(bgNode.stringValue()).normalize();
+            return Files.isRegularFile(bg) ? Optional.of(bg) : Optional.empty();
+        } catch (Exception e) {
+            ErrorEventFactory.fromThrowable(e).omit().handle();
+            return Optional.empty();
+        }
+    }
 
     default Optional<GameVersion> determineVersionFromInstallation(Path p) {
         return Optional.empty();
