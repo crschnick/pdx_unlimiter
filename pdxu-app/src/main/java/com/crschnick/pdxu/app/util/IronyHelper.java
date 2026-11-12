@@ -29,6 +29,8 @@ public class IronyHelper {
         var exe = AppPrefs.get().ironyDirectory().getValue().resolve("IronyModManager.exe");
         new ProcessBuilder(
                         "cmd", "/C", exe.toString(), "-g", game.getTranslatedAbbreviation(), continueGame ? "-r" : "")
+                .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                .redirectError(ProcessBuilder.Redirect.DISCARD)
                 .start();
     }
 

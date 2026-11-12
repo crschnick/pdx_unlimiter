@@ -111,6 +111,8 @@ public class ProtonPdxLauncherDist extends PdxLauncherDist {
                 .put(
                         "STEAM_COMPAT_DATA_PATH",
                         SteamDist.getSteamAppsCompatDir(getGame()).toString());
+        pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+        pb.redirectError(ProcessBuilder.Redirect.DISCARD);
         pb.start();
     }
 

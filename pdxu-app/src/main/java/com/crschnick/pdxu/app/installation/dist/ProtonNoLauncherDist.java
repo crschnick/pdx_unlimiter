@@ -72,6 +72,8 @@ public class ProtonNoLauncherDist extends GameDist {
                                 .resolve("compatdata")
                                 .resolve(String.valueOf(getGame().getSteamAppId()))
                                 .toString());
+        pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+        pb.redirectError(ProcessBuilder.Redirect.DISCARD);
         pb.start();
     }
 

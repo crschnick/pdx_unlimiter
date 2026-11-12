@@ -118,6 +118,8 @@ public final class WindowsStoreDist extends PdxLauncherDist {
     public void startLauncher(Map<String, String> env) throws IOException {
         var pb = new ProcessBuilder("cmd", "/C", "start", "shell:AppsFolder\\" + packageFamilyName + "!App");
         pb.environment().putAll(env);
+        pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+        pb.redirectError(ProcessBuilder.Redirect.DISCARD);
         pb.start();
     }
 

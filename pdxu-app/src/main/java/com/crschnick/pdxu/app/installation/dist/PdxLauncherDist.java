@@ -103,6 +103,8 @@ public class PdxLauncherDist extends GameDist {
 
         pb.command(cmd);
         pb.environment().putAll(env);
+        pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+        pb.redirectError(ProcessBuilder.Redirect.DISCARD);
         pb.start();
     }
 

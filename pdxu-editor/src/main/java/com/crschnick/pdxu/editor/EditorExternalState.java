@@ -208,7 +208,10 @@ public class EditorExternalState {
                             ? List.of("sh", "-c", "\"" + editor + "\" \"" + file + "\"")
                             : List.of("open", "-a", editor, file);
             logger.trace("Executing command: " + command);
-            Runtime.getRuntime().exec(command.toArray(String[]::new));
+            new ProcessBuilder(command)
+                    .redirectOutput(ProcessBuilder.Redirect.DISCARD)
+                    .redirectError(ProcessBuilder.Redirect.DISCARD)
+                    .start();
         } catch (IOException e) {
             ErrorEventFactory.fromThrowable(e).handle();
         }

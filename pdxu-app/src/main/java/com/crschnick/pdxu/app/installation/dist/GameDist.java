@@ -81,6 +81,8 @@ public abstract class GameDist {
             input.addAll(args);
             var pb = new ProcessBuilder().command(input);
             pb.environment().putAll(env);
+            pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+            pb.redirectError(ProcessBuilder.Redirect.DISCARD);
             pb.start();
         }
     }

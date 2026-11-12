@@ -45,6 +45,8 @@ public class LegacyLauncherDist extends GameDist {
         input.add(exec.toString());
         var pb = new ProcessBuilder(input);
         pb.environment().putAll(env);
+        pb.redirectOutput(ProcessBuilder.Redirect.DISCARD);
+        pb.redirectError(ProcessBuilder.Redirect.DISCARD);
         pb.start();
     }
 
