@@ -114,7 +114,7 @@ jobs:
           persist-credentials: false
 
       - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+        uses: gradle/actions/wrapper-validation@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
 
       - name: Set variables
         run: |
@@ -145,7 +145,7 @@ jobs:
             }
 
       - name: Set up JDK
-        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
         with:
           java-version-file: '.java-version'
           distribution: 'zulu'
@@ -173,7 +173,7 @@ jobs:
           curl -L --output "dist/build/dist/github-release/pdx_unlimiter-linux.zip" "https://github.com/crschnick/pdx_unlimiter/releases/download/2.13.18/pdx_unlimiter-linux.zip"
 
       - name: Create release
-        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        uses: softprops/action-gh-release@8a0cd651e5b2365bd640854a3fa5dfc70e4875f3 # v3.0.4
         with:
           body_path: dist/build/dist/release/github-changelog.md
           token: ${{ github.token }}
@@ -223,10 +223,10 @@ jobs:
           persist-credentials: false
 
       - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+        uses: gradle/actions/wrapper-validation@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
 
       - name: Set up JDK
-        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
         with:
           java-version-file: '.java-version'
           distribution: 'zulu'
@@ -293,7 +293,7 @@ jobs:
           persist-credentials: false
 
       - name: Validate Gradle wrapper
-        uses: gradle/actions/wrapper-validation@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+        uses: gradle/actions/wrapper-validation@8da46b539cd8fe6ab27ca75128919a18d757604c # v6.4.1
 
       - name: Set variables
         run: |
@@ -321,7 +321,7 @@ jobs:
           merge-multiple: true
           path: dist/build/dist/depots/macos-arm
 
-      - uses: game-ci/steam-deploy@50f6b29fc64922e19a16d202a88fe199d394b536 # v3.2.1
+      - uses: game-ci/steam-deploy@87f8a362c6a8a7dbde08099e4c05da88877f7113 # v3.2.2
         with:
           username: ${{ secrets.STEAM_USERNAME }}
           configVdf: ${{ secrets.STEAM_CONFIG_VDF}}
