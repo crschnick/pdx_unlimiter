@@ -40,7 +40,8 @@ public class FileImporter {
                 statusMap.put(t, result);
             });
 
-            if (AppPrefs.get().deleteOnImport().getValue()) {
+            // Only delete the original if it was imported successfully or is already in the storage
+            if (s.isEmpty() && AppPrefs.get().deleteOnImport().getValue()) {
                 TrackEvent.debug("Deleting import target " + t.getName());
                 t.delete();
             }

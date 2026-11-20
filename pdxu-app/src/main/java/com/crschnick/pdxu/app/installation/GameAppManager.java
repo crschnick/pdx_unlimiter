@@ -88,6 +88,10 @@ public final class GameAppManager {
                 TrackEvent.info("Detected new running game instance of "
                         + process.get().getGame().getId());
                 activeGame.set(process.get());
+                // Restart the timed import interval for every new game instance.
+                // Otherwise, an overdue timer would immediately import (and possibly delete)
+                // the savegame that was just exported for the game to continue
+                lastImport = Instant.now();
                 activeGame.get().onStart();
                 AppLayoutModel.get().selectGame(activeGame.get().getGame());
             }
