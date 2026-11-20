@@ -21,6 +21,9 @@ import javafx.scene.layout.VBox;
 
 import lombok.Getter;
 
+import java.util.Collections;
+import java.util.IdentityHashMap;
+
 import static atlantafx.base.theme.Styles.ACCENT;
 import static atlantafx.base.theme.Styles.BUTTON_OUTLINED;
 
@@ -57,8 +60,9 @@ public class ErrorHandlerComp extends SimpleComp {
                     if (r) {
                         closeDialogAction.run();
                     }
-                } catch (Exception ignored) {
+                } catch (Exception ex) {
                     closeDialogAction.run();
+                    ErrorEventFactory.fromThrowable(ex).handle();
                 }
             });
         });
@@ -91,8 +95,9 @@ public class ErrorHandlerComp extends SimpleComp {
     private String getEventDescription() {
         var desc = event.getDescription();
 
+        var visited = Collections.newSetFromMap(new IdentityHashMap<Throwable, Boolean>());
         Throwable t = event.getThrowable();
-        while (t != null) {
+        while (t != null && visited.add(t)) {
             var toAppend = t.getMessage() != null
                     ? t.getMessage()
                     : AppI18n.get("errorTypeOccured", t.getClass().getSimpleName());
@@ -146,7 +151,6 @@ public class ErrorHandlerComp extends SimpleComp {
         if (actionBox.getChildren().size() > 0) {
             actionBox.getChildren().addFirst(header);
             content.getChildren().add(new Separator(Orientation.HORIZONTAL));
-            actionBox.getChildren().get(1).getStyleClass().addAll(BUTTON_OUTLINED);
             content.getChildren().addAll(actionBox);
         }
 

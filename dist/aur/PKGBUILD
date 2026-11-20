@@ -46,8 +46,7 @@ package() {
 
     for logoFile in $srcdir/*.png; do
         res=$(basename "$logoFile" ".png" | cut -d "_" -f 2)
-        install -d "$pkgdir/usr/share/icons/hicolor/$res/apps"
-        cp -a "$logoFile" "$pkgdir/usr/share/icons/hicolor/$res/apps/${pkgname}.png"
+        install -Dm0644 "$logoFile" "$pkgdir/usr/share/icons/hicolor/$res/apps/${pkgname}.png"
     done
 
 	touch "$pkgdir/opt/$pkgname/aur"

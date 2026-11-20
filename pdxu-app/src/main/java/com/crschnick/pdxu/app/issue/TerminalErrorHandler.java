@@ -6,10 +6,8 @@ import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.AppProperties;
 import com.crschnick.pdxu.app.core.mode.AppOperationMode;
 import com.crschnick.pdxu.app.core.window.AppDialog;
-import com.crschnick.pdxu.app.platform.PlatformInit;
 import com.crschnick.pdxu.app.update.AppDistributionType;
 import com.crschnick.pdxu.app.util.Hyperlinks;
-import com.crschnick.pdxu.app.util.ModuleLayerLoader;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 
 public class TerminalErrorHandler extends GuiErrorHandlerBase implements ErrorHandler {
@@ -44,11 +42,6 @@ public class TerminalErrorHandler extends GuiErrorHandlerBase implements ErrorHa
 
     private void handleGui(ErrorEvent event) {
         try {
-            AppProperties.init();
-            ModuleLayerLoader.loadAll(ModuleLayer.boot(), t -> {
-                ErrorEventFactory.fromThrowable(t).handle();
-            });
-            PlatformInit.init(true);
             ErrorHandlerDialog.showAndWait(event);
         } catch (Throwable r) {
             event.clearAttachments();

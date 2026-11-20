@@ -31,7 +31,7 @@ public class AttachmentHelper {
                 compressDirectoryToZipfile(rootDir, sourceDir.resolve(file.getName()), out);
             } else {
                 ZipEntry entry = new ZipEntry(
-                        rootDir.relativize(sourceDir).resolve(file.getName()).toString());
+                        rootDir.relativize(sourceDir).resolve(file.getName()).toString().replace('\\', '/'));
                 out.putNextEntry(entry);
 
                 try (var in =
