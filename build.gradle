@@ -71,14 +71,14 @@ def getJvmArgs() {
     def os = DefaultNativePlatform.currentOperatingSystem
     def jvmRunArgs = [
             "-Dvisualvm.display.name=$productName",
-            "-Djavafx.preloader=" + packageName("core.AppPreloader"),
+            "-Djavafx.preloader=" + toPackageName("core.AppPreloader"),
             "-Djdk.virtualThreadScheduler.parallelism=8"
     ]
 
     // Virtual threads cause crashes on Windows ARM with Liberica
     if (os.isWindows() && arch == "arm64") {
         jvmRunArgs += [
-                "-D" + propertyName("useVirtualThreads") + "=false"
+                "-D" + toPropertyName("useVirtualThreads") + "=false"
         ]
     }
 
@@ -94,7 +94,7 @@ def getJvmArgs() {
     ]
 
     // Module access fixes
-    def appPackage = packageName(null)
+    def appPackage = toPackageName(null)
     jvmRunArgs += [
             "--add-exports", "javafx.graphics/com.sun.javafx.tk=$appPackage",
             "--add-exports", "jdk.zipfs/jdk.nio.zipfs=io.xpipe.modulefs",
@@ -229,9 +229,9 @@ project.ext {
     jpackageExecutableName = distName
     jpackageMacOsBundleName = "${groupName.replaceAll("_", "-")}.${artifactName.replaceAll("_", "-")}"
     jpackageReleaseArguments = jvmRunArgs + [
-            "-D" + propertyName("version") + "=" + versionString,
-            "-D" + propertyName("build") + "=$versionString/${new Date().format('yyyy-MM-dd-HH-mm')}",
-            "-D" + propertyName("buildId") + "=" + buildId
+            "-D" + toPropertyName("version") + "=" + versionString,
+            "-D" + toPropertyName("build") + "=$versionString/${new Date().format('yyyy-MM-dd-HH-mm')}",
+            "-D" + toPropertyName("buildId") + "=" + buildId
             ]
 
     // Make sure that the dynamic library from jna is loaded without any extraction
@@ -257,7 +257,7 @@ project.ext {
 
     sentryUrl = "https://cff56f4c1d624f46b64f51a8301d3543@sentry.io/5466262"
     if (sentryUrl != null) {
-        jpackageReleaseArguments += "-D" + propertyName("sentryUrl") + "=" + sentryUrl
+        jpackageReleaseArguments += "-D" + toPropertyName("sentryUrl") + "=" + sentryUrl
     }
 
     def injected = project.objects.newInstance(InjectedExecOps)
@@ -269,23 +269,29 @@ version = versionString
 
 // Global helper functions
 
-def propertyName(String s) {
+def toPropertyName(String s) {
     return groupName + "." + artifactName + "." + s
 }
 
-def packageName(String s) {
+def toPackageName(String s) {
     return groupName + "." + artifactName + (s != null ? "." + s : "")
 }
 
-def replaceVariablesInFile(String f, Map<String, String> replacements) {
-    def fileName = file(f).getName()
-    def text = file(f).text
-    def replaced = text.replace(replacements)
-    def build = "${project.layout.buildDirectory.get()}/${UUID.randomUUID()}"
-    file(build).mkdirs()
-    def temp = "$build/$fileName"
-    file(temp).text = replaced
-    return file(temp)
+// Gradle 10 no longer resolves properties and methods from parent projects implicitly
+subprojects { subproject ->
+    rootProject.ext.properties.each { k, v -> subproject.ext.set(k, v) }
+    // These must not also exist as methods of this script, as those would take precedence over the extra properties
+    subproject.ext.propertyName = { String s -> this.toPropertyName(s) }
+    subproject.ext.packageName = { String s -> this.toPackageName(s) }
+    subproject.ext.replaceVariablesInFile = { f, Map<String, String> replacements ->
+        def source = subproject.file(f)
+        def replaced = source.text.replace(replacements)
+        def build = subproject.layout.buildDirectory.dir(UUID.randomUUID().toString()).get().asFile
+        build.mkdirs()
+        def temp = new File(build, source.getName())
+        temp.text = replaced
+        return temp
+    }
 }
 
 // Developer config file setup

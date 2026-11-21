@@ -61,7 +61,7 @@ tasks.register('trainAot', DefaultTask) {
             cfg.text = cfg.text + "java-options=-XX:AOTCache=\$ROOTDIR/Contents/runtime/Contents/Home/lib/server/cache.aot\n"
         }
 
-        def dataDir = project.file("$distDir/local_train")
+        def dataDir = file("$distDir/local_train")
         delete(dataDir)
     }
 }

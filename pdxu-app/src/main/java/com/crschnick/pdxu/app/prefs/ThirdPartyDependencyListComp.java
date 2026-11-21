@@ -16,16 +16,16 @@ public class ThirdPartyDependencyListComp extends Comp<CompStructure<?>> {
     private TitledPane createPane(ThirdPartyDependency t) {
         var tp = new TitledPane();
         tp.setExpanded(false);
-        var link = new Hyperlink(t.name() + " @ " + t.version());
+        var link = new Hyperlink(t.getName() + " @ " + t.getVersion());
         link.setOnAction(e -> {
-            Hyperlinks.open(t.link());
+            Hyperlinks.open(t.getLink());
         });
         tp.setPadding(Insets.EMPTY);
         tp.setGraphic(link);
         tp.setAlignment(Pos.CENTER_LEFT);
         AppFontSizes.xs(tp);
 
-        var licenseName = new Label("(" + t.licenseName() + ")");
+        var licenseName = new Label("(" + t.getLicenseName() + ")");
         var sp = new StackPane(link, licenseName);
         StackPane.setAlignment(licenseName, Pos.CENTER_RIGHT);
         StackPane.setAlignment(link, Pos.CENTER_LEFT);
@@ -34,7 +34,7 @@ public class ThirdPartyDependencyListComp extends Comp<CompStructure<?>> {
 
         var text = new TextArea();
         text.setEditable(false);
-        text.setText(t.licenseText());
+        text.setText(t.getLicenseText());
         text.setWrapText(true);
         text.setPrefHeight(300);
         text.maxWidthProperty().bind(tp.widthProperty());

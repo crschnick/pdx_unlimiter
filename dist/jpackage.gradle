@@ -90,6 +90,24 @@ jlink {
     }
 }
 
+// Newer jlink versions fail if multiple modules contain the same resource directory
+// The OSGi metadata of some dependencies is not needed at runtime
+tasks.named('jlink').configure {
+    def jlinkJarsDir = "${project.layout.buildDirectory.get()}/jlinkbase/jlinkjars"
+    doFirst {
+        fileTree(jlinkJarsDir).matching { include '*.jar' }.each { jar ->
+            java.nio.file.FileSystems.newFileSystem(jar.toPath()).withCloseable { fs ->
+                def dir = fs.getPath('OSGI-INF')
+                if (java.nio.file.Files.exists(dir)) {
+                    java.nio.file.Files.walk(dir).withCloseable { stream ->
+                        stream.sorted(Comparator.reverseOrder()).toList().each { java.nio.file.Files.delete(it) }
+                    }
+                }
+            }
+        }
+    }
+}
+
 tasks.register('prepareMacOSResources', DefaultTask) {
     doLast {
         file("${project.layout.buildDirectory.get()}/macos_resources").mkdirs()

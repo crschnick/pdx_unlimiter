@@ -56,7 +56,6 @@
     -color-fg-subtle: rgb(166, 173, 200);
     -color-fg-emphasis: rgb(180, 190, 254);
     -color-bg-default: rgb(30, 30, 46);
-    -color-bg-default-transparent: #1E1E2ED2;
     -color-bg-overlay: rgb(24, 24, 37);
     -color-bg-subtle: rgb(49, 50, 68);
     -color-bg-inset: rgb(17, 17, 27);
@@ -85,13 +84,17 @@
     -color-danger-muted: rgba(255, 69, 58, 0.4);
     -color-danger-subtle: rgba(255, 69, 58, 0.15);
     -fx-background-color: -color-bg-default;
+    -fx-font-size: 14px;
+    -fx-background-radius: inherit;
+    -fx-background-insets: inherit;
+    -fx-padding: inherit;
 }
 
-.root:macos { -color-bg-default-transparent: #13171de6; }
+.root:macos { -color-bg-default-transparent: #181825e6; }
 
-.root:linux { -color-bg-default-transparent: #191c23b8; }
+.root:linux { -color-bg-default-transparent: #1e1e2eb8; }
 
-.root:windows { -color-bg-default-transparent: #191c23b8; }
+.root:windows { -color-bg-default-transparent: #1e1e2eb8; }
 
 .root .table-view {
     -color-cell-bg-odd: derive(-color-bg-subtle, -35%);
@@ -100,8 +103,4 @@
 
 .root:dark * {
     -color-foreground-base: derive(-color-bg-default-transparent, 9%);
-}
-
-.root:light * {
-    -color-foreground-base: derive(-color-bg-default-transparent, -3%);
 }

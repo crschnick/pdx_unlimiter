@@ -37,7 +37,6 @@ import java.lang.ref.WeakReference;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class AppTheme {
 
@@ -295,7 +294,6 @@ public class AppTheme {
     public static class DerivedTheme extends Theme {
 
         private final String name;
-        private final int skipLines;
 
         public DerivedTheme(
                 String id,
@@ -307,8 +305,7 @@ public class AppTheme {
                 Color borderColor,
                 Supplier<Color> contextMenuColor,
                 Supplier<Color> emphasisColor,
-                int displayBorderRadius,
-                int skipLines) {
+                int displayBorderRadius) {
             super(
                     id,
                     cssId,
@@ -320,7 +317,6 @@ public class AppTheme {
                     emphasisColor,
                     displayBorderRadius);
             this.name = name;
-            this.skipLines = skipLines;
         }
 
         @Override
@@ -334,9 +330,10 @@ public class AppTheme {
 
             // Watch out for the leading slash
             AppResources.with("atlantafx.base", theme.getUserAgentStylesheet().substring(1), path -> {
-                var baseStyleContent = Files.readString(path);
-                builder.append("\n")
-                        .append(baseStyleContent.lines().skip(skipLines).collect(Collectors.joining("\n")));
+                // The base .root block is replaced by the variables of the derived theme
+                var lines = Files.readString(path).lines().toList();
+                var rootEnd = lines.indexOf("}");
+                builder.append("\n").append(String.join("\n", lines.subList(rootEnd + 1, lines.size())));
             });
 
             Application.setUserAgentStylesheet(Styles.toDataURI(builder.toString()));
@@ -479,8 +476,7 @@ public class AppTheme {
                                 .darker(),
                         0.2),
                 () -> Platform.getPreferences().getAccentColor(),
-                4,
-                91);
+                4);
 
         // Adjust this to create your own theme
         @SuppressWarnings("unused")
@@ -495,8 +491,7 @@ public class AppTheme {
                 () -> ColorHelper.withOpacity(
                         Platform.getPreferences().getAccentColor().desaturate().desaturate(), 0.2),
                 () -> Platform.getPreferences().getAccentColor(),
-                4,
-                91);
+                4);
 
         // Also include your custom theme here
         public static final List<Theme> ALL = List.of(

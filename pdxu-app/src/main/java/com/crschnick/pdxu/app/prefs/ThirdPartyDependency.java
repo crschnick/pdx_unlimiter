@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.prefs;
 
 import com.crschnick.pdxu.app.core.AppResources;
 
+import lombok.Value;
 import org.apache.commons.io.FilenameUtils;
 
 import java.nio.file.Files;
@@ -11,11 +12,19 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Properties;
 
-public record ThirdPartyDependency(String name, String version, String licenseName, String licenseText, String link) {
+@Value
+public class ThirdPartyDependency {
 
-    private static final List<ThirdPartyDependency> ALL = new ArrayList<>();
+    private static List<ThirdPartyDependency> ALL;
 
-    public static void init() {
+    String name;
+    String version;
+    String licenseName;
+    String licenseText;
+    String link;
+
+    private static List<ThirdPartyDependency> load() {
+        var all = new ArrayList<ThirdPartyDependency>();
         AppResources.with(AppResources.MAIN_MODULE, "third-party", path -> {
             if (!Files.exists(path)) {
                 return;
@@ -33,7 +42,7 @@ public record ThirdPartyDependency(String name, String version, String licenseNa
                     var textFile = p.resolveSibling(
                             FilenameUtils.getBaseName(p.getFileName().toString()) + ".license");
                     var text = Files.readString(textFile);
-                    ALL.add(new ThirdPartyDependency(
+                    all.add(new ThirdPartyDependency(
                             props.getProperty("name"),
                             props.getProperty("version"),
                             props.getProperty("license"),
@@ -42,11 +51,12 @@ public record ThirdPartyDependency(String name, String version, String licenseNa
                 }
             }
         });
+        return List.copyOf(all);
     }
 
-    public static List<ThirdPartyDependency> getAll() {
-        if (ALL.size() == 0) {
-            init();
+    public static synchronized List<ThirdPartyDependency> getAll() {
+        if (ALL == null) {
+            ALL = load();
         }
         return ALL;
     }

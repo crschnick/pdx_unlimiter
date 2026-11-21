@@ -62,9 +62,14 @@ public class AppPrefsSidebarComp extends SimpleComp {
         var vbox = new VerticalComp(buttons).styleClass("sidebar");
         vbox.apply(struc -> {
             AppPrefs.get().getSelectedCategory().subscribe(val -> {
+                // Null is only set temporarily to reset the scroll position
+                if (val == null) {
+                    return;
+                }
+
                 PlatformThread.runLaterIfNeeded(() -> {
-                    var index = val != null ? effectiveCategories.indexOf(val) : 0;
-                    if (index >= struc.get().getChildren().size()) {
+                    var index = effectiveCategories.indexOf(val);
+                    if (index < 0 || index >= struc.get().getChildren().size()) {
                         return;
                     }
 

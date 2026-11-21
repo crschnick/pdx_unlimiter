@@ -16,7 +16,3 @@
 .root:dark * {
     -color-foreground-base: derive(-color-bg-default-transparent, 9%);
 }
-
-.root:light * {
-    -color-foreground-base: derive(-color-bg-default-transparent, -3%);
-}

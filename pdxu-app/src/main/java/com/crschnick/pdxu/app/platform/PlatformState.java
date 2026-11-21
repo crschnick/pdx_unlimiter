@@ -21,6 +21,7 @@ import java.awt.*;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public enum PlatformState {
     NOT_INITIALIZED,
@@ -29,10 +30,10 @@ public enum PlatformState {
 
     @Getter
     @Setter
-    private static PlatformState current = PlatformState.NOT_INITIALIZED;
+    private static volatile PlatformState current = PlatformState.NOT_INITIALIZED;
 
     private static Throwable lastError;
-    private static boolean restartQueued;
+    private static final AtomicBoolean restartQueued = new AtomicBoolean();
 
     public static Throwable getLastError() {
         return lastError;
@@ -67,7 +68,7 @@ public enum PlatformState {
     }
 
     public static void handleStderrMessage(String msg) {
-        if (restartQueued) {
+        if (restartQueued.get()) {
             return;
         }
 
@@ -81,8 +82,8 @@ public enum PlatformState {
         if (AppPrefs.get() != null
                 && AppPrefs.get().canSaveLocal()
                 && !AppPrefs.get().disableHardwareAcceleration().get()
-                && l.stream().anyMatch(msg::contains)) {
-            restartQueued = true;
+                && l.stream().anyMatch(msg::contains)
+                && restartQueued.compareAndSet(false, true)) {
             AppCache.update("hardwareAccelerationDisabled", true);
             // Delay this to guarantee that the application starts up as much as possible
             // This is to ensure that any initialization on initial startup is run

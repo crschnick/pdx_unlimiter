@@ -10,14 +10,17 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.stage.Window;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.function.Consumer;
 
 public class PlatformThreadWatcher {
 
     private static final Set<Window> windows = new HashSet<>();
     private static final Set<Node> nodes = new HashSet<>();
+    private static final Set<Node> watchedNodes = Collections.newSetFromMap(new WeakHashMap<>());
     // Reuse listener for everything. Disabling generics allows that
     @SuppressWarnings("rawtypes")
     private static final ChangeListener listener = new ChangeListener() {
@@ -109,21 +112,23 @@ public class PlatformThreadWatcher {
     }
 
     private static void watchGraph(Node node, Consumer<Node> callback) {
+        // Listeners stay registered for the node's lifetime, so each node only has to be set up once
+        if (!watchedNodes.add(node)) {
+            return;
+        }
+
         if (node instanceof Parent p) {
             for (Node c : p.getChildrenUnmodifiable()) {
                 watchGraph(c, callback);
             }
 
-            ListChangeListener<? super Node> childListener = change -> {
-                for (Node c : change.getList()) {
-                    watchGraph(c, callback);
-                }
-            };
-            p.sceneProperty().subscribe(scene -> {
-                if (scene != null) {
-                    p.getChildrenUnmodifiable().addListener(childListener);
-                } else {
-                    p.getChildrenUnmodifiable().removeListener(childListener);
+            p.getChildrenUnmodifiable().addListener((ListChangeListener<? super Node>) change -> {
+                while (change.next()) {
+                    if (change.wasAdded()) {
+                        for (Node c : change.getAddedSubList()) {
+                            watchGraph(c, callback);
+                        }
+                    }
                 }
             });
         }

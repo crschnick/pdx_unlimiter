@@ -44,6 +44,9 @@ def debugArguments = file("$projectDir/debug/debug_arguments.txt").text.lines()
 if (os.isWindows()) {
     tasks.register('baseDist', DefaultTask) {
         doLast {
+            // Files of a previous run might be read-only, which breaks overwriting them
+            fileTree("$distDir/base").each { it.setWritable(true) }
+
             copy {
                 from "$distDir/jpackage/${jpackageExecutableName}"
                 into "$distDir/base"

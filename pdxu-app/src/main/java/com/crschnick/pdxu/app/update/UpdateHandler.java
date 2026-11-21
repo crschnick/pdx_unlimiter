@@ -110,11 +110,16 @@ public abstract class UpdateHandler {
     public abstract List<ModalButton> createActions();
 
     public final AvailableRelease refreshUpdateCheck() throws Exception {
-        if (busy.getValue()) {
-            return lastUpdateCheckResult.getValue();
+        BooleanScope busyScope;
+        synchronized (this) {
+            if (busy.getValue()) {
+                return lastUpdateCheckResult.getValue();
+            }
+
+            busyScope = new BooleanScope(busy).start();
         }
 
-        try (var ignored = new BooleanScope(busy).start()) {
+        try (var ignored = busyScope) {
             return refreshUpdateCheckImpl();
         }
     }

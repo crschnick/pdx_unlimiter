@@ -17,7 +17,6 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 import atlantafx.base.controls.ProgressSliderSkin;
@@ -58,7 +57,6 @@ public class AppearanceCategory extends AppPrefsCategory {
                     d.setArcHeight(theme.getDisplayBorderRadius() + 2);
                     d.getStyleClass().add("dot");
                     d.setFill(theme.getBorderColor());
-                    d.setFill(Color.GRAY);
 
                     var s = new StackPane(d, b);
                     setGraphic(s);
