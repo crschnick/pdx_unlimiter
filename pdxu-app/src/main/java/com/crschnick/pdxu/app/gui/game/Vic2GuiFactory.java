@@ -13,8 +13,8 @@ import com.crschnick.pdxu.model.vic2.Vic2Tag;
 
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
-import javafx.scene.effect.ColorAdjust;
 import javafx.geometry.Rectangle2D;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;

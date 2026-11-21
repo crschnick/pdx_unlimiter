@@ -7,7 +7,6 @@ import com.crschnick.pdxu.app.info.eu5.Eu5SavegameData;
 import com.crschnick.pdxu.app.info.hoi4.Hoi4SavegameData;
 import com.crschnick.pdxu.app.info.stellaris.StellarisSavegameData;
 import com.crschnick.pdxu.app.info.vic2.Vic2SavegameData;
-import com.crschnick.pdxu.app.info.vic2.Vic2SavegameData;
 import com.crschnick.pdxu.app.info.vic3.Vic3SavegameData;
 import com.crschnick.pdxu.app.installation.GameFileContext;
 import com.crschnick.pdxu.app.installation.GameInstallation;

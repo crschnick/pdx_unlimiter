@@ -43,4 +43,4 @@ jobs:
           cache: gradle
 
       - name: Execute build
-        run: ./gradlew spotlessApply build
+        run: ./gradlew build -x spotlessCheck
