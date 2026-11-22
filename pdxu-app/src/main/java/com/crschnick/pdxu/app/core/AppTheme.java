@@ -547,7 +547,7 @@ public class AppTheme {
 
         protected String getPlatformPreferencesStylesheet() {
             var s = """
-                    * {
+                    .root {
                         -color-context-menu: %s;
                         -color-accent-fg: %s;
                         -color-accent-emphasis: %s;

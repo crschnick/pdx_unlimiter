@@ -7,7 +7,3 @@
 .root .table-view {
     -color-cell-bg-odd: derive(-color-bg-subtle, 35%);
 }
-
-.root:light * {
-    -color-foreground-base: derive(-color-bg-default-transparent, -3%);
-}

@@ -100,7 +100,3 @@
     -color-cell-bg-odd: derive(-color-bg-subtle, -35%);
     -color-cell-bg: derive(-color-bg-subtle, -30%);
 }
-
-.root:dark * {
-    -color-foreground-base: derive(-color-bg-default-transparent, 9%);
-}
