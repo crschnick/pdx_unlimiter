@@ -5,6 +5,7 @@ import com.crschnick.pdxu.app.core.SavegameManagerState;
 import com.crschnick.pdxu.app.core.TaskExecutor;
 import com.crschnick.pdxu.app.gui.game.GameGuiFactory;
 import com.crschnick.pdxu.app.gui.game.GameImage;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.savegame.FileImporter;
 import com.crschnick.pdxu.app.util.ThreadHelper;
 
@@ -19,11 +20,13 @@ import javafx.scene.layout.StackPane;
 
 import com.jfoenix.controls.JFXSpinner;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.kordamp.ikonli.javafx.FontIcon;
 
 @AllArgsConstructor
 public class GuiLayoutComp extends SimpleComp {
 
+    @Getter
     private final SavegameManagerState<?, ?> savegameManagerState;
 
     private BorderPane createLayout() {
@@ -39,7 +42,7 @@ public class GuiLayoutComp extends SimpleComp {
         return layout;
     }
 
-    private void setBusy(Region loadingBg, boolean busy) {
+    private static void setBusy(Region loadingBg, boolean busy) {
         if (!busy) {
             ThreadHelper.createPlatformThread("loading delay", true, () -> {
                         ThreadHelper.sleep(50);
@@ -90,13 +93,13 @@ public class GuiLayoutComp extends SimpleComp {
         var loadingBg = new StackPane(loading);
         loadingBg.getStyleClass().add(GuiStyle.CLASS_LOADING);
         loadingBg.setVisible(false);
-        TaskExecutor.getInstance().busyProperty().addListener((c, o, n) -> {
-            setBusy(loadingBg, n);
-        });
+        // JFoenix only pauses the spinner animation if the spinner itself is hidden
+        loading.visibleProperty().bind(loadingBg.visibleProperty());
+        Listeners.listenWeak(loadingBg, TaskExecutor.getInstance().busyProperty(), GuiLayoutComp::setBusy);
         loadingBg.setMinWidth(Pane.USE_COMPUTED_SIZE);
         loadingBg.setPrefHeight(Pane.USE_COMPUTED_SIZE);
 
-        var fileDropIcon = new FontIcon();
+        var fileDropIcon = new FontIcon("mdi-file-import");
         var fileDropOverlay = new StackPane(fileDropIcon);
         fileDropOverlay.setAlignment(Pos.CENTER);
         fileDropOverlay.getStyleClass().add("file-drag");

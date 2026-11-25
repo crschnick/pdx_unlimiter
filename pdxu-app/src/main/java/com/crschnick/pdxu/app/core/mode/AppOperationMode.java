@@ -178,6 +178,9 @@ public abstract class AppOperationMode {
                     CURRENT.finalTeardown();
                 }
                 CURRENT = null;
+                if (AppProperties.get().isHeapAnalysisMode()) {
+                    AppHeapAnalysis.runAfterShutdown();
+                }
             } catch (Throwable t) {
                 ErrorEventFactory.fromThrowable(t).term().handle();
                 AppOperationMode.halt(1);
@@ -188,7 +191,11 @@ public abstract class AppOperationMode {
         thread.start();
 
         // Use a timer to always exit after some time in case we get stuck
-        var limit = !hasError && !AppProperties.get().isDevelopmentEnvironment() ? 25000 : Integer.MAX_VALUE;
+        var limit = !hasError
+                        && !AppProperties.get().isDevelopmentEnvironment()
+                        && !AppProperties.get().isHeapAnalysisMode()
+                ? 25000
+                : Integer.MAX_VALUE;
         var exited = thread.join(Duration.ofMillis(limit));
         if (!exited) {
             TrackEvent.info("Shutdown took too long. Halting ...");

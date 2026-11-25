@@ -123,7 +123,7 @@ public class AppearanceCategory extends AppPrefsCategory {
                                 Comp.of(() -> {
                                             var s = new Slider(0.3, 1.0, prefs.windowOpacity.get());
                                             s.getStyleClass().add(Styles.SMALL);
-                                            prefs.windowOpacity.bind(s.valueProperty());
+                                            s.valueProperty().addListener((obs, o, n) -> prefs.windowOpacity.set(n.doubleValue()));
                                             s.setSkin(new ProgressSliderSkin(s));
                                             return s;
                                         })

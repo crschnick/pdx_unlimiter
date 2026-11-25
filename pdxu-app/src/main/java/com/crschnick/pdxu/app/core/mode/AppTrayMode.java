@@ -12,7 +12,17 @@ public class AppTrayMode extends AppOperationMode {
 
     @Override
     public boolean isSupported() {
-        return OsType.ofLocal() == OsType.WINDOWS && SystemTray.isSupported();
+        if (OsType.ofLocal() != OsType.WINDOWS) {
+            return false;
+        }
+
+        try {
+            return SystemTray.isSupported();
+        } catch (LinkageError e) {
+            // The awt library can be blocked, e.g. by Windows application control
+            ErrorEventFactory.fromThrowable(e).discard().handle();
+            return false;
+        }
     }
 
     @Override

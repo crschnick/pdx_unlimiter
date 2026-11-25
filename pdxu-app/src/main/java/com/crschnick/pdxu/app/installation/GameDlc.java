@@ -40,7 +40,7 @@ public class GameDlc {
         Node node = TextFormatParser.text().parse(filePath);
         GameDlc dlc = new GameDlc();
         dlc.filePath = filePath;
-        dlc.name = node.getNodeForKey("name").getString();
+        dlc.name = node.getNodeForKeyIfExistent("name").map(Node::getString).orElse(dlcName);
 
         // Notice the misspelled word "compatability"!
         if (node.getNodeForKeyIfExistent("affects_compatability")

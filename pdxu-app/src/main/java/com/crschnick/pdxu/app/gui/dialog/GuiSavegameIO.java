@@ -43,7 +43,7 @@ public class GuiSavegameIO {
 
         Button b = new Button();
         b.minHeightProperty().bind(textArea.heightProperty());
-        b.setGraphic(new FontIcon());
+        b.setGraphic(new FontIcon("mdi-magnify"));
         b.getStyleClass().add(GuiStyle.CLASS_BROWSE);
         b.setOnMouseClicked((m) -> {
             DirectoryChooser directoryChooser = new DirectoryChooser();

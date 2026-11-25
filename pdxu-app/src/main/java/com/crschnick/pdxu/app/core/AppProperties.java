@@ -35,6 +35,7 @@ public class AppProperties {
     UUID sessionId;
     boolean newBuildSession;
     boolean aotTrainMode;
+    boolean heapAnalysisMode;
     boolean debugPlatformThreadAccess;
     boolean buildAllPages;
     AppArguments arguments;
@@ -149,6 +150,9 @@ public class AppProperties {
         aotTrainMode = Optional.ofNullable(System.getProperty(AppNames.propertyName("aotTrainMode")))
                 .map(Boolean::parseBoolean)
                 .orElse(false);
+        heapAnalysisMode = Optional.ofNullable(System.getProperty(AppNames.propertyName("heapAnalysisMode")))
+                .map(Boolean::parseBoolean)
+                .orElse(false);
         explicitMode = AppOperationModeSelection.getIfPresent(System.getProperty(AppNames.propertyName("mode")))
                 .orElse(null);
     }
@@ -187,6 +191,10 @@ public class AppProperties {
                 TrackEvent.debug("Detected app property " + e.getKey() + "=" + e.getValue());
             }
         }
+    }
+
+    public boolean isUnattendedRun() {
+        return aotTrainMode || heapAnalysisMode;
     }
 
     public boolean isDevelopmentEnvironment() {

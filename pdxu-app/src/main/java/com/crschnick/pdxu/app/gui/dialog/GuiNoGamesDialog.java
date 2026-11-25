@@ -9,7 +9,7 @@ public class GuiNoGamesDialog {
 
     public static void showIfNeeded() {
         if (AppProperties.get().isDevelopmentEnvironment()
-                || AppProperties.get().isAotTrainMode()
+                || AppProperties.get().isUnattendedRun()
                 || !GameInstallation.ALL.isEmpty()) {
             return;
         }

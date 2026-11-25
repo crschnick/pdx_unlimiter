@@ -81,6 +81,11 @@ public class Vic3CoatOfArmsCache extends GameCacheManager.Cache {
             CascadeDirectoryHelper.traverseDirectory(Path.of("common").resolve("country_definitions"), ctx, path -> {
                 try {
                     TextFormatParser.vic3().parse(path).forEach((k, v) -> {
+                        // Top-level entries can also be variable definitions
+                        if (!v.isArray()) {
+                            return;
+                        }
+
                         var c = v.getNodeForKeyIfExistent("color");
                         if (c.isPresent()) {
                             map.put(

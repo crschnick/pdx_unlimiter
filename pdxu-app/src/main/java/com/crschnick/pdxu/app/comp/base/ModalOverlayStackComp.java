@@ -3,9 +3,9 @@ package com.crschnick.pdxu.app.comp.base;
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.SimpleComp;
 import com.crschnick.pdxu.app.core.window.AppDialog;
+import com.crschnick.pdxu.app.platform.Listeners;
 
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.Region;
 
@@ -29,8 +29,8 @@ public class ModalOverlayStackComp extends SimpleComp {
     private Comp<?> buildModalOverlay(Comp<?> current, int index) {
         ObservableList<ModalOverlay> modalOverlays = AppDialog.getModalOverlays();
         var prop = new SimpleObjectProperty<>(modalOverlays.size() > index ? modalOverlays.get(index) : null);
-        modalOverlays.addListener((ListChangeListener<? super ModalOverlay>) c -> {
-            prop.set(modalOverlays.size() > index ? modalOverlays.get(index) : null);
+        Listeners.listenListWeak(prop, modalOverlays, (p, list) -> {
+            p.set(list.size() > index ? list.get(index) : null);
         });
         prop.addListener((observable, oldValue, newValue) -> {
             if (newValue == null && oldValue != null) {

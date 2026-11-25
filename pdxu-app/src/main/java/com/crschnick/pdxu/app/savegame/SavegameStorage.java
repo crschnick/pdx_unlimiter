@@ -869,7 +869,7 @@ public abstract class SavegameStorage<T, I extends SavegameInfo<T>> {
             @Override
             public void invalid(SavegameParseResult.Invalid iv) {
                 ErrorEventFactory.fromMessage("Savegame is invalid: " + iv.message)
-                        .omit()
+                        .discard()
                         .handle();
                 resultToReturn[0] = iv;
             }

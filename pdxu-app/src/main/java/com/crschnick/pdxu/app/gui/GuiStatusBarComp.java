@@ -9,6 +9,8 @@ import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
 import com.crschnick.pdxu.app.installation.GameAppManager;
 import com.crschnick.pdxu.app.installation.dist.GameDistLauncher;
+import com.crschnick.pdxu.app.platform.BindingsHelper;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.savegame.*;
 import com.crschnick.pdxu.app.util.Hyperlinks;
 
@@ -23,7 +25,6 @@ import javafx.scene.layout.Region;
 import lombok.RequiredArgsConstructor;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.util.List;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.*;
 
@@ -52,21 +53,19 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
         BorderPane.setAlignment(text, Pos.CENTER);
 
         Label latest = new Label();
-        latest.setGraphic(new FontIcon());
+        latest.setGraphic(new FontIcon("mdi-clipboard-outline"));
         latest.getStyleClass().add(CLASS_TEXT);
         latest.getStyleClass().add(CLASS_SAVEGAME);
 
         var watcher = SavegameWatcher.ALL.get(g);
-        javafx.beans.value.ChangeListener<List<FileImportTarget.StandardImportTarget>> l = (c, o, n) -> {
+        Listeners.subscribeWeak(latest, watcher.savegamesProperty(), (label, n) -> {
             Platform.runLater(() -> {
                 var name = watcher.getLatest()
                         .map(FileImportTarget.StandardImportTarget::getName)
                         .orElse(AppI18n.get("none"));
-                latest.setText(AppI18n.get("latest") + ": " + name);
+                label.setText(AppI18n.get("latest") + ": " + name);
             });
-        };
-        watcher.savegamesProperty().addListener(l);
-        l.changed(null, null, watcher.savegamesProperty().get());
+        });
         barPane.setCenter(latest);
 
         Button importLatest = new Button(AppI18n.get("import"));
@@ -78,7 +77,7 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
         });
 
         Button b = new Button(AppI18n.get("kill"));
-        b.setGraphic(new FontIcon());
+        b.setGraphic(new FontIcon("mdi-stop"));
         b.getStyleClass().add(CLASS_KILL);
         b.setOnAction(event -> {
             GameAppManager.getInstance().kill();
@@ -91,7 +90,7 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
 
         {
             Button help = new Button();
-            help.setGraphic(new FontIcon());
+            help.setGraphic(new FontIcon("mdi-help-circle-outline"));
             help.getStyleClass().add("help-button");
             help.setOnAction(event -> {
                 Hyperlinks.open(Hyperlinks.SAVESCUM_GUIDE);
@@ -142,7 +141,7 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
             }
             {
                 Button export = new Button(AppI18n.get("export"));
-                export.setGraphic(new FontIcon());
+                export.setGraphic(new FontIcon("mdi-export"));
                 export.getStyleClass().add(CLASS_EXPORT);
                 export.setOnAction(event -> {
                     SavegameActions.exportSavegame(e);
@@ -156,7 +155,7 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
 
             if (e.getInfo() != null && ctx.getInstallation().getDist().supportsLauncher()) {
                 Button launch = new Button(AppI18n.get("startLauncher"));
-                launch.setGraphic(new FontIcon());
+                launch.setGraphic(new FontIcon("mdi-play-circle-outline"));
                 launch.getStyleClass().add("launcher-button");
                 launch.setOnAction(event -> {
                     GameDistLauncher.startLauncherWithContinueGame(e);
@@ -175,7 +174,7 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
                     splitButton.setText(AppI18n.get("continueGame"));
 
                     var debugItem = new MenuItem(AppI18n.get("debugMode"));
-                    debugItem.setGraphic(new FontIcon());
+                    debugItem.setGraphic(new FontIcon("mdi-play"));
                     debugItem.getStyleClass().add("continue-button");
                     debugItem.setOnAction(event -> {
                         GameDistLauncher.continueSavegame(e, true);
@@ -189,7 +188,7 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
                     launch = new Button(AppI18n.get("continueGame"));
                 }
 
-                launch.setGraphic(new FontIcon());
+                launch.setGraphic(new FontIcon("mdi-play"));
                 launch.getStyleClass().add("continue-button");
                 launch.setOnAction(event -> {
                     GameDistLauncher.continueSavegame(e, false);
@@ -202,7 +201,7 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
 
             {
                 Button help = new Button();
-                help.setGraphic(new FontIcon());
+                help.setGraphic(new FontIcon("mdi-help-circle-outline"));
                 help.getStyleClass().add("help-button");
                 help.setOnAction(event -> {
                     Hyperlinks.open(Hyperlinks.LAUNCH_GUIDE);
@@ -286,11 +285,13 @@ public class GuiStatusBarComp<T, I extends SavegameInfo<T>> extends SimpleComp {
             });
         });
 
-        GameAppManager.getInstance().activeGameProperty().addListener((c, o, n) -> {
+        // The comp state is used, so the pane keeps the comp alive instead of the global property
+        BindingsHelper.preserve(pane, this);
+        Listeners.listenWeak(pane, this, GameAppManager.getInstance().activeGameProperty(), (p, comp, n) -> {
             if (n != null) {
-                setRunning(pane, n.getGame());
+                comp.setRunning(p, n.getGame());
             } else {
-                stopRunning(pane);
+                comp.stopRunning(p);
             }
         });
         var g = GameAppManager.getInstance().activeGameProperty().get();

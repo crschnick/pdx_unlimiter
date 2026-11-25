@@ -6,6 +6,8 @@ import com.crschnick.pdxu.app.core.*;
 import com.crschnick.pdxu.app.core.window.AppDialog;
 import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.issue.TrackEvent;
+import com.crschnick.pdxu.app.platform.BindingsHelper;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.ColorHelper;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
 
@@ -111,15 +113,17 @@ public class AppMainWindowContentComp extends SimpleComp {
             pane.setAlignment(Pos.TOP_LEFT);
             pane.getStyleClass().add("background");
 
-            loaded.subscribe(struc -> {
+            // The loaded content property is global, so it must not keep the window content alive
+            BindingsHelper.preserve(pane, sidebarPresent);
+            Listeners.subscribeWeak(pane, sidebarPresent, loaded, (p, present, struc) -> {
                 if (struc != null) {
                     TrackEvent.info("Window content node set");
                     struc.prepareAddition();
-                    pane.getStyleClass().remove("background");
+                    p.getStyleClass().remove("background");
                     loadingAnimation.stop();
-                    pane.getChildren().remove(loadingVbox);
-                    pane.getChildren().add(struc.get());
-                    sidebarPresent.set(true);
+                    // The loading box is the only child at this point
+                    p.getChildren().setAll(struc.get());
+                    present.set(true);
                     struc.show();
                     TrackEvent.info("Window content node shown");
                 }

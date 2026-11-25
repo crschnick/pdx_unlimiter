@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.editor.target;
 
 import com.crschnick.pdxu.app.installation.GameFileContext;
+import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.util.RakalyHelper;
 import com.crschnick.pdxu.io.node.ArrayNode;
 import com.crschnick.pdxu.io.parser.TextFormatParser;
@@ -43,13 +44,15 @@ public class SavegameEditTarget extends EditTarget {
         var succ = res.success();
         if (succ.isPresent()) {
             return succ.get().content;
-        } else {
-            var msg = res.error()
-                    .map(e -> e.error.getMessage())
-                    .or(() -> res.invalid().map(i -> i.message))
-                    .orElse("");
-            throw new IllegalArgumentException(msg);
         }
+
+        var invalid = res.invalid();
+        if (invalid.isPresent()) {
+            throw ErrorEventFactory.expected(new IllegalArgumentException(invalid.get().message));
+        }
+
+        var msg = res.error().map(e -> e.error.getMessage()).orElse("");
+        throw new IllegalArgumentException(msg);
     }
 
     @Override

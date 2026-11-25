@@ -85,23 +85,6 @@
 -fx-alignment: center;
 }
 
-.list-expand-button .ikonli-font-icon {
-    -fx-icon-code: "mdi-json";
-}
-
-.coa-button .ikonli-font-icon {
-    -fx-icon-code: "mdi-eye";
-}
-
-
-.nav-back-button .ikonli-font-icon {
-    -fx-icon-code: "mdi-arrow-left-bold";
-}
-
-.nav-forward-button .ikonli-font-icon {
-    -fx-icon-code: "mdi-arrow-right-bold";
-}
-
 .coa-options {
 -fx-padding: 0.5em;
   -fx-background-color: -color-bg-inset;

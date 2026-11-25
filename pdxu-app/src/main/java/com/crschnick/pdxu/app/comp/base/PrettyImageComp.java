@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.comp.base;
 import com.crschnick.pdxu.app.comp.SimpleComp;
 import com.crschnick.pdxu.app.core.AppImages;
 import com.crschnick.pdxu.app.issue.TrackEvent;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
 
@@ -16,7 +17,7 @@ import javafx.scene.layout.StackPane;
 
 import org.apache.commons.io.FilenameUtils;
 
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 public class PrettyImageComp extends SimpleComp {
 
@@ -93,7 +94,7 @@ public class PrettyImageComp extends SimpleComp {
         storeIcon.setSmooth(true);
         stack.getChildren().add(storeIcon);
 
-        Consumer<String> update = val -> {
+        BiConsumer<StackPane, String> update = (s, val) -> {
             PlatformThread.runLaterIfNeeded(() -> {
                 var useDark = AppPrefs.get() != null
                         && AppPrefs.get().theme().getValue() != null
@@ -105,18 +106,17 @@ public class PrettyImageComp extends SimpleComp {
                 image.set(fixed);
 
                 if (val == null) {
-                    stack.getChildren().getFirst().setVisible(false);
+                    s.getChildren().getFirst().setVisible(false);
                 } else {
-                    stack.getChildren().getFirst().setVisible(true);
+                    s.getChildren().getFirst().setVisible(true);
                 }
             });
         };
 
-        value.subscribe(update);
+        var value = this.value;
+        Listeners.subscribeWeak(stack, value, update);
         if (AppPrefs.get() != null) {
-            AppPrefs.get().theme().addListener((observable, oldValue, newValue) -> {
-                update.accept(value.getValue());
-            });
+            Listeners.listenWeak(stack, AppPrefs.get().theme(), (s, t) -> update.accept(s, value.getValue()));
         }
 
         stack.setFocusTraversable(false);

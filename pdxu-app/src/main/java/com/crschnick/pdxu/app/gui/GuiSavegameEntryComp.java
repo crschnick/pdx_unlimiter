@@ -9,6 +9,7 @@ import com.crschnick.pdxu.app.core.window.AppDialog;
 import com.crschnick.pdxu.app.gui.dialog.GuiSavegameNotes;
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.GameInstallation;
+import com.crschnick.pdxu.app.platform.BindingsHelper;
 import com.crschnick.pdxu.app.savegame.SavegameActions;
 import com.crschnick.pdxu.app.savegame.SavegameBranches;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
@@ -90,6 +91,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
 
             var tagImage = context.getGuiFactory().createImage(e);
             HBox tagBar = new HBox(tagImage.getValue(), l);
+            BindingsHelper.preserve(tagBar, tagImage);
             tagImage.addListener((c, o, n) -> {
                 Platform.runLater(() -> {
                     tagBar.getChildren().set(0, n);
@@ -152,7 +154,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
         staticButtons.getStyleClass().add(CLASS_BUTTON_BAR);
         {
             Button export = new Button(null, new FontIcon());
-            export.setGraphic(new FontIcon());
+            export.setGraphic(new FontIcon("mdi-export"));
             export.setOnAction((m) -> {
                 SavegameActions.exportSavegame(e);
                 savegameManagerState.selectEntry(null);
@@ -173,7 +175,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
         }
         {
             Button copy = new Button(null, new FontIcon());
-            copy.setGraphic(new FontIcon());
+            copy.setGraphic(new FontIcon("mdi-content-copy"));
             copy.setOnMouseClicked((m) -> {
                 SavegameActions.copySavegame(e);
             });
@@ -221,7 +223,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
 
         {
             Button melt = new Button(null, new FontIcon());
-            melt.setGraphic(new FontIcon());
+            melt.setGraphic(new FontIcon("mdi-stove"));
             melt.setOnMouseClicked((m) -> {
                 SavegameActions.meltSavegame(e);
             });
@@ -244,7 +246,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
 
             Platform.runLater(() -> {
                 Button branch = new Button(null, new FontIcon());
-                branch.setGraphic(new FontIcon());
+                branch.setGraphic(new FontIcon("mdi-source-branch"));
                 branch.setOnMouseClicked((m) -> {
                     SavegameActions.branch(e);
                 });
@@ -262,7 +264,7 @@ public class GuiSavegameEntryComp<T, I extends SavegameInfo<T>> extends SimpleCo
                             && GameInstallation.ALL.get(converterSupport.getToGame()) != null) {
                         Platform.runLater(() -> {
                             Button convert = new Button(null, new FontIcon());
-                            convert.setGraphic(new FontIcon());
+                            convert.setGraphic(new FontIcon("mdi-step-forward-2"));
                             convert.setOnMouseClicked((m) -> {
                                 converterSupport.convert(e);
                             });

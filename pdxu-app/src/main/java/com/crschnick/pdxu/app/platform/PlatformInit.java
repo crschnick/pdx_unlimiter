@@ -74,7 +74,7 @@ public class PlatformInit {
     }
 
     private static void initSync() {
-        if (AppProperties.get().isAotTrainMode() && OsType.ofLocal() == OsType.LINUX) {
+        if (AppProperties.get().isUnattendedRun() && OsType.ofLocal() == OsType.LINUX) {
             latch.countDown();
             return;
         }

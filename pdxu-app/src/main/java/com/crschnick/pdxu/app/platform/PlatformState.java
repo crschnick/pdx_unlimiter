@@ -116,7 +116,8 @@ public enum PlatformState {
 
             // Catch more than just the headless exception in case the graphics environment initialization completely
             // fails
-        } catch (HeadlessException | AWTError e) {
+            // LinkageError happens when the awt library is blocked, e.g. by Windows application control
+        } catch (HeadlessException | AWTError | LinkageError e) {
             var msg = getErrorMessage(e.getMessage());
             PlatformState.setCurrent(PlatformState.EXITED);
             lastError = new UnsupportedOperationException(msg, e);
@@ -190,6 +191,7 @@ public enum PlatformState {
                 // Platform initialization has failed in this case
                 var msg = getErrorMessage(t.getMessage());
                 var ex = new UnsupportedOperationException(msg, t);
+                ErrorEventFactory.expected(t);
                 ErrorEventFactory.expected(ex);
                 PlatformState.setCurrent(PlatformState.EXITED);
                 lastError = ex;
@@ -205,6 +207,8 @@ public enum PlatformState {
             Font.getDefault();
         } catch (Throwable e) {
             var ex = new IllegalStateException("Unable to load fonts. Do you have a valid font package installed?", e);
+            ErrorEventFactory.expected(e);
+            ErrorEventFactory.expected(ex);
             lastError = ex;
             PlatformState.setCurrent(PlatformState.EXITED);
             return;

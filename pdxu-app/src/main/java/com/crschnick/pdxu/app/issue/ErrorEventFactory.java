@@ -49,6 +49,12 @@ public class ErrorEventFactory {
     }
 
     public static synchronized void preconfigure(ErrorEvent.ErrorEventBuilder event) {
+        var found = EVENT_BASES.get(event.getThrowable());
+        if (found != null) {
+            found.apply(event);
+            return;
+        }
+
         EVENT_BASES.put(event.getThrowable(), event);
     }
 
@@ -56,6 +62,13 @@ public class ErrorEventFactory {
         var b = EVENT_BASES.remove(t);
         if (b == null) {
             b = ErrorEvent.builder().throwable(t);
+        }
+
+        for (Throwable pre : ErrorEvent.getThrowableChain(t)) {
+            var found = EVENT_BASES.get(pre);
+            if (found != null) {
+                b.apply(found);
+            }
         }
 
         if (t instanceof SSLHandshakeException) {

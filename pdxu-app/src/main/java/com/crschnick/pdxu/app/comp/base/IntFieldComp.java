@@ -3,11 +3,11 @@ package com.crschnick.pdxu.app.comp.base;
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.CompStructure;
 import com.crschnick.pdxu.app.comp.SimpleCompStructure;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 
 import javafx.application.Platform;
 import javafx.beans.property.Property;
-import javafx.beans.value.ChangeListener;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyEvent;
 
@@ -39,17 +39,20 @@ public class IntFieldComp extends Comp<CompStructure<TextField>> {
     public CompStructure<TextField> createBase() {
         var field = new TextField(value.getValue() != null ? value.getValue().toString() : null);
 
-        value.addListener((ChangeListener<Number>) (observableValue, oldValue, newValue) -> {
+        var value = this.value;
+        var minValue = this.minValue;
+        var maxValue = this.maxValue;
+        Listeners.listenWeak(field, value, (f, newValue) -> {
             PlatformThread.runLaterIfNeeded(() -> {
                 // Check if control value is the same. Then don't set it as that might cause bugs
-                if ((newValue == null && field.getText().isEmpty())
-                        || Objects.equals(field.getText(), newValue != null ? newValue.toString() : null)) {
+                if ((newValue == null && f.getText().isEmpty())
+                        || Objects.equals(f.getText(), newValue != null ? newValue.toString() : null)) {
                     return;
                 }
 
                 if (newValue == null) {
                     Platform.runLater(() -> {
-                        field.setText(null);
+                        f.setText(null);
                     });
                     return;
                 }
@@ -64,7 +67,7 @@ public class IntFieldComp extends Comp<CompStructure<TextField>> {
                     return;
                 }
 
-                field.setText(newValue.toString());
+                f.setText(newValue.toString());
             });
         });
 

@@ -111,6 +111,8 @@ public class AppBaseMode extends AppOperationMode {
         AppBeacon.reset();
         AppLayoutModel.reset();
         AppTheme.reset();
+        AppMainWindow.reset();
+        AppImages.reset();
         PlatformState.reset();
         AppResources.reset();
         AppDataLock.reset();

@@ -18,7 +18,7 @@ public class UpdateAvailableDialog {
     }
 
     public static void showIfNeeded(boolean wait, boolean refresh) {
-        if (AppProperties.get().isAotTrainMode()) {
+        if (AppProperties.get().isUnattendedRun()) {
             return;
         }
 

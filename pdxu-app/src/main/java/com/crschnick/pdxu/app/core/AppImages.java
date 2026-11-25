@@ -30,6 +30,10 @@ public class AppImages {
         images.keySet().removeIf(filter);
     }
 
+    public static void reset() {
+        images.clear();
+    }
+
     public static void init() {
         if (images.size() > 0) {
             return;

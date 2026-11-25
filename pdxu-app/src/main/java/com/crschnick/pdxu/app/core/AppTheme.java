@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.core.window.AppMainWindow;
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 import com.crschnick.pdxu.app.issue.TrackEvent;
 import com.crschnick.pdxu.app.platform.ColorHelper;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
 import com.crschnick.pdxu.app.prefs.PrefsChoiceValue;
@@ -33,7 +34,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.SneakyThrows;
 
-import java.lang.ref.WeakReference;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.function.Supplier;
@@ -64,28 +64,17 @@ public class AppTheme {
                     AppPrefs.get().performanceMode().getValue());
         });
 
-        // Allow for GC
-        var ref = new WeakReference<>(stage);
-
-        AppPrefs.get().theme().subscribe(t -> {
-            var val = ref.get();
-            if (val != null) {
-                var scene = val.getScene();
-                if (scene != null) {
-                    var r = scene.getRoot();
-                    applyClasses(r, t, AppPrefs.get().performanceMode().get());
-                }
+        Listeners.subscribeWeak(stage, AppPrefs.get().theme(), (s, t) -> {
+            var scene = s.getScene();
+            if (scene != null) {
+                applyClasses(scene.getRoot(), t, AppPrefs.get().performanceMode().get());
             }
         });
 
-        AppPrefs.get().performanceMode().subscribe(pm -> {
-            var val = ref.get();
-            if (val != null) {
-                var scene = val.getScene();
-                if (scene != null) {
-                    var r = scene.getRoot();
-                    applyClasses(r, AppPrefs.get().theme().getValue(), pm);
-                }
+        Listeners.subscribeWeak(stage, AppPrefs.get().performanceMode(), (s, pm) -> {
+            var scene = s.getScene();
+            if (scene != null) {
+                applyClasses(scene.getRoot(), AppPrefs.get().theme().getValue(), pm);
             }
         });
     }

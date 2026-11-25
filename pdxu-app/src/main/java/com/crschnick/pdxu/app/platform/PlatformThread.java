@@ -5,6 +5,8 @@ import com.crschnick.pdxu.app.issue.ErrorEventFactory;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
+import javafx.beans.WeakListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ListChangeListener;
@@ -27,9 +29,7 @@ public class PlatformThread {
 
             @Override
             public synchronized void addListener(ChangeListener<? super T> listener) {
-                ChangeListener<? super T> l = (c, o, n) -> {
-                    PlatformThread.runLaterIfNeeded(() -> listener.changed(c, o, n));
-                };
+                ChangeListener<? super T> l = new SyncChangeListener<>(listener);
 
                 changeListenerMap.put(listener, l);
                 ov.addListener(l);
@@ -50,9 +50,7 @@ public class PlatformThread {
 
             @Override
             public synchronized void addListener(InvalidationListener listener) {
-                InvalidationListener l = o -> {
-                    PlatformThread.runLaterIfNeeded(() -> listener.invalidated(o));
-                };
+                InvalidationListener l = new SyncInvalidationListener(listener);
 
                 invListenerMap.put(listener, l);
                 ov.addListener(l);
@@ -79,9 +77,7 @@ public class PlatformThread {
 
             @Override
             public synchronized void addListener(ListChangeListener<? super T> listener) {
-                ListChangeListener<? super T> l = (lc) -> {
-                    PlatformThread.runLaterIfNeeded(() -> listener.onChanged(lc));
-                };
+                ListChangeListener<? super T> l = new SyncListChangeListener<>(ol, listener);
 
                 listChangeListenerMap.put(listener, l);
                 ol.addListener(l);
@@ -242,9 +238,7 @@ public class PlatformThread {
 
             @Override
             public synchronized void addListener(InvalidationListener listener) {
-                InvalidationListener l = o -> {
-                    PlatformThread.runLaterIfNeeded(() -> listener.invalidated(o));
-                };
+                InvalidationListener l = new SyncInvalidationListener(listener);
 
                 invListenerMap.put(listener, l);
                 ol.addListener(l);
@@ -261,16 +255,74 @@ public class PlatformThread {
         return obs;
     }
 
+    private static boolean wasGarbageCollected(Object listener) {
+        return listener instanceof WeakListener w && w.wasGarbageCollected();
+    }
+
+    private record SyncChangeListener<T>(ChangeListener<? super T> listener)
+            implements ChangeListener<T>, WeakListener {
+
+        @Override
+        public void changed(ObservableValue<? extends T> observable, T oldValue, T newValue) {
+            if (wasGarbageCollected()) {
+                observable.removeListener(this);
+                return;
+            }
+
+            runLaterIfNeeded(() -> listener.changed(observable, oldValue, newValue));
+        }
+
+        @Override
+        public boolean wasGarbageCollected() {
+            return PlatformThread.wasGarbageCollected(listener);
+        }
+    }
+
+    private record SyncInvalidationListener(InvalidationListener listener)
+            implements InvalidationListener, WeakListener {
+
+        @Override
+        public void invalidated(Observable observable) {
+            if (wasGarbageCollected()) {
+                observable.removeListener(this);
+                return;
+            }
+
+            runLaterIfNeeded(() -> listener.invalidated(observable));
+        }
+
+        @Override
+        public boolean wasGarbageCollected() {
+            return PlatformThread.wasGarbageCollected(listener);
+        }
+    }
+
+    private record SyncListChangeListener<T>(ObservableList<T> source, ListChangeListener<? super T> listener)
+            implements ListChangeListener<T>, WeakListener {
+
+        @Override
+        public void onChanged(Change<? extends T> c) {
+            if (wasGarbageCollected()) {
+                source.removeListener(this);
+                return;
+            }
+
+            runLaterIfNeeded(() -> listener.onChanged(c));
+        }
+
+        @Override
+        public boolean wasGarbageCollected() {
+            return PlatformThread.wasGarbageCollected(listener);
+        }
+    }
+
     private static boolean canRunPlatform() {
         if (PlatformState.getCurrent() != PlatformState.RUNNING) {
             return false;
         }
 
-        if (AppOperationMode.isInShutdown()) {
-            return false;
-        }
-
-        return true;
+        // Some other components might already be disposed
+        return !AppOperationMode.isInShutdownHook();
     }
 
     public static void enterNestedEventLoop(Object key) {

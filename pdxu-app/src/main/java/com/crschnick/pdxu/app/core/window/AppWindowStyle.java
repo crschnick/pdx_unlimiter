@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.core.window;
 
 import com.crschnick.pdxu.app.core.*;
 import com.crschnick.pdxu.app.issue.TrackEvent;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.util.OsType;
 
 import javafx.application.Platform;
@@ -21,8 +22,13 @@ public class AppWindowStyle {
 
     public static void addMaximizedPseudoClass(Stage stage) {
         stage.getScene().rootProperty().subscribe(root -> {
-            stage.maximizedProperty().subscribe(v -> {
-                root.pseudoClassStateChanged(PseudoClass.getPseudoClass("maximized"), v);
+            if (root == null) {
+                return;
+            }
+
+            // Replaced roots must not be kept alive by the stage
+            Listeners.subscribeWeak(root, stage.maximizedProperty(), (r, v) -> {
+                r.pseudoClassStateChanged(PseudoClass.getPseudoClass("maximized"), v);
             });
         });
     }

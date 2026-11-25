@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.CompStructure;
 import com.crschnick.pdxu.app.core.AppFontSizes;
 import com.crschnick.pdxu.app.core.AppI18n;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 
 import javafx.beans.binding.Bindings;
@@ -68,13 +69,13 @@ public class TileButtonComp extends Comp<TileButtonComp.Structure> {
         });
 
         var header = new Label();
-        name.subscribe(value -> {
+        Listeners.subscribeWithScene(header, name, value -> {
             PlatformThread.runLaterIfNeeded(() -> {
                 header.setText(value);
             });
         });
         var desc = new Label();
-        description.subscribe(value -> {
+        Listeners.subscribeWithScene(desc, description, value -> {
             PlatformThread.runLaterIfNeeded(() -> {
                 desc.setText(value);
             });

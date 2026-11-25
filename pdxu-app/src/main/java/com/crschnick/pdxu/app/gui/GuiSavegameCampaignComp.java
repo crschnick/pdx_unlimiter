@@ -5,16 +5,16 @@ import com.crschnick.pdxu.app.comp.base.IconButtonComp;
 import com.crschnick.pdxu.app.core.AppFontSizes;
 import com.crschnick.pdxu.app.core.window.AppDialog;
 import com.crschnick.pdxu.app.info.SavegameInfo;
+import com.crschnick.pdxu.app.platform.BindingsHelper;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.savegame.SavegameActions;
 import com.crschnick.pdxu.app.savegame.SavegameCampaign;
 import com.crschnick.pdxu.app.savegame.SavegameContext;
-import com.crschnick.pdxu.app.savegame.SavegameEntry;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.SetChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Cursor;
@@ -49,6 +49,7 @@ public class GuiSavegameCampaignComp<T, I extends SavegameInfo<T>> extends Simpl
         {
             SavegameContext.withCollectionContext(campaign, gi -> {
                 ObservableValue<Node> prop = gi.getGuiFactory().createImage(campaign);
+                BindingsHelper.preserve(btn, prop);
                 prop.addListener((change, o, n) -> {
                     Platform.runLater(() -> {
                         btn.getChildren().set(0, prop.getValue());
@@ -112,10 +113,10 @@ public class GuiSavegameCampaignComp<T, I extends SavegameInfo<T>> extends Simpl
             Label count = new Label("[" + campaign.getSavegames().size() + "]");
             count.getStyleClass().add(CLASS_DATE);
             count.setAlignment(Pos.CENTER_LEFT);
-            campaign.getSavegames().addListener((SetChangeListener<SavegameEntry<?, ?>>) change -> {
-                int newLength = change.getSet().size();
+            Listeners.listenSetWeak(count, campaign.getSavegames(), (l, set) -> {
+                int newLength = set.size();
                 Platform.runLater(() -> {
-                    count.setText("[" + newLength + "]");
+                    l.setText("[" + newLength + "]");
                 });
             });
             bottom.getChildren().add(count);

@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.comp;
 import com.crschnick.pdxu.app.comp.base.TooltipHelper;
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.platform.BindingsHelper;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 
 import javafx.beans.value.ObservableValue;
@@ -108,7 +109,7 @@ public abstract class Comp<S extends CompStructure<?>> {
         return apply(struc -> {
             var region = struc.get();
             BindingsHelper.preserve(region, o);
-            o.subscribe(n -> {
+            Listeners.subscribeWithScene(region, o, n -> {
                 PlatformThread.runLaterIfNeeded(() -> {
                     region.setVisible(n);
                 });
@@ -120,7 +121,7 @@ public abstract class Comp<S extends CompStructure<?>> {
         return apply(struc -> {
             var region = struc.get();
             BindingsHelper.preserve(region, o);
-            o.subscribe(n -> {
+            Listeners.subscribeWithScene(region, o, n -> {
                 PlatformThread.runLaterIfNeeded(() -> {
                     region.setDisable(n);
                 });
@@ -136,7 +137,7 @@ public abstract class Comp<S extends CompStructure<?>> {
         return apply(struc -> {
             var region = struc.get();
             BindingsHelper.preserve(region, o);
-            o.subscribe(n -> {
+            Listeners.subscribeWithScene(region, o, n -> {
                 PlatformThread.runLaterIfNeeded(() -> {
                     if (!n) {
                         region.setVisible(true);

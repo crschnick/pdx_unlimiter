@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.CompStructure;
 import com.crschnick.pdxu.app.comp.SimpleCompStructure;
 import com.crschnick.pdxu.app.core.AppI18n;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 import com.crschnick.pdxu.app.util.Translatable;
 
@@ -18,7 +19,6 @@ import javafx.util.StringConverter;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
-import java.lang.ref.WeakReference;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,11 +46,8 @@ public class ChoiceComp<T> extends Comp<CompStructure<ComboBox<T>>> {
         return new ChoiceComp<>(value, map, includeNone);
     }
 
-    @Override
-    public CompStructure<ComboBox<T>> createBase() {
-        var cb = new ComboBox<T>();
-
-        Supplier<StringConverter<T>> converter = () -> new StringConverter<>() {
+    private static <T> StringConverter<T> createConverter(ObservableValue<Map<T, ObservableValue<String>>> range) {
+        return new StringConverter<>() {
             @Override
             public String toString(T object) {
                 if (object == null) {
@@ -70,34 +67,40 @@ public class ChoiceComp<T> extends Comp<CompStructure<ComboBox<T>>> {
                 throw new UnsupportedOperationException();
             }
         };
+    }
+
+    @Override
+    public CompStructure<ComboBox<T>> createBase() {
+        var cb = new ComboBox<T>();
+
+        var range = this.range;
+        Supplier<StringConverter<T>> converter = () -> createConverter(range);
         cb.setConverter(converter.get());
 
         // Reset converter on language change to force an update
         // This does not work properly in older JFX versions, see JDK-8384006
-        var ref = new WeakReference<>(cb);
-        AppI18n.activeLanguage().subscribe((v) -> {
-            var refValue = ref.get();
-            if (refValue != null) {
-                Platform.runLater(() -> {
-                    refValue.setConverter(converter.get());
-                });
-            }
+        Listeners.subscribeWeak(cb, AppI18n.activeLanguage(), (box, v) -> {
+            Platform.runLater(() -> {
+                box.setConverter(converter.get());
+            });
         });
 
-        range.subscribe(c -> {
+        var includeNone = this.includeNone;
+        Listeners.subscribeWeak(cb, range, (box, c) -> {
             var list = FXCollections.observableArrayList(c.keySet());
             if (!list.contains(null) && includeNone) {
                 list.add(null);
             }
 
-            cb.getItems().setAll(list);
+            box.getItems().setAll(list);
         });
 
+        var value = this.value;
         cb.valueProperty().addListener((observable, oldValue, newValue) -> {
             value.setValue(newValue);
         });
-        value.subscribe(val -> {
-            PlatformThread.runLaterIfNeeded(() -> cb.valueProperty().set(val));
+        Listeners.subscribeWeak(cb, value, (box, val) -> {
+            PlatformThread.runLaterIfNeeded(() -> box.valueProperty().set(val));
         });
 
         cb.getStyleClass().add("choice-comp");

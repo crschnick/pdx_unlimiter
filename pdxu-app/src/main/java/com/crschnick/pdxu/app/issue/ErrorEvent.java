@@ -52,6 +52,17 @@ public class ErrorEvent {
         userReport = text;
     }
 
+    static List<Throwable> getThrowableChain(Throwable throwable) {
+        var list = new ArrayList<Throwable>();
+        var visited = Collections.newSetFromMap(new IdentityHashMap<Throwable, Boolean>());
+        var t = throwable;
+        while (t != null && visited.add(t)) {
+            list.addFirst(t);
+            t = t.getCause();
+        }
+        return list;
+    }
+
     private boolean shouldIgnore(Throwable throwable) {
         // Guard against cause cycles
         var visited = Collections.newSetFromMap(new IdentityHashMap<Throwable, Boolean>());
@@ -82,7 +93,7 @@ public class ErrorEvent {
             addAttachment(AppLogs.get().getSessionLogsDirectory());
         }
 
-        if (AppProperties.get() != null && AppProperties.get().isAotTrainMode()) {
+        if (AppProperties.get() != null && AppProperties.get().isUnattendedRun()) {
             new LogErrorHandler().handle(this);
             if (this.isTerminal()) {
                 AppOperationMode.halt(1);
@@ -119,6 +130,25 @@ public class ErrorEvent {
     }
 
     public static class ErrorEventBuilder {
+
+        public void apply(ErrorEventBuilder other) {
+            var e = other.build();
+            if (!e.reportable) {
+                expected();
+            }
+            if (e.terminal) {
+                term();
+            }
+            if (e.link != null) {
+                link = e.link;
+            }
+            if (e.description != null) {
+                description = e.description;
+            }
+            if (e.omitted) {
+                omit();
+            }
+        }
 
         public ErrorEventBuilder term() {
             return terminal(true);

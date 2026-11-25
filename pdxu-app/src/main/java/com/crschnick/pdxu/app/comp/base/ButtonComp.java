@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.CompStructure;
 import com.crschnick.pdxu.app.comp.SimpleCompStructure;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -48,12 +49,12 @@ public class ButtonComp extends Comp<CompStructure<Button>> {
     public CompStructure<Button> createBase() {
         var button = new Button(null);
         if (name != null) {
-            name.subscribe(t -> {
+            Listeners.subscribeWithScene(button, name, t -> {
                 PlatformThread.runLaterIfNeeded(() -> button.setText(t));
             });
         }
         if (graphic != null) {
-            graphic.subscribe(t -> {
+            Listeners.subscribeWithScene(button, graphic, t -> {
                 PlatformThread.runLaterIfNeeded(() -> {
                     if (t == null) {
                         button.setGraphic(null);

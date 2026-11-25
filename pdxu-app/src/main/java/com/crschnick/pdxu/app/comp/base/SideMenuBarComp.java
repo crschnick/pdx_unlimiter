@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.comp.SimpleCompStructure;
 import com.crschnick.pdxu.app.core.AppFontSizes;
 import com.crschnick.pdxu.app.core.AppLayoutModel;
 import com.crschnick.pdxu.app.core.mode.AppOperationMode;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 import com.crschnick.pdxu.app.update.AppDistributionType;
 import com.crschnick.pdxu.app.update.UpdateAvailableDialog;
@@ -14,7 +15,6 @@ import com.crschnick.pdxu.app.util.ThreadHelper;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.css.PseudoClass;
 import javafx.geometry.Insets;
@@ -30,7 +30,7 @@ import lombok.AllArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 @AllArgsConstructor
 public class SideMenuBarComp extends Comp<CompStructure<VBox>> {
@@ -90,8 +90,8 @@ public class SideMenuBarComp extends Comp<CompStructure<VBox>> {
         vbox.getStyleClass().add("sidebar-comp");
 
         var queueButtons = new VBox();
-        Consumer<List<? extends AppLayoutModel.QueueEntry>> update = l -> {
-            queueButtons.getChildren().clear();
+        BiConsumer<VBox, List<? extends AppLayoutModel.QueueEntry>> update = (box, l) -> {
+            box.getChildren().clear();
             for (int i = l.size() - 1; i >= 0; i--) {
                 var item = l.get(i);
                 var b = new IconButtonComp(item.getIcon(), null);
@@ -116,15 +116,15 @@ public class SideMenuBarComp extends Comp<CompStructure<VBox>> {
                 });
                 b.accessibleText(item.getName());
                 var stack = createStyle(null, b);
-                queueButtons.getChildren().add(stack.createRegion());
+                box.getChildren().add(stack.createRegion());
             }
         };
 
-        update.accept(new ArrayList<>(queueEntries));
-        queueEntries.addListener((ListChangeListener<? super AppLayoutModel.QueueEntry>) c -> {
-            var l = new ArrayList<>(c.getList());
+        update.accept(queueButtons, new ArrayList<>(queueEntries));
+        Listeners.listenListWeak(queueButtons, queueEntries, (box, list) -> {
+            var l = new ArrayList<>(list);
             PlatformThread.runLaterIfNeeded(() -> {
-                update.accept(l);
+                update.accept(box, l);
             });
         });
         vbox.getChildren().add(queueButtons);
@@ -146,9 +146,9 @@ public class SideMenuBarComp extends Comp<CompStructure<VBox>> {
                 return;
             }
 
-            value.addListener((c, o, n) -> {
+            Listeners.listenWeak(struc.get(), value, (s, n) -> {
                 PlatformThread.runLaterIfNeeded(() -> {
-                    struc.get().pseudoClassStateChanged(selected, Objects.equals(n, e));
+                    s.pseudoClassStateChanged(selected, Objects.equals(n, e));
                 });
             });
         });

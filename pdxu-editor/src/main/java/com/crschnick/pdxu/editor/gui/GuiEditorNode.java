@@ -73,7 +73,7 @@ public class GuiEditorNode {
         {
             int length = n.getRawSize();
             var btn = new Button("List (" + length + ")");
-            var icon = new FontIcon();
+            var icon = new FontIcon("mdi-json");
             GuiTooltips.install(icon, "Expand node");
             btn.getStyleClass().add("list-expand-button");
             btn.setGraphic(icon);
@@ -85,7 +85,7 @@ public class GuiEditorNode {
         {
             var preview = new Label();
             preview.getStyleClass().add("preview");
-            preview.setGraphic(new FontIcon());
+            preview.setGraphic(new FontIcon("mdi-tooltip-outline"));
             preview.setOnMouseEntered(e -> {
                 var text = NodeWriter.writeToString(
                         n.toWritableNode(),

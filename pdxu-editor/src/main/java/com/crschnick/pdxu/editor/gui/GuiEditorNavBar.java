@@ -53,7 +53,7 @@ public class GuiEditorNavBar {
             backButton.setAccessibleText("Go back");
             GuiTooltips.install(backButton, AppI18n.get("editorNavbarBack"));
             backButton.getStyleClass().add("nav-back-button");
-            backButton.setGraphic(new FontIcon());
+            backButton.setGraphic(new FontIcon("mdi-arrow-left-bold"));
             backButton.setAlignment(Pos.CENTER);
             box.getChildren().add(backButton);
             backButton.disableProperty().bind(Bindings.not(state.getNavigation().canGoBackProperty()));
@@ -64,7 +64,7 @@ public class GuiEditorNavBar {
             forwardButton.setAccessibleText("Go forward");
             GuiTooltips.install(forwardButton, AppI18n.get("editorNavbarForward"));
             forwardButton.getStyleClass().add("nav-forward-button");
-            forwardButton.setGraphic(new FontIcon());
+            forwardButton.setGraphic(new FontIcon("mdi-arrow-right-bold"));
             forwardButton.setAlignment(Pos.CENTER);
             box.getChildren().add(forwardButton);
             forwardButton
@@ -146,7 +146,7 @@ public class GuiEditorNavBar {
         {
             Button edit = new Button(null, new FontIcon());
             edit.setFocusTraversable(false);
-            edit.setGraphic(new FontIcon());
+            edit.setGraphic(new FontIcon("mdi-pencil"));
             edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
             GuiTooltips.install(edit, AppI18n.get("editorOpenInExternalEditor"));
             edit.setOnAction(e -> {

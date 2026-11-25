@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.gui.dialog;
 
 import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.savegame.FileImportTarget;
 import com.crschnick.pdxu.app.savegame.SavegameWatcher;
 
@@ -43,12 +44,13 @@ public class GuiImporterState {
             updateShownTargets();
         });
 
-        SavegameWatcher.ALL.get(game).savegamesProperty().addListener((c, o, n) -> {
-            allTargets.clear();
-            allTargets.addAll(n.stream()
+        // The watcher is global, so don't let it keep the state and therefore the dialog alive
+        Listeners.listenWeak(this, SavegameWatcher.ALL.get(game).savegamesProperty(), (s, n) -> {
+            s.allTargets.clear();
+            s.allTargets.addAll(n.stream()
                     .map(t -> new ImportEntry(t, new SimpleBooleanProperty(false)))
                     .collect(Collectors.toList()));
-            updateShownTargets();
+            s.updateShownTargets();
         });
 
         selectAll.addListener((c, o, n) -> {

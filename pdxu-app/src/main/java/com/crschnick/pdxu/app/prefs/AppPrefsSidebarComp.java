@@ -6,6 +6,7 @@ import com.crschnick.pdxu.app.comp.base.ButtonComp;
 import com.crschnick.pdxu.app.comp.base.VerticalComp;
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.AppRestart;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 
 import javafx.beans.property.ReadOnlyObjectWrapper;
@@ -39,9 +40,8 @@ public class AppPrefsSidebarComp extends SimpleComp {
                                 struc.get().setGraphicTextGap(9);
                                 struc.get().setTextAlignment(TextAlignment.LEFT);
                                 struc.get().setAlignment(Pos.CENTER_LEFT);
-                                AppPrefs.get().getSelectedCategory().subscribe(val -> {
-                                    struc.get()
-                                            .pseudoClassStateChanged(
+                                Listeners.subscribeWeak(struc.get(), AppPrefs.get().getSelectedCategory(), (s, val) -> {
+                                    s.pseudoClassStateChanged(
                                                     PseudoClass.getPseudoClass("selected"),
                                                     appPrefsCategory.equals(val));
                                 });
@@ -61,7 +61,7 @@ public class AppPrefsSidebarComp extends SimpleComp {
 
         var vbox = new VerticalComp(buttons).styleClass("sidebar");
         vbox.apply(struc -> {
-            AppPrefs.get().getSelectedCategory().subscribe(val -> {
+            Listeners.subscribeWeak(struc.get(), AppPrefs.get().getSelectedCategory(), (s, val) -> {
                 // Null is only set temporarily to reset the scroll position
                 if (val == null) {
                     return;
@@ -69,11 +69,11 @@ public class AppPrefsSidebarComp extends SimpleComp {
 
                 PlatformThread.runLaterIfNeeded(() -> {
                     var index = effectiveCategories.indexOf(val);
-                    if (index < 0 || index >= struc.get().getChildren().size()) {
+                    if (index < 0 || index >= s.getChildren().size()) {
                         return;
                     }
 
-                    ((Button) struc.get().getChildren().get(index)).fire();
+                    ((Button) s.getChildren().get(index)).fire();
                 });
             });
         });

@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.SimpleComp;
 import com.crschnick.pdxu.app.core.AppLayoutModel;
 import com.crschnick.pdxu.app.platform.BindingsHelper;
+import com.crschnick.pdxu.app.platform.Listeners;
 
 import javafx.application.Platform;
 import javafx.beans.property.ListProperty;
@@ -49,8 +50,8 @@ public class GuiListViewComp<T> extends SimpleComp {
             }
         });
 
-        AppLayoutModel.get().getSelected().addListener((observable, oldValue, newValue) -> {
-            listView.getSelectionModel().clearSelection();
+        Listeners.listenWeak(listView, AppLayoutModel.get().getSelected(), (lv, v) -> {
+            lv.getSelectionModel().clearSelection();
         });
 
         Runnable updateFixedSize = () -> {

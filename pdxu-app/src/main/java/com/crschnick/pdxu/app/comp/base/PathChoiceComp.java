@@ -3,7 +3,9 @@ package com.crschnick.pdxu.app.comp.base;
 import com.crschnick.pdxu.app.comp.SimpleComp;
 import com.crschnick.pdxu.app.core.AppI18n;
 import com.crschnick.pdxu.app.core.window.AppMainWindow;
+import com.crschnick.pdxu.app.platform.BindingsHelper;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 
 import javafx.beans.property.Property;
@@ -30,15 +32,15 @@ public class PathChoiceComp extends SimpleComp {
     @Override
     protected Region createSimple() {
         var prop = new SimpleStringProperty();
-        pathProperty.subscribe(s -> PlatformThread.runLaterIfNeeded(() -> {
+        Listeners.subscribeWeak(prop, pathProperty, (p, s) -> PlatformThread.runLaterIfNeeded(() -> {
             if (s != null
-                    && prop.get() != null
-                    && prop.get().strip().equals(prop.get())
-                    && s.equals(Path.of(prop.get()))) {
+                    && p.get() != null
+                    && p.get().strip().equals(p.get())
+                    && s.equals(Path.of(p.get()))) {
                 return;
             }
 
-            prop.set(s != null ? s.toString() : null);
+            p.set(s != null ? s.toString() : null);
         }));
         prop.addListener((observable, oldValue, newValue) -> {
             try {
@@ -76,6 +78,8 @@ public class PathChoiceComp extends SimpleComp {
 
         var hbox = new InputGroupComp(List.of(fileNameComp, browseButton));
         hbox.setHeightReference(fileNameComp);
-        return hbox.createRegion();
+        var region = hbox.createRegion();
+        BindingsHelper.preserve(region, prop);
+        return region;
     }
 }

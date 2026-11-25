@@ -3,6 +3,8 @@ package com.crschnick.pdxu.app.prefs;
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.SimpleComp;
 import com.crschnick.pdxu.app.comp.base.VerticalComp;
+import com.crschnick.pdxu.app.platform.BindingsHelper;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 import com.crschnick.pdxu.app.util.BooleanScope;
 
@@ -66,7 +68,9 @@ public class AppPrefsComp extends SimpleComp {
             });
         });
 
-        AppPrefs.get().getSelectedCategory().addListener((observable, oldValue, val) -> {
+        // The comp caches category nodes, so the pane keeps the comp alive instead of the global property
+        BindingsHelper.preserve(scrollPane, this);
+        Listeners.listenWeak(scrollPane, this, AppPrefs.get().getSelectedCategory(), (sp, comp, val) -> {
             if (val == null) {
                 return;
             }
@@ -79,8 +83,8 @@ public class AppPrefsComp extends SimpleComp {
                 BooleanScope.executeExclusive(externalUpdate, () -> {
                     // This value is off initially if we haven't opened the settings before
                     // Perhaps it's the layout that is not done yet?
-                    var off = computeCategoryOffset(box, scrollPane, val);
-                    scrollPane.setVvalue(off);
+                    var off = comp.computeCategoryOffset((VBox) sp.getContent(), sp, val);
+                    sp.setVvalue(off);
                 });
             });
         });

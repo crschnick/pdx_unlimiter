@@ -2,6 +2,7 @@ package com.crschnick.pdxu.app.gui.game;
 
 import com.crschnick.pdxu.app.info.SavegameInfo;
 import com.crschnick.pdxu.app.installation.Game;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.savegame.SavegameCampaign;
 import com.crschnick.pdxu.app.savegame.SavegameEntry;
 import com.crschnick.pdxu.app.util.ImageHelper;
@@ -21,6 +22,8 @@ import javafx.scene.paint.Color;
 
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+
+import java.lang.ref.WeakReference;
 
 import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_IMAGE_ICON;
 import static com.crschnick.pdxu.app.gui.GuiStyle.CLASS_TAG_ICON;
@@ -49,13 +52,21 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
         SimpleObjectProperty<Node> prop;
         if (entry.getInfo() == null) {
             prop = new SimpleObjectProperty<>(new Region());
+            // The entry outlives the comps, so only keep a weak reference to the property that holds the node
+            var ref = new WeakReference<>(prop);
             entry.stateProperty().addListener(new ChangeListener<>() {
                 @Override
                 public void changed(
                         ObservableValue<? extends SavegameEntry.State> observable,
                         SavegameEntry.State oldValue,
                         SavegameEntry.State n) {
-                    prop.set(n == SavegameEntry.State.LOADED ? tagNode(entry.getInfo()) : new Region());
+                    var p = ref.get();
+                    if (p == null) {
+                        entry.stateProperty().removeListener(this);
+                        return;
+                    }
+
+                    p.set(n == SavegameEntry.State.LOADED ? tagNode(entry.getInfo()) : new Region());
                     if (n == SavegameEntry.State.INACTIVE) {
                         entry.stateProperty().removeListener(this);
                     }
@@ -71,8 +82,8 @@ public abstract class GameGuiFactory<T, I extends SavegameInfo<T>> {
     public ObservableValue<Node> createImage(SavegameCampaign<T, I> campaign) {
         SimpleObjectProperty<Node> prop =
                 new SimpleObjectProperty<>(GameImage.imageNode(campaign.getImage(), CLASS_TAG_ICON));
-        campaign.imageProperty().addListener((ChangeListener<? super Image>) (c, o, n) -> {
-            prop.set(GameImage.imageNode(n, CLASS_TAG_ICON));
+        Listeners.listenWeak(prop, campaign.imageProperty(), (p, n) -> {
+            p.set(GameImage.imageNode(n, CLASS_TAG_ICON));
         });
         return prop;
     }

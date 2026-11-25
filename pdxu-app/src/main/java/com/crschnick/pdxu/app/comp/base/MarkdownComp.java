@@ -17,7 +17,10 @@ import com.crschnick.pdxu.app.util.ThreadHelper;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ListChangeListener;
 import javafx.concurrent.Worker;
+import javafx.scene.Node;
+import javafx.scene.control.ScrollBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
@@ -140,9 +143,26 @@ public class MarkdownComp extends Comp<CompStructure<StackPane>> {
             });
         });
 
+        // WebKit derives the scrollbar thickness from the pref width of a test scrollbar child
+        // The scrollbars overlay the content, so keep it within the right padding of the markdown css
+        wv.getChildrenUnmodifiable().forEach(MarkdownComp::resizeScrollBar);
+        wv.getChildrenUnmodifiable().addListener((ListChangeListener<Node>) c -> {
+            while (c.next()) {
+                c.getAddedSubList().forEach(MarkdownComp::resizeScrollBar);
+            }
+        });
+
         wv.getStyleClass().add("markdown-comp");
         addLinkHandler(wv.getEngine());
         return wv;
+    }
+
+    private static void resizeScrollBar(Node node) {
+        if (node instanceof ScrollBar sb) {
+            sb.setMinWidth(0);
+            sb.setPrefWidth(7);
+            sb.setMaxWidth(7);
+        }
     }
 
     private void addLinkHandler(WebEngine engine) {

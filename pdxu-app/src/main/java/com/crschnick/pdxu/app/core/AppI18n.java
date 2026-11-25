@@ -12,6 +12,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.Property;
 import javafx.beans.value.ObservableValue;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 
 public class AppI18n {
@@ -19,7 +20,7 @@ public class AppI18n {
     private static AppI18n INSTANCE;
     private final Property<AppI18nData> currentLanguage = new GlobalObjectProperty<>();
     private final Property<SupportedLocale> currentLocale = new GlobalObjectProperty<>();
-    private final Map<String, ObservableValue<String>> observableCache = new HashMap<>();
+    private final Map<String, WeakReference<ObservableValue<String>>> observableCache = new HashMap<>();
     private AppI18nData english;
 
     public AppI18n() {
@@ -71,7 +72,8 @@ public class AppI18n {
                 return binding;
             }
 
-            var found = observableCache.get(key);
+            var ref = observableCache.get(key);
+            var found = ref != null ? ref.get() : null;
             if (found != null) {
                 return found;
             }
@@ -81,7 +83,8 @@ public class AppI18n {
                         return getLocalised(key, vars);
                     },
                     currentLanguage);
-            observableCache.put(key, binding);
+            observableCache.values().removeIf(r -> r.get() == null);
+            observableCache.put(key, new WeakReference<>(binding));
             return binding;
         }
     }

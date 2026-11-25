@@ -22,6 +22,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -143,6 +144,23 @@ public class AppMainWindow {
                 ErrorEventFactory.fromThrowable(t).term().handle();
             }
         });
+    }
+
+    public static synchronized void reset() {
+        PlatformThread.runLaterIfNeededBlocking(() -> loadedContent.setValue(null));
+        if (INSTANCE == null) {
+            return;
+        }
+
+        var stage = INSTANCE.stage;
+        PlatformThread.runLaterIfNeededBlocking(() -> {
+            // Detach the content so that it is no longer part of a scene, which also stops running animations
+            if (stage.getScene() != null) {
+                stage.getScene().setRoot(new Region());
+            }
+            stage.setScene(null);
+        });
+        INSTANCE = null;
     }
 
     public static AppMainWindow get() {

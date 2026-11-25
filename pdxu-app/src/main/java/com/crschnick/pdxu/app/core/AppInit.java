@@ -109,8 +109,8 @@ public class AppInit {
     private static AppOperationMode getStartupMode() {
         var event = TrackEvent.withInfo("Startup mode determined");
 
-        if (AppProperties.get().isAotTrainMode()) {
-            event.tag("mode", "background").tag("reason", "aot").handle();
+        if (AppProperties.get().isUnattendedRun()) {
+            event.tag("mode", "background").tag("reason", "unattended").handle();
             return AppOperationMode.BACKGROUND;
         }
 
@@ -148,6 +148,14 @@ public class AppInit {
                 AppOperationMode.switchToSyncOrThrow(AppOperationMode.BACKGROUND);
                 AppOperationMode.setInStartup(false);
                 AppAotTrain.runTrainingMode();
+                AppOperationMode.shutdown(false);
+                return;
+            }
+
+            if (AppProperties.get().isHeapAnalysisMode()) {
+                AppOperationMode.switchToSyncOrThrow(AppOperationMode.BACKGROUND);
+                AppOperationMode.setInStartup(false);
+                AppHeapAnalysis.run();
                 AppOperationMode.shutdown(false);
                 return;
             }

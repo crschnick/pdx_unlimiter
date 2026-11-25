@@ -33,7 +33,7 @@ public abstract class UpdateHandler {
     protected final BooleanProperty busy = new SimpleBooleanProperty();
 
     protected UpdateHandler(boolean startBackgroundThread) {
-        if (startBackgroundThread && !AppProperties.get().isAotTrainMode()) {
+        if (startBackgroundThread && !AppProperties.get().isUnattendedRun()) {
             startBackgroundUpdater();
         }
 

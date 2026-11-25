@@ -91,6 +91,16 @@ run {
     jvmArgs += ['-XX:+EnableDynamicAgentLoading']
 }
 
+tasks.register('runHeapAnalysis', JavaExec) {
+    workingDir = rootDir
+    classpath = run.classpath
+    mainModule = application.mainModule
+    mainClass = application.mainClass
+    jvmArgs += application.applicationDefaultJvmArgs
+    jvmArgs += ['-XX:+EnableDynamicAgentLoading', "-D${propertyName('heapAnalysisMode')}=true"]
+    systemProperties run.systemProperties
+}
+
 processResources {
     // Generate binary stylesheets from css
     doLast {

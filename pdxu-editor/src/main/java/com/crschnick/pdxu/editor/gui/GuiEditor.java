@@ -284,7 +284,7 @@ public class GuiEditor {
                                     .createNodeJumps(state, (EditorRealNode) n);
                             if (pointers.size() > 0) {
                                 var b = new Button(null, new FontIcon());
-                                b.setGraphic(new FontIcon());
+                                b.setGraphic(new FontIcon("mdi-arrow-right-bold-circle-outline"));
                                 b.getStyleClass().add("jump-to-def-button");
                                 GuiTooltips.install(
                                         b,
@@ -313,7 +313,7 @@ public class GuiEditor {
                                     && es.getBackingNode().getString().contains("\n"));
 
                     Button edit = new Button(null, new FontIcon());
-                    edit.setGraphic(new FontIcon());
+                    edit.setGraphic(new FontIcon("mdi-pencil"));
                     edit.getStyleClass().add(GuiStyle.CLASS_EDIT);
                     edit.setDisable(disable);
                     edit.setOnAction(e -> {
@@ -326,7 +326,7 @@ public class GuiEditor {
                     Button del = new Button();
                     del.setDisable(disable || ((EditorRealNode) n).isRoot());
                     GuiTooltips.install(del, AppI18n.get("deleteNode"));
-                    del.setGraphic(new FontIcon());
+                    del.setGraphic(new FontIcon("mdi2t-trash-can-outline"));
                     del.getStyleClass().add(GuiStyle.CLASS_DELETE);
                     del.setOnAction(e -> {
                         var r = AppSideWindow.showBlockingAlert(alert -> {
@@ -375,7 +375,7 @@ public class GuiEditor {
             ToggleButton filterKeys = new ToggleButton();
             filterKeys.setAccessibleText("Include keys in search");
             filterKeys.getStyleClass().add(GuiStyle.CLASS_KEY);
-            filterKeys.setGraphic(new FontIcon());
+            filterKeys.setGraphic(new FontIcon("mdi-key"));
             filterKeys.selectedProperty().bindBidirectional(edFilter.filterKeysProperty());
             GuiTooltips.install(filterKeys, AppI18n.get("editorSearchFilterKeys"));
             toggleBar.getChildren().add(filterKeys);
@@ -385,7 +385,7 @@ public class GuiEditor {
             ToggleButton filterValues = new ToggleButton();
             filterValues.setAccessibleText("Include values in search");
             filterValues.getStyleClass().add(GuiStyle.CLASS_VALUE);
-            filterValues.setGraphic(new FontIcon());
+            filterValues.setGraphic(new FontIcon("mdi-tag-text-outline"));
             filterValues.selectedProperty().bindBidirectional(edFilter.filterValuesProperty());
             edFilter.filterValuesProperty().addListener((c, o, n) -> {
                 filterValues.setSelected(n);
@@ -424,7 +424,7 @@ public class GuiEditor {
                     edFilter.filterStringProperty().set(filter.getText());
                     filter.setEffect(null);
                 });
-                search.setGraphic(new FontIcon());
+                search.setGraphic(new FontIcon("mdi-filter"));
                 search.getStyleClass().add(GuiStyle.CLASS_FILTER);
                 textBar.getChildren().add(search);
                 filter.prefHeightProperty().bind(search.heightProperty());
@@ -440,7 +440,7 @@ public class GuiEditor {
                     edFilter.filterStringProperty().set("");
                     filter.setEffect(null);
                 });
-                clear.setGraphic(new FontIcon());
+                clear.setGraphic(new FontIcon("mdi-filter-remove"));
                 clear.getStyleClass().add(GuiStyle.CLASS_CLEAR);
                 textBar.getChildren().add(clear);
             }
@@ -453,7 +453,7 @@ public class GuiEditor {
             ToggleButton cs = new ToggleButton();
             cs.setAccessibleText("Case sensitive");
             cs.getStyleClass().add(GuiStyle.CLASS_CASE_SENSITIVE);
-            cs.setGraphic(new FontIcon());
+            cs.setGraphic(new FontIcon("mdi-case-sensitive-alt"));
             cs.selectedProperty().bindBidirectional(edFilter.caseSensitiveProperty());
             GuiTooltips.install(cs, AppI18n.get("editorSearchCaseSensitive"));
             box.getChildren().add(cs);

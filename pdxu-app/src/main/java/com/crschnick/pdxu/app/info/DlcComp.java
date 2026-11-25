@@ -41,7 +41,7 @@ public class DlcComp extends SavegameInfoComp {
         }
 
         Label label = new Label(AppI18n.get("dlcs") + " (" + this.dlcs.size() + ")");
-        label.setGraphic(new FontIcon());
+        label.setGraphic(new FontIcon("mdi-folder-multiple-outline"));
         label.getStyleClass().add(CLASS_CONTENT);
 
         var tooltip = AppI18n.get("dlcsRequired") + ":\n"

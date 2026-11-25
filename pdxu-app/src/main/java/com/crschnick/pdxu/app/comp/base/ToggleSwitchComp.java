@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.CompStructure;
 import com.crschnick.pdxu.app.comp.SimpleCompStructure;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 
 import javafx.beans.property.Property;
@@ -40,20 +41,20 @@ public class ToggleSwitchComp extends Comp<CompStructure<ToggleSwitch>> {
         s.selectedProperty().addListener((observable, oldValue, newValue) -> {
             selected.setValue(newValue);
         });
-        selected.addListener((observable, oldValue, newValue) -> {
+        Listeners.attachWithScene(s, selected, newValue -> {
             PlatformThread.runLaterIfNeeded(() -> {
-                s.setSelected(newValue);
+                s.setSelected(newValue != null ? newValue : false);
             });
         });
         if (name != null) {
-            name.subscribe(value -> {
+            Listeners.subscribeWithScene(s, name, value -> {
                 PlatformThread.runLaterIfNeeded(() -> {
                     s.setText(value);
                 });
             });
         }
         if (graphic != null) {
-            graphic.subscribe(value -> {
+            Listeners.subscribeWithScene(s, graphic, value -> {
                 PlatformThread.runLaterIfNeeded(() -> {
                     s.setGraphic(value != null ? value.createGraphicNode() : null);
                 });

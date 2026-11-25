@@ -39,7 +39,7 @@ public class Vic3SavegameAdapter implements EditorSavegameAdapter {
         @Override
         public javafx.scene.Node create(EditorState state, EditorRealNode node, Region valueDisplay) {
             var b = new Button(null, new FontIcon());
-            b.setGraphic(new FontIcon());
+            b.setGraphic(new FontIcon("mdi-eye"));
             b.getStyleClass().add("coa-button");
             GuiTooltips.install(b, "Open in coat of arms preview window");
             b.setOnAction(e -> {

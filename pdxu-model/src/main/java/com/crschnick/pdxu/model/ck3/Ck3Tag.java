@@ -129,10 +129,14 @@ public class Ck3Tag {
             });
         });
 
-        var coa = CoatOfArms.fromNode(n.getNodeForKey("meta_data").getNodeForKey("meta_coat_of_arms"), null);
-        var name = n.getNodeForKey("meta_data").hasKey("meta_player_name")
-                ? n.getNodeForKey("meta_data").getNodeForKey("meta_player_name").getString()
-                : n.getNodeForKey("meta_data").getNodeForKey("meta_title_name").getString();
+        var metaData = n.getNodeForKey("meta_data");
+        var coa = metaData.getNodeForKeyIfExistent("meta_coat_of_arms")
+                .map(coaNode -> CoatOfArms.fromNode(coaNode, null))
+                .orElseGet(CoatOfArms::empty);
+        var name = metaData.getNodeForKeyIfExistent("meta_player_name")
+                .or(() -> metaData.getNodeForKeyIfExistent("meta_title_name"))
+                .map(Node::getString)
+                .orElse("?");
 
         var landedNode = personNode.getNodeForKey("landed_data");
         var gv = landedNode
@@ -186,7 +190,10 @@ public class Ck3Tag {
             }
 
             var primary = domain.getNodeArray().getFirst().getLong();
-            var gv = v.getNodeForKey("landed_data").getNodeForKey("government").getString();
+            var gv = landedNode
+                    .getNodeForKeyIfExistent("government")
+                    .map(Node::getString)
+                    .orElse("?");
             var balance = landedNode
                     .getNodeForKeyIfExistent("balance")
                     .map(Node::getDouble)

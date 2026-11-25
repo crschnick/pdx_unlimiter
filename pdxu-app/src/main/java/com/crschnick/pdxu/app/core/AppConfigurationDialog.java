@@ -13,7 +13,7 @@ import javafx.scene.layout.Region;
 public class AppConfigurationDialog {
 
     public static void showIfNeeded() {
-        if (!AppProperties.get().isInitialLaunch() || AppProperties.get().isAotTrainMode()) {
+        if (!AppProperties.get().isInitialLaunch() || AppProperties.get().isUnattendedRun()) {
             return;
         }
 

@@ -4,6 +4,7 @@ import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.CompStructure;
 import com.crschnick.pdxu.app.comp.SimpleCompStructure;
 import com.crschnick.pdxu.app.platform.LabelGraphic;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 
 import javafx.beans.property.SimpleObjectProperty;
@@ -35,10 +36,10 @@ public class LabelComp extends Comp<CompStructure<Label>> {
     @Override
     public CompStructure<Label> createBase() {
         var label = new Label();
-        text.subscribe(t -> {
+        Listeners.subscribeWithScene(label, text, t -> {
             PlatformThread.runLaterIfNeeded(() -> label.setText(t));
         });
-        graphic.subscribe(t -> {
+        Listeners.subscribeWithScene(label, graphic, t -> {
             PlatformThread.runLaterIfNeeded(() -> label.setGraphic(t != null ? t.createGraphicNode() : null));
         });
         label.setAlignment(Pos.CENTER);

@@ -3,6 +3,7 @@ package com.crschnick.pdxu.app.comp.base;
 import com.crschnick.pdxu.app.comp.Comp;
 import com.crschnick.pdxu.app.comp.CompStructure;
 import com.crschnick.pdxu.app.comp.SimpleCompStructure;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 
 import javafx.beans.property.Property;
@@ -33,8 +34,8 @@ public class TextFieldComp extends Comp<CompStructure<TextField>> {
                 }
             });
         }
-        lastAppliedValue.addListener((c, o, n) -> {
-            currentValue.setValue(n);
+        Listeners.listenWeak(currentValue, lastAppliedValue, (cv, n) -> {
+            cv.setValue(n);
         });
     }
 
@@ -44,15 +45,15 @@ public class TextFieldComp extends Comp<CompStructure<TextField>> {
         text.textProperty().addListener((c, o, n) -> {
             currentValue.setValue(n != null && n.length() > 0 ? n : null);
         });
-        lastAppliedValue.addListener((c, o, n) -> {
+        Listeners.listenWeak(text, lastAppliedValue, (t, n) -> {
             PlatformThread.runLaterIfNeeded(() -> {
                 // Check if control value is the same. Then don't set it as that might cause bugs
-                if (Objects.equals(text.getText(), n)
-                        || (n == null && text.getText().isEmpty())) {
+                if (Objects.equals(t.getText(), n)
+                        || (n == null && t.getText().isEmpty())) {
                     return;
                 }
 
-                text.setText(n);
+                t.setText(n);
             });
         });
 

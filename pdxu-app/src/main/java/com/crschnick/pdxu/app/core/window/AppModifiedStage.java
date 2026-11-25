@@ -1,6 +1,7 @@
 package com.crschnick.pdxu.app.core.window;
 
 import com.crschnick.pdxu.app.issue.ErrorEventFactory;
+import com.crschnick.pdxu.app.platform.Listeners;
 import com.crschnick.pdxu.app.platform.NativeWinWindowControl;
 import com.crschnick.pdxu.app.platform.PlatformThread;
 import com.crschnick.pdxu.app.prefs.AppPrefs;
@@ -19,7 +20,6 @@ import javafx.util.Duration;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.SystemUtils;
 
-import java.lang.ref.WeakReference;
 
 public class AppModifiedStage extends Stage {
 
@@ -56,31 +56,13 @@ public class AppModifiedStage extends Stage {
             return;
         }
 
-        // Fix GC not working when the stage is no longer needed
-        var ref = new WeakReference<>(stage);
-
         if (AppPrefs.get() != null) {
-            AppPrefs.get().theme().addListener((observable, oldValue, newValue) -> {
-                var val = ref.get();
-                if (val != null) {
-                    updateStage(val);
-                }
-            });
-            AppPrefs.get().performanceMode().addListener((observable, oldValue, newValue) -> {
-                var val = ref.get();
-                if (val != null) {
-                    updateStage(val);
-                }
-            });
+            Listeners.listenWeak(stage, AppPrefs.get().theme(), (s, v) -> updateStage(s));
+            Listeners.listenWeak(stage, AppPrefs.get().performanceMode(), (s, v) -> updateStage(s));
         }
 
         if (stage.getScene() != null) {
-            stage.getScene().rootProperty().addListener((observable, oldValue, newValue) -> {
-                var val = ref.get();
-                if (val != null) {
-                    applyModes(val);
-                }
-            });
+            Listeners.listenWeak(stage, stage.getScene().rootProperty(), (s, v) -> applyModes(s));
         }
     }
 

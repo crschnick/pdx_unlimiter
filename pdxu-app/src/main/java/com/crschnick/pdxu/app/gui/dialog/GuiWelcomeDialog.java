@@ -14,7 +14,7 @@ public class GuiWelcomeDialog {
 
     public static void showAndWaitIfNeeded() {
         if (AppProperties.get().isDevelopmentEnvironment()
-                || AppProperties.get().isAotTrainMode()
+                || AppProperties.get().isUnattendedRun()
                 || !AppProperties.get().isInitialLaunch()) {
             return;
         }

@@ -36,18 +36,19 @@ public class Vic3TagRenderer {
 
         var all = new LinkedArrayNode(Stream.concat(
                         files.stream().map(path -> {
-                            ArrayNode content = null;
+                            // Broken files, e.g. from mods, are skipped
                             try {
-                                content = TextFormatParser.vic3().parse(path);
+                                ArrayNode content = TextFormatParser.vic3().parse(path);
+                                NodeEvaluator.evaluateArrayNode(content.getArrayNode(), env);
+                                return Optional.of(content);
                             } catch (Exception e) {
                                 return Optional.<ArrayNode>empty();
                             }
-
-                            return Optional.of(content);
                         }),
-                        Arrays.stream(otherNodes).map(Optional::of))
+                        Arrays.stream(otherNodes)
+                                .peek(arrayNode -> NodeEvaluator.evaluateArrayNode(arrayNode.getArrayNode(), env))
+                                .map(Optional::of))
                 .flatMap(Optional::stream)
-                .peek(arrayNode -> NodeEvaluator.evaluateArrayNode(arrayNode.getArrayNode(), env))
                 .toList());
         return all;
     }
